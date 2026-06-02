@@ -1,0 +1,27 @@
+[
+    {
+        "_id": "65b0d4189b825d20ce1e5701",
+        "name": "Cafés",
+        "imageUrl": "/img/categories/Cafes.png"
+    },
+    {
+        "_id": "65b0d4189b825d20ce1e5703",
+        "name": "Frappes",
+        "imageUrl": "/img/categories/frappe.png"
+    },
+    {
+        "_id": "65b0d4189b825d20ce1e5705",
+        "name": "Postres",
+        "imageUrl": "/img/categories/cake.png"
+    },
+    {
+        "_id": "65b0d4189b825d20ce1e5707",
+        "name": "Paninis",
+        "imageUrl": "/img/categories/panini.png"
+    },
+    {
+        "_id": "65b0d4189b825d20ce1e5709",
+        "name": "Bebidas",
+        "imageUrl": "/img/categories/soft-drink.png"
+    }
+]

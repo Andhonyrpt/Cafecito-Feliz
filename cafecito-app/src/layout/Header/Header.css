@@ -1,0 +1,133 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    height: 80px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.header-left {
+    flex: 1;
+}
+
+.header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 28px;
+}
+
+.user-profile-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: none;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.user-avatar {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-dot-online {
+    width: 7px;
+    height: 7px;
+    background-color: var(--success);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 12px;
+}
+
+.user-profile-button.not-authenticated .user-avatar {
+    background-color: #EAEAEA;
+    color: #999999;
+}
+
+.user-profile-button.not-authenticated .user-name {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.clock-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-left: 2px solid var(--border);
+    padding-left: 16px;
+}
+
+.clock-icon {
+    color: var(--primary-dark);
+}
+
+.clock-text {
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+    line-height: 1.4;
+}
+
+.clock-time {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.clock-date {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 2px;
+}
+
+.logout-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background-color: #FFFFFF;
+    color: var(--button-danger);
+    cursor: pointer;
+}

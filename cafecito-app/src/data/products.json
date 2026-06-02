@@ -1,0 +1,57 @@
+[
+    {
+        "_id": "68b0d4189b825d20ce1e573e",
+        "name": "Latte Clásico",
+        "price": 65,
+        "imageUrl": "/img/products/latte-clasico.jpg",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5736",
+        "name": "Capuchino",
+        "price": 65,
+        "imageUrl": "/img/products/cappuccino-1_600x.webp",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701",
+            "name": "Bebidas Calientes"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5734",
+        "name": "Latte Vainilla",
+        "price": 70,
+        "imageUrl": "/img/products/latte-vainilla.webp",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e573c",
+        "name": "Americano",
+        "price": 55,
+        "imageUrl": "/img/products/americano.webp",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e573a",
+        "name": "Mocha",
+        "price": 75,
+        "imageUrl": "/img/products/MochaLatte-1200x1200-1.jpg",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5732",
+        "name": "Caramelo Macchiato",
+        "price": 75,
+        "imageUrl": "/img/products/caramel-macchiato.avif",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    }
+]    
