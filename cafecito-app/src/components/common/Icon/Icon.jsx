@@ -968,6 +968,105 @@ const Icon = ({ name, size = 20, className = "" }) => {
         <path d="M 108 54 Q 104 52 106 48" fill="none" stroke="#68b353" stroke-width="1" />
       </svg >
 
+    ),
+    unlock: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        {/* Arco del candado con caída interna estilizada */}
+        <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+
+  /* Cuerpo principal con esquinas dobles y detalles de relieve */
+        <rect x="4" y="10" width="16" height="11" rx="2" fill="none" />
+
+        {/* Placa interna decorativa (Le da el look premium parecido a la tarjeta) */}
+        <rect x="7" y="13" width="10" height="5" rx="1" strokeWidth="1.5" opacity="0.4" />
+
+        {/* Ranura de la llave detallada (Cerradura de seguridad) */}
+        <circle cx="12" cy="15" r="1" fill="currentColor" />
+        <path d="M12 16v1" strokeWidth="1.5" />
+      </svg>
+
+    ),
+    lock: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        {/* Arco abierto y desplazado en una curva más detallada */}
+        <path d="M7 10V7a5 5 0 0 1 9.5-2.2" />
+
+        {/* Cuerpo principal (Mismo grosor y escala que el de lock) */}
+        <rect x="4" y="10" width="16" height="11" rx="2" fill="none" />
+
+        {/* Placa interna decorativa */}
+        <rect x="7" y="13" width="10" height="5" rx="1" strokeWidth="1.5" opacity="0.4" />
+
+        {/* Ranura de la llave detallada */}
+        <circle cx="12" cy="15" r="1" fill="currentColor" />
+        <path d="M12 16v1" strokeWidth="1.5" />
+      </svg>
+
+    ),
+    alertTriangle: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        {/* Triángulo exterior principal con esquinas suavizadas */}
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+
+        {/* Línea interna decorativa de relieve (Sigue la geometría del triángulo con opacidad) */}
+        <path
+          d="M10.93 6L3.92 17.75a0.5xl 0.5xl 0 0 0 .43 0.75h14.3a0.5xl 0.5xl 0 0 0 .43-.75L13.07 6a0.75 0.75 0 0 0-1.14 0z"
+          strokeWidth="1.2"
+          opacity="0.4"
+        />
+
+        {/* Signo de exclamación detallado y con peso visual */}
+        <line x1="12" y1="9" x2="12" y2="13" strokeWidth="2.2" />
+        <circle cx="12" cy="17" r="1" fill="currentColor" />
+      </svg>
+
+    ),
+    key: (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        {/* Ajustamos las coordenadas Y a "13" para bajar el dibujo al centro real del input */}
+        <circle cx="6" cy="13" r="3" />
+        <path d="M9 13h11m-3 0v3m-3-3v3" />
+      </svg>
     )
   };
 

@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import Icon from '../../components/common/Icon';
+import { useSession } from '../../context/SessionContext';
 import './Header.css';
 
 export default function Header() {
 
     const [time, setTime] = useState(new Date());
 
-    // Simulación de autenticación (Cambia a true o false para probar ambos estados)
-    const isAuth = true;
-    const user = { name: "María López", role: "Vendedora" };
+    // Simulación de autenticación 
+    const { currentUser, setIsModalOpen, setSessionMode, calculateExpectedTotals } = useSession();
+    const isAuth = !!currentUser;
 
     useEffect(() => {
 
@@ -39,6 +40,12 @@ export default function Header() {
         }).format(date);
     };
 
+    const handleLogout = () => {
+        calculateExpectedTotals();
+        setSessionMode('close'); // Setea el modal en modo Cierre de Caja
+        setIsModalOpen(true);    // Despliega el modal encima de la app
+    };
+
     return (
         <header className='header'>
             <div className='header-left' />
@@ -53,20 +60,16 @@ export default function Header() {
                 <button
                     className={`user-profile-button ${!isAuth ? 'not-authenticated' : ''}`}>
                     <div className='user-avatar'>
-                        {isAuth ? (
-                            <Icon name="user" size={18} />
-                        ) : (
-                            <Icon name="user" size={18} className="logged-out-icon" />
-                        )}
+                        <Icon name="user" size={18} className={!isAuth ? "logged-out-icon" : ""} />
                     </div>
 
                     <div className="user-text">
                         <span className="user-name">
-                            {isAuth ? user.name : "Inicia sesión"}
+                            {isAuth ? currentUser.name : "Inicia sesión"}
                         </span>
 
                         <span className="user-role">
-                            {isAuth ? user.role : "Invitado"}
+                            {isAuth ? currentUser.role : "Invitado"}
                             {isAuth && <span className='status-dot-online'></span>}
                         </span>
                     </div>
@@ -84,7 +87,7 @@ export default function Header() {
 
                 {isAuth && (
                     <div>
-                        <button className='logout-button'>
+                        <button className='logout-button' onClick={handleLogout}>
                             <Icon name="logOut" size={24} />
                         </button>
                     </div>

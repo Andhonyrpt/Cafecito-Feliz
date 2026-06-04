@@ -1,0 +1,23 @@
+[
+    {
+        "_id": "emp_01",
+        "employeeId": "EMP-01",
+        "name": "Andhony AndereK",
+        "role": "Administrador",
+        "pin": "0000"
+    },
+    {
+        "_id": "emp_02",
+        "employeeId": "EMP-02",
+        "name": "María López",
+        "role": "Vendedora",
+        "pin": "1234"
+    },
+    {
+        "_id": "emp_03",
+        "employeeId": "EMP-03",
+        "name": "Carlos Ruíz",
+        "role": "Barista",
+        "pin": "4321"
+    }
+]

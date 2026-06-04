@@ -1,0 +1,30 @@
+[
+    {
+        "_id": "order_01",
+        "employeeId": "EMP-02",
+        "timestamp": "2026-06-03T10:15:00Z",
+        "paymentMethod": "cash",
+        "total": 120.00
+    },
+    {
+        "_id": "order_02",
+        "employeeId": "EMP-02",
+        "timestamp": "2026-06-03T11:45:00Z",
+        "paymentMethod": "cash",
+        "total": 230.50
+    },
+    {
+        "_id": "order_03",
+        "employeeId": "EMP-03", 
+        "timestamp": "2026-06-03T09:15:00Z",
+        "paymentMethod": "cash",
+        "total": 315.00
+    },
+    {
+        "_id": "order_04",
+        "employeeId": "EMP-02",
+        "timestamp": "2026-06-03T13:30:00Z",
+        "paymentMethod": "cash",
+        "total": 450.00
+    }
+]
