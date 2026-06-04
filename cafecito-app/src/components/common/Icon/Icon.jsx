@@ -19,19 +19,50 @@ const Icon = ({ name, size = 20, className = "" }) => {
       </svg>
     ),
     creditCard: (
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <line x1="2" y1="10" x2="22" y2="10" />
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 70" width="48" height="28">
+        <defs>
+          <linearGradient id="bgCard" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1e3c72" />
+            <stop offset="50%" stop-color="#2a5298" />
+            <stop offset="100%" stop-color="#1a2a6c" />
+          </linearGradient>
+
+          <linearGradient id="chipGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffe066" />
+            <stop offset="40%" stop-color="#f5b041" />
+            <stop offset="100%" stop-color="#c0392b" />
+          </linearGradient>
+
+          <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff416c" />
+            <stop offset="100%" stop-color="#ff4b2b" />
+          </linearGradient>
+        </defs>
+
+        <rect x="2" y="3" width="116" height="65" rx="6" fill="#0d1b2a" opacity="0.3" />
+
+        <rect x="2" y="2" width="116" height="64" rx="6" fill="url(#bgCard)" stroke="#122548" stroke-width="1" />
+
+        <path d="M 2 30 Q 40 10 80 40 T 118 20" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.15" />
+        <path d="M 2 45 Q 50 25 90 55 T 118 35" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.08" />
+
+        <rect x="12" y="16" width="18" height="14" rx="2" fill="url(#chipGold)" stroke="#b7950b" stroke-width="0.5" />
+        <path d="M 12 23 L 30 23 M 21 16 L 21 30 M 16 16 Q 21 23 16 30 M 26 16 Q 21 23 26 30" fill="none" stroke="#7d6608" stroke-width="0.5" opacity="0.7" />
+
+        <path d="M 36 19 Q 39 23 36 27 M 39 16 Q 43 23 39 30 M 42 13 Q 47 23 42 34" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity="0.8" />
+
+        <g fill="#ffffff" opacity="0.4">
+          <circle cx="15" cy="44" r="1" /><circle cx="20" cy="44" r="1" /><circle cx="25" cy="44" r="1" /><circle cx="30" cy="44" r="1" />
+          <circle cx="38" cy="44" r="1" /><circle cx="43" cy="44" r="1" /><circle cx="48" cy="44" r="1" /><circle cx="53" cy="44" r="1" />
+          <circle cx="61" cy="44" r="1" /><circle cx="66" cy="44" r="1" /><circle cx="71" cy="44" r="1" /><circle cx="76" cy="44" r="1" />
+        </g>
+
+        <rect x="12" y="54" width="35" height="3" rx="1.5" fill="#ffffff" opacity="0.3" />
+
+        <circle cx="94" cy="52" r="7" fill="url(#logoGrad)" opacity="0.9" />
+        <circle cx="104" cy="52" r="7" fill="#ffb703" opacity="0.8" />
       </svg>
+
     ),
     trash: (
       <svg
@@ -898,6 +929,45 @@ const Icon = ({ name, size = 20, className = "" }) => {
           points="252.4,141 243.7,141 243.7,124.6 248.3,121.3 252.4,121.3 "
         />
       </svg>
+    ),
+    cash: (
+      <svg svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 70" width="48" height="28" >
+        <defs>
+          <linearGradient id="bgBill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#418632" />
+            <stop offset="100%" stop-color="#2a5c1e" />
+          </linearGradient>
+
+          <linearGradient id="centerBill" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#dbf2cd" />
+            <stop offset="100%" stop-color="#b4df9a" />
+          </linearGradient>
+
+          <linearGradient id="signColor" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#1e4614" />
+            <stop offset="100%" stop-color="#2f6d20" />
+          </linearGradient>
+        </defs>
+
+        <rect x="2" y="3" width="116" height="65" rx="8" fill="#1b3614" opacity="0.3" />
+
+        <rect x="2" y="2" width="116" height="64" rx="8" fill="url(#bgBill)" stroke="#1e4015" stroke-width="1.5" />
+
+        <path d="M 10 8 L 110 8 A 4 4 0 0 1 114 12 L 114 56 A 4 4 0 0 1 110 60 L 10 60 A 4 4 0 0 1 6 56 L 6 12 A 4 4 0 0 1 10 8 Z" fill="none" stroke="#68b353" stroke-width="1.5" stroke-dasharray="4,2" />
+
+        <ellipse cx="60" cy="34" rx="26" ry="20" fill="url(#centerBill)" stroke="#418632" stroke-width="1" />
+
+        <circle cx="20" cy="34" r="3" fill="#68b353" opacity="0.7" />
+        <circle cx="100" cy="34" r="3" fill="#68b353" opacity="0.7" />
+
+        <text x="60" y="42" font-family="Arial, sans-serif" font-size="24" font-weight="900" text-anchor="middle" fill="url(#signColor)">$</text>
+
+        <path d="M 12 14 Q 16 16 14 20" fill="none" stroke="#68b353" stroke-width="1" />
+        <path d="M 108 14 Q 104 16 106 20" fill="none" stroke="#68b353" stroke-width="1" />
+        <path d="M 12 54 Q 16 52 14 48" fill="none" stroke="#68b353" stroke-width="1" />
+        <path d="M 108 54 Q 104 52 106 48" fill="none" stroke="#68b353" stroke-width="1" />
+      </svg >
+
     )
   };
 

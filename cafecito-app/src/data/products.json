@@ -53,5 +53,59 @@
         "parentCategory": {
             "_id": "65b0d4189b825d20ce1e5701"
         }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5733",
+        "name": "Caramelo Macchiato",
+        "price": 75,
+        "imageUrl": "/img/products/caramel-macchiato.avif",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5734",
+        "name": "Caramelo Macchiato",
+        "price": 75,
+        "imageUrl": "/img/products/caramel-macchiato.avif",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5735",
+        "name": "Caramelo Macchiato",
+        "price": 75,
+        "imageUrl": "/img/products/caramel-macchiato.avif",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5736",
+        "name": "Caramelo Macchiato",
+        "price": 75,
+        "imageUrl": "/img/products/caramel-macchiato.avif",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5737",
+        "name": "Caramelo Macchiato",
+        "price": 75,
+        "imageUrl": "/img/products/caramel-macchiato.avif",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5738",
+        "name": "Caramelo Macchiato",
+        "price": 75,
+        "imageUrl": "/img/products/caramel-macchiato.avif",
+        "parentCategory": {
+            "_id": "65b0d4189b825d20ce1e5701"
+        }
     }
-]    
+]

@@ -1,0 +1,45 @@
+.client-selector {
+    background: var(--card);
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--r4);
+}
+
+.client-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.client-search-container {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.client-search-container input {
+    padding: 10px;
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--r1);
+    outline: none;
+    margin-right: 7px;
+}
+
+.active-client-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #fff8e1;
+    /* Ese tono amarillento de cliente seleccionado */
+    border-radius: 12px;
+}
+
+.active-client-badge img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}

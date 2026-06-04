@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from "react";
 import Button from "../common/Button/Button";
 import './ProductCard.css';
 
-const ProductCard = memo(({ product, orientation, priority = false }) => {
+const ProductCard = memo(({ product, orientation, priority = false, onAdd }) => {
     const { name, price, imageUrl } = product;
 
     const cardClass = `product-card product-card--${orientation}`;
@@ -23,7 +23,9 @@ const ProductCard = memo(({ product, orientation, priority = false }) => {
                         ${price.toFixed(2)}
                     </h3>
 
-                    <Button variant="secondary" size="sm">
+                    <Button variant="secondary" size="sm"
+                        onClick={onAdd}
+                    >
                         +
                     </Button>
                 </div>

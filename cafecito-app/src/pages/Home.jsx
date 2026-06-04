@@ -4,6 +4,7 @@ import categoriesData from "../data/categories.json";
 import DynamicIcon from "../components/common/DynamicIcon/DynamicIcon";
 import List from "../components/List/List";
 import Button from "../components/common/Button/Button";
+import OrderPanel from "../components/Order/OrderPanel";
 import './Home.css';
 
 export default function Home() {
@@ -27,7 +28,7 @@ export default function Home() {
         (product) => product.parentCategory?._id === activeCategoryId
     );
 
-    
+
     return (
         <div className="home-container">
 
@@ -91,10 +92,8 @@ export default function Home() {
                 ></List>
             </div>
 
-            <div className="">
-                <h1>
-                    Area de Cobro
-                </h1>
+            <div className="checkout-container">
+                    <OrderPanel />
             </div>
         </div>
     )

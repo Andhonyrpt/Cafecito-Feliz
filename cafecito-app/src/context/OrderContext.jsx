@@ -1,0 +1,94 @@
+import { createContext, useContext, useEffect, useReducer, useState, useRef } from "react";
+import storageService from "../services/storageService";
+import { orderReducer, orderInitialState, ORDER_ACTIONS } from "./orderReducer";
+
+const OrderContext = createContext();
+
+const STORAGE_KEYS = {
+    ORDER: "order",
+    CLIENT: "active_client"
+}
+
+export function OrderProvider({ children }) {
+    const [state, dispatch] = useReducer(orderReducer, orderInitialState);
+    const [activeClient, setActiveClient] = useState(null);
+
+    const subtotal = state.items.reduce((sum, i) => {
+        const price = i.product?.price || i.price || 0;
+        return sum + (price * (i.quantity || 0));
+    }, 0);
+
+    const iva = subtotal * 0.16;
+    const totalToPay = subtotal + iva;
+    const totalItemsCount = state.items.reduce((sum, i) => sum + (i.quantity || 0), 0);
+
+    useEffect(() => {
+        storageService.set(STORAGE_KEYS.ORDER, state.items);
+    }, [state.items]);
+
+
+    useEffect(() => {
+        const initializeOrder = async () => {
+            const localItems = storageService.get(STORAGE_KEYS.ORDER) || [];
+            const localClient = storageService.get(STORAGE_KEYS.CLIENT);
+
+            if (localItems.length > 0 && state.items.length === 0) {
+                dispatchEvent({ type: ORDER_ACTIONS.INIT, payload: localItems })
+            }
+
+            if (localClient) {
+                setActiveClient(localClient);
+            }
+        };
+        initializeOrder();
+    }, []);
+
+    const addItemToOrder = (product, quantity = 1) => {
+        dispatch({ type: ORDER_ACTIONS.ADD, payload: { ...product, quantity } });
+    };
+
+    const updateItemQuantity = (_id, quantity) => {
+        dispatch({ type: ORDER_ACTIONS.SET_QTY, payload: { _id, quantity } });
+    };
+
+    const removeItemFromOrder = (_id) => {
+        dispatch({ type: ORDER_ACTIONS.REMOVE, payload: { _id } });
+    };
+
+    const removeClientFromOrder = () => {
+        setActiveClient(null);
+        storageService.remove(STORAGE_KEYS.CLIENT);
+    };
+
+    const resetPOSPanel = () => {
+        dispatch({ type: ORDER_ACTIONS.CLEAR });
+        setActiveClient(null);
+        storageService.remove(STORAGE_KEYS.ORDER);
+        storageService.remove(STORAGE_KEYS.CLIENT);
+    };
+
+    const value = {
+        orderItems: state.items,
+        activeClient,
+        subtotal,
+        iva,
+        totalToPay,
+        totalItemsCount,
+        addItemToOrder,
+        updateItemQuantity,
+        removeItemFromOrder,
+        removeClientFromOrder,
+        resetPOSPanel
+    };
+
+    return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
+}
+
+export function useOrder() {
+    const context = useContext(OrderContext);
+
+    if (!context) {
+        throw new Error("useOrder debe usarse dentro de un OrderProvider");
+    }
+    return context;
+}

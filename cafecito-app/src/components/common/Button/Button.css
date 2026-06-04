@@ -23,12 +23,12 @@
 
 /* Button Variants */
 .btn-primary {
-    background: var(--color-primary-600);
-    color: var(--accent-contrast);
+    background: var(--success);
+    color: var(--text);
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--color-primary-400);
+    background: var(--success-dark);
 }
 
 .btn-secondary {
@@ -71,8 +71,18 @@
 }
 
 /* Button Sizes */
+.btn-xsm {
+    padding: 3px 5px;
+    font-size: 8px;
+}
+
 .btn-sm {
     padding: 6px 10px;
+    font-size: 16px;
+}
+
+.btn-md {
+    padding: 12px 20px;
     font-size: 16px;
 }
 
