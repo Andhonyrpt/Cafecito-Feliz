@@ -5,13 +5,31 @@ import {
     refreshToken,
     logout
 } from '../controllers/authController.js';
-//middlewares de validacion
+import validate from '../middlewares/validation.js';
+import {
+    displayNameValidation,
+    passwordValidation,
+    passwordLoginValidation,
+    employeeIdValidation,
+    urlValidation
+} from '../middlewares/validators.js';
 
 const router = express.Router();
 
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', [
+    displayNameValidation(),
+    employeeIdValidation(),
+    passwordValidation(),
+    urlValidation('avatar')
+], validate, register);
+
+router.post('/login', [
+    employeeIdValidation(),
+    passwordLoginValidation()
+], validate, login);
+
 router.post('/refresh', refreshToken);
+
 router.post('/logout', logout);
 
 export default router;

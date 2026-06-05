@@ -1,0 +1,134 @@
+import { body, param, query } from "express-validator";
+
+export const employeeIdValidation = (optional = false) => {
+    const validator = body("employeeId")
+        .trim()
+        .toUpperCase()
+        .matches(/^EMP-\d+$/)
+        .withMessage('El ID de empleado debe tener el formato correcto (Ej: EMP-01)');
+
+    return optional ? validator.optional() : validator.notEmpty().withMessage('El ID de empleado es obligatorio')
+};
+
+export const passwordValidation = () =>
+    body('password')
+        .isLength({ min: 6 })
+        .withMessage('Password must be at least 6 characters long')
+        .matches(/\d/)
+        .withMessage("Password must contain at least one number")
+        .matches(/[a-zA-Z]/)
+        .withMessage("Password must contain at least one letter");
+
+// Validación de contraseña completa con número y letra requeridos
+export const fullPasswordValidation = (required = true) => {
+    const validator = body("password")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters long")
+        .matches(/\d/)
+        .withMessage("Password must contain at least one number")
+        .matches(/[a-zA-Z]/)
+        .withMessage("Password must contain at least one letter");
+
+    return required ? validator.notEmpty().withMessage("Password is required") : validator.optional();
+};
+
+// Validación de password para login (solo verifica que no esté vacío)
+export const passwordLoginValidation = () =>
+    body("password").notEmpty().withMessage("Password is required");
+
+export const pinValidation = () =>
+    body('password') // O 'pin', dependiendo de cómo caches el campo en el req.body
+        .trim()
+        .isNumeric()
+        .withMessage('El PIN solo debe contener números.')
+        .isLength({ min: 5 })
+        .withMessage('El PIN debe tener al menos 5 dígitos.');
+
+export const displayNameValidation = (optional = false) => {
+    const validator = body('displayName')
+        .isLength({ min: 2, max: 50 })
+        .withMessage("Display name must be between 2 and 50 characters")
+        .trim()
+        .escape();
+
+    return optional ? validator.optional() : validator.notEmpty().withMessage('Display name is required');
+};
+
+// Validación de displayName con caracteres especiales permitidos
+export const userDisplayNameValidation = (required = true) => {
+    const validator = body("displayName")
+        .isLength({ min: 2, max: 50 })
+        .withMessage("Display name must be between 2 and 50 characters")
+        .matches(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/)
+        .withMessage("Display name must contain only letters, numbers and spaces")
+        .trim()
+        .escape();
+
+    return required
+        ? validator.notEmpty().withMessage("Display name is required")
+        : validator.optional();
+};
+
+export const paginationValidation = () => [
+    query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+    query("limit")
+        .optional()
+        .isInt({ min: 1, max: 100 })
+        .withMessage("Limit must be between 1 and 100"),
+];
+
+export const urlValidation = (field = "url") =>
+    body(field).optional().isURL().withMessage(`${field} must be a valid URL`);
+
+// Validación de MongoID en body
+export const bodyMongoIdValidation = (field, label, optional = false) => {
+    const validator = body(field).isMongoId().withMessage(`Invalid ${label} format`);
+
+    return optional ? validator.optional() : validator.notEmpty().withMessage(`${label} is required`);
+};
+
+// Validación de MongoID en param 
+export const mongoIdValidation = (field = "id", customLabel = null) => {
+    const label = customLabel || field;
+    return param(field).isMongoId().withMessage(`${label} must be a valid MongoDB ObjectId`);
+};
+
+// Validación de MongoID en query
+export const queryMongoIdValidation = (field, label) =>
+    query(field).optional().isMongoId().withMessage(`Invalid ${label} format`);
+
+// Validación de boolean
+export const booleanValidation = (field) =>
+    body(field).optional().isBoolean().withMessage(`${field} must be a boolean`);
+
+// Validación de role
+export const roleValidation = () =>
+    body("role")
+        .optional()
+        .isIn(["admin", "vendedor", "barista"])
+        .withMessage("Role must be admin, customer, or guest");
+
+// Validación de sort field
+export const sortFieldValidation = (allowedFields = []) =>
+    query("sort")
+        .optional()
+        .isIn(allowedFields)
+        .withMessage(`Sort must be one of: ${allowedFields.join(", ")}`);
+
+// Validación de order (asc/desc)
+export const orderValidation = () =>
+    query("order").optional().isIn(["asc", "desc"]).withMessage("Order must be asc or desc");
+
+// Validación de role en query
+export const queryRoleValidation = () =>
+    query("role")
+        .optional()
+        .isIn(["admin", "vendedor", "barista"])
+        .withMessage("Role must be admin, customer, or guest");
+
+// Validación de isActive en query
+export const queryIsActiveValidation = () =>
+    query("isActive")
+        .optional()
+        .isIn(["true", "false"])
+        .withMessage("isActive must be true or false");
