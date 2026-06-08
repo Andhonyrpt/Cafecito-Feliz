@@ -1,5 +1,8 @@
-import { createContext, useState, useContext } from "react";
-import employeesData from '../data/employees.json';
+import { createContext, useState, useContext, useEffect } from "react";
+// import employeesData from '../data/employees.json';
+import { http } from "../services/http";
+import { getUserProfile } from "../services/userService";
+import { login, verifyEmployeePin } from "../services/auth";
 import ordersData from '../data/orders.json';
 
 const SessionContext = createContext();
@@ -9,6 +12,25 @@ export function SessionProvider({ children }) {
     const [isModalOpen, setIsModalOpen] = useState(true);
     const [sessionMode, setSessionMode] = useState('open');
     const [expectedCash, setExpectedCash] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkActiveSession = async () => {
+            const token = localStorage.getItem('authToken');
+
+            if (token) {
+                try {
+                    const user = await getUserProfile();
+                    setCurrentUser(user);
+                    setIsModalOpen(false);
+                } catch (error) {
+                    localStorage.removeItem('authToken');
+                }
+            }
+            setLoading(false);
+        };
+        checkActiveSession();
+    }, []);
 
     const calculateExpectedTotals = () => {
         if (!currentUser) return;
@@ -24,33 +46,46 @@ export function SessionProvider({ children }) {
         setExpectedCash(expectedTotal);
     };
 
-    const handleSessionSubmit = (data) => {
+    const handleSessionSubmit = async (data) => {
         if (sessionMode === 'open') {
 
-            const foundEmployee = employeesData.find((emp) => emp.employeeId.toUpperCase() === data.employeeId.toUpperCase() && emp.pin === data.pin);
+            try {
+                const res = await login({
+                    employeeId: data.employeeId,
+                    password: data.pin
+                });
 
-            if (!foundEmployee) {
-                // Si no coincide, regresamos un mensaje de error
-                return 'Número de empleado o PIN incorrectos.';
+                const { token, user } = res.data;
+
+                localStorage.setItem('authToken', token);
+
+                setCurrentUser({
+                    ...user,
+                    initialCash: Number(data.amount),
+                    openedAt: data.timestamp
+                });
+
+                setIsModalOpen(false);
+                return true;
+
+            } catch (error) {
+                console.error('Error en login:', error);
+                return error.response?.data?.message;
             }
 
-            setCurrentUser({
-                name: foundEmployee.name, // En el futuro vendrá de la API
-                role: foundEmployee.role,
-                employeeId: foundEmployee.employeeId,
-                initialCash: data.amount,
-                openedAt: data.timestamp
-            });
-            setIsModalOpen(false);
-            return true;
-
         } else {
-            if (data.pin !== currentUser?.pin && data.pin !== '0000') {
-                // (Opcional: puedes dejar un PIN maestro como '0000' por seguridad del administrador)
-                const checkActiveEmp = employeesData.find(emp => emp.employeeId === currentUser.employeeId);
-                if (checkActiveEmp && data.pin !== checkActiveEmp.pin) {
-                    return 'El PIN no coincide con el usuario activo.';
-                }
+            try {
+                await verifyEmployeePin(currentUser.employeeId, data.pin);
+
+                console.log("Cierre de caja exitoso");
+
+                setCurrentUser(null);
+                setSessionMode('open');
+                setIsModalOpen(true);
+                return true;
+
+            } catch (error) {
+                return error.response?.data?.message;
             }
 
             console.log("Cierre de caja - ¿Coincide?:", data.isCashCorrect, "Motivo descuadre:", data.discrepancyReason, "a las:", data.timestamp);

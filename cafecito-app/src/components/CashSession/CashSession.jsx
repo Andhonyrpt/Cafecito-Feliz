@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Icon from '../common/Icon';
+import { checkEmployeeRole } from '../../services/auth';
 import './CashSession.css';
 
 export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, expectedCash }) {
@@ -9,10 +10,38 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
     const [error, setError] = useState('');
     const [isCashCorrect, setIsCashCorrect] = useState(null);
     const [discrepancyReason, setDiscrepancyReason] = useState('');
-
-    if (!isOpen) return null;
+    const [detectedRole, setDetectedRole] = useState('vendedor');
 
     const isOpening = mode === 'open';
+
+    const isAdmin = detectedRole === 'admin';
+
+    useEffect(() => {
+        const verifyRole = async () => {
+            const cleanId = employeeId.trim();
+
+            if (cleanId.length >= 6) {
+                const role = await checkEmployeeRole(cleanId);
+
+                if (role === 'unknown') {
+                    setError('El número de empleado no está registrado.');
+                    setDetectedRole('vendedor'); // Muestra campos por defecto
+                } else if (role === 'error') {
+                    setError('Error de conexión con el servidor.');
+                    setDetectedRole('vendedor');
+                } else {
+                    setError(''); // Limpia el error si el rol es válido (admin o vendedor)
+                    setDetectedRole(role);
+                }
+            } else {
+                setDetectedRole('vendedor');
+                setError('');
+            }
+        };
+
+        verifyRole();
+
+    }, [employeeId]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,9 +49,17 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
         if (isOpening) {
 
-            if (!employeeId || !pin || !amount) {
-                setError('Todos los campos son obligatorios para continuar.');
-                return;
+            if (isAdmin) {
+                if (!employeeId || !pin) {
+                    setError('Todos los campos son obligatorios para continuar.');
+                    return;
+                }
+            } else {
+                // Si es vendedor normal, el dinero sigue siendo obligatorio
+                if (!employeeId || !pin || !amount) {
+                    setError('Todos los campos son obligatorios para continuar.');
+                    return;
+                }
             }
         } else {
             if (isCashCorrect === null) {
@@ -44,7 +81,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
         const sessionData = {
             employeeId: isOpening ? employeeId : null,
             pin,
-            amount: isOpening ? parseFloat(amount) : expectedCash,
+            amount: isOpening ? (isAdmin ? 0 : parseFloat(amount)) : expectedCash,
             timestamp: new Date(),
             isCashCorrect: isOpening ? null : isCashCorrect,
             discrepancyReason: isOpening ? "" : discrepancyReason
@@ -59,11 +96,14 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
             setAmount('');
             setIsCashCorrect(null);
             setDiscrepancyReason('');
+            setDetectedRole('vendedor');
         } else {
             // Si el contexto devolvió un string de error, lo pintamos en pantalla
             setError(result);
         }
     };
+
+    if (!isOpen) return null;
 
     return (
         <div className='session-modal-overlay'>
@@ -72,18 +112,20 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                     <div className={`session-icon-badge ${isOpening ? 'open-badge' : 'close-badge'}`}>
                         <Icon name={isOpening ? "unlock" : "lock"} size={24} />
                     </div>
-                    <h2>{isOpening ? 'Apertura de turno' : 'Cierre de turno y caja'}</h2>
+                    <h2>{isOpening ? (isAdmin ? 'Acceso de Administrador' : 'Apertura de turno') : 'Cierre de turno y caja'}</h2>
                     <p>
                         {
                             isOpening ?
-                                "Ingresa tu PIN de empleado y el dinero en efectivo con el que inicia la caja." :
+                                (isAdmin ?
+                                    "Ingresa tus credenciales de administrador para acceder al panel de control."
+                                    : "Ingresa tu PIN de empleado y el dinero en efectivo con el que inicia la caja.") :
                                 "Registra tu PIN para confirmar tu identidad y el efectivo total final en caja."
                         }
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className='session-modal-form'>
-                    {error && (
+                    {error && (typeof error === 'string' ? error.trim().length > 0 : error.message) && (
                         <div className='session-modal-error'>
                             <Icon name="alertTriangle" size={16} />
                             <span>{error}</span>
@@ -112,16 +154,16 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                             <input
                                 type="password"
                                 placeholder="••••"
-                                maxLength={4}
+                                maxLength={6}
                                 value={pin}
                                 onChange={(e) => setPin(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    <div className='session-input-group'>
-                        <label>{isOpening ? "Fondo inicial en Caja" : "Efectivo Final en Caja"}</label>
-                        {isOpening ? (
+                    {isOpening && !isAdmin && (
+                        <div className='session-input-group'>
+                            <label>Fondo inicial en Caja</label>
                             <div className='session-input-wrapper'>
                                 <span className='session-currency-prefix'>$</span>
                                 <input
@@ -133,12 +175,8 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                                     onChange={(e) => setAmount(e.target.value)}
                                 />
                             </div>
-                        ) : (
-                            <div className='session-balance-badge'>
-                                <span>${expectedCash.toFixed(2)}</span>
-                            </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
 
                     {!isOpening && (
                         <div className="session-input-group">

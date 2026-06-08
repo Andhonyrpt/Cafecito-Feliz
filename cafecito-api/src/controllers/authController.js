@@ -150,8 +150,46 @@ async function refreshToken(req, res, next) {
     }
 };
 
-async function logout(req, res) {
+async function logout(req, res, next) {
     res.status(200).json({ message: "Logged out successfully" });
 }
 
-export { register, login, refreshToken, logout };
+async function verifyPin(req, res, next) {
+    try {
+        const { employeeId, password } = req.body;
+
+        const user = await User.findOne({ employeeId });
+
+        if (!user || !user.isActive) {
+            return res.status(404).json({ message: 'User not found ' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.hashPassword);
+
+        if (!isMatch) {
+            return res.status(401).json({ message: 'EL PIN es incorrecto' })
+        }
+
+        res.status(200).json({ success: true, message: "PIN verificado correctamente." });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+async function checkRole(req, res, next) {
+    try {
+        const { employeeId } = req.params;
+        const user = await User.findOne({ employeeId });
+
+        if (!user) {
+            return res.status(200).json({ role: 'unknown' });
+        }
+
+        res.status(200).json({ role: user.role });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export { register, login, refreshToken, logout, verifyPin,checkRole };
