@@ -4,6 +4,9 @@ import categoriesData from "../data/categories.json";
 import DynamicIcon from "../components/common/DynamicIcon/DynamicIcon";
 import List from "../components/List/List";
 import Button from "../components/common/Button/Button";
+import OrderPanel from "../components/Order/OrderPanel";
+import CashSession from "../components/CashSession/CashSession";
+import { useSession } from "../context/SessionContext";
 import './Home.css';
 
 export default function Home() {
@@ -12,6 +15,8 @@ export default function Home() {
     const [categories, setCategories] = useState(categoriesData);
     const [activeCategoryId, setActiveCategoryId] = useState(categoriesData[0]?._id);
     const [viewLayout, setViewLayout] = useState("grid");
+
+    const { isModalOpen, sessionMode, handleSessionSubmit, expectedCash } = useSession();
 
     const categoryCounts = products.reduce((acc, product) => {
         const catId = product.parentCategory?._id;
@@ -27,9 +32,15 @@ export default function Home() {
         (product) => product.parentCategory?._id === activeCategoryId
     );
 
-    
+
     return (
         <div className="home-container">
+            <CashSession
+                isOpen={isModalOpen}
+                mode={sessionMode}
+                onSessionSubmit={handleSessionSubmit}
+                expectedCash={expectedCash}
+            />
 
             <div className="category-menu">
                 {categories.map((category) => (
@@ -91,10 +102,8 @@ export default function Home() {
                 ></List>
             </div>
 
-            <div className="">
-                <h1>
-                    Area de Cobro
-                </h1>
+            <div className="checkout-container">
+                <OrderPanel />
             </div>
         </div>
     )

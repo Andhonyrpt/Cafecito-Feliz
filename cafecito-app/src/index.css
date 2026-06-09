@@ -1,13 +1,158 @@
+/* Reset mínimo y tipografía */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/*  Variables CSS  */
+:root {
+
+  --bg: #F8F4EF;
+  --panel: #FCF9F5;
+  --card: #FFFFFF;
+  --border: #EEE5DC;
+  --border-disabled: #D3D3D3;
+  --primary: #C96A2D;
+  --primary-dark: #B75C23;
+  --primary-soft: #FBEADF;
+  --success: #2F9A35;
+  --success-dark: #26852C;
+  --text: #2D221C;
+  --text-light: #8A7D72;
+  --input: #FAF7F3;
+  --total-bg: #FFF2E8;
+  --total-text: #B55D29;
+  --reward: #6FA34B;
+  --button-secondary: #F6E3D7;
+  --button-secondary-hover: #F3D1BD;
+  --button-danger: #dc3545;
+  --button-danger-hover: #bd2130;
+  --button-danger-hover-bg: rgba(220, 53, 69, 0.1);
+
+  /* Variables adicionales */
+  --radius: 8px;
+  --r1: 4px;
+  --r2: 6px;
+  --r3: 8px;
+  --r4: 12px;
+  --r5: 16px;
+  --r6: 18px;
+  --r7: 20px;
+  --r8: 24px;
+  --gap: 16px;
+
+  /* Elevaciones y shadows */
+  --elev-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --elev-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  --elev-3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  --elev-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  --elev-5: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* Tipografía */
+.h1 {
+  font-size: clamp(30px, 4vw, 38px);
+  font-weight: 700;
+  margin: 0 0 12px;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+
+.h2 {
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 600;
+  margin: 0 0 8px;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+}
+
+.muted {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* Componentes base */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--elev-1);
+  padding: 16px;
+}
+
+/* 3) Utilidades base */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 24px);
+}
+
+.container-wide {
+  max-width: 1400px;
+}
+
+.container-narrow {
+  max-width: 800px;
+}
+
+.grid {
+  display: grid;
+  gap: var(--gap);
+}
+
+.grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.flex {
+  display: flex;
+  gap: clamp(12px, 2vw, 16px);
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  justify-content: space-between;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.hidden {
+  display: none !important;
 }

@@ -1,11 +1,11 @@
 import express from 'express';
 import mongoose from 'mongoose';
-// import dbConnection from './src/config/database.js';
+import dbConnection from './src/config/database.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import errorHandler from './middleware/errorHandler.js';
+import errorHandler from './src/middlewares/errorHandler.js';
 import setupGlobalErrorHandlers from "./src/middlewares/globalerrorHandler.js";
-import dbConnection from './src/config/database.js';
+import routes from './src/routes/index.js';
 
 dotenv.config();
 
@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// app.use('/api', routes);
+app.use('/api', routes);
 
 app.use((req, res) => {
     res.status(404).json({
