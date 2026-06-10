@@ -4,7 +4,8 @@ import "./List.css";
 
 export default function List({
     products = [],
-    layout = "grid"
+    layout = "grid",
+    onAddProduct
 }) {
     const { addItemToOrder } = useOrder();
 
@@ -21,7 +22,7 @@ export default function List({
                                 orientation="vertical"
                                 className="list-item"
                                 priority={index < 2}
-                                onAdd={() => addItemToOrder(product)}
+                                onAdd={() => onAddProduct(product)}
                             />
                         );
                     })}
@@ -36,7 +37,7 @@ export default function List({
                                 orientation="horizontal"
                                 className="list-item"
                                 priority={index < 2}
-                                onAdd={() => addItemToOrder(product)}
+                                onAdd={() => onAddProduct(product)}
                             />
                         );
                     })}
