@@ -48,6 +48,14 @@
     align-items: center;
 }
 
+.user-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
 .user-text {
     display: flex;
     flex-direction: column;

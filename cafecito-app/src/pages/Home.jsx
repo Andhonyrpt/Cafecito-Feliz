@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchProducts } from "../services/productService";
 import { fetchCategories } from "../services/categoryService";
-// import productsData from "../data/products.json";
-// import categoriesData from "../data/categories.json";
 import DynamicIcon from "../components/common/DynamicIcon/DynamicIcon";
 import List from "../components/List/List";
 import Button from "../components/common/Button/Button";

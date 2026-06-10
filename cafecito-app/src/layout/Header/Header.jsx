@@ -60,12 +60,19 @@ export default function Header() {
                 <button
                     className={`user-profile-button ${!isAuth ? 'not-authenticated' : ''}`}>
                     <div className='user-avatar'>
-                        <Icon name="user" size={18} className={!isAuth ? "logged-out-icon" : ""} />
+                        {isAuth ? (
+                            <img src={currentUser.avatar}
+                                alt={currentUser.displayName}
+                                className='user-avatar-img'
+                            />
+                        ) : (
+                            <Icon name="user" size={18} className={!isAuth ? "logged-out-icon" : ""} />
+                        )}
                     </div>
 
                     <div className="user-text">
                         <span className="user-name">
-                            {isAuth ? currentUser.name : "Inicia sesión"}
+                            {isAuth ? currentUser.displayName : "Inicia sesión"}
                         </span>
 
                         <span className="user-role">
