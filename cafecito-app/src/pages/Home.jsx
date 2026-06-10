@@ -7,6 +7,8 @@ import Button from "../components/common/Button/Button";
 import OrderPanel from "../components/Order/OrderPanel";
 import CashSession from "../components/CashSession/CashSession";
 import { useSession } from "../context/SessionContext";
+import { useOrder } from "../context/OrderContext";
+import ModifiersModal from "../components/Order/ModifiersModal/ModifiersModal";
 import './Home.css';
 import Icon from "../components/common/Icon";
 
@@ -20,9 +22,12 @@ export default function Home() {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [paginationInfo, setPaginationInfo] = useState({});
+    const [isModifiersOpen, setIsModifiersOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
 
     const { isModalOpen, sessionMode, handleSessionSubmit, expectedCash } = useSession();
+    const { addItemToOrder } = useOrder();
 
     useEffect(() => {
         let isMounted = true;
@@ -113,6 +118,24 @@ export default function Home() {
         setCurrentPage(1);
     };
 
+    const handleOpenModifiers = (product) => {
+        setSelectedProduct(product);
+        setIsModifiersOpen(true);
+    };
+
+    // Esta función se ejecuta cuando le dan "Agregar a la orden" dentro del modal:
+    const handleConfirmAddOrder = (product, note) => {
+        // 🚀 Aquí mandas el producto + la nota a tu función actual de agregar al carrito
+        const productWithNotes = {
+            ...product,
+            orderNotes: note
+        };
+
+        // Ej: addToCart(product, note);
+        addItemToOrder(productWithNotes);
+        console.log("Producto enviado a la orden con notas:", productWithNotes);
+    };
+
 
     return (
         <div className="home-container">
@@ -183,6 +206,7 @@ export default function Home() {
                     <List
                         products={products}
                         layout={viewLayout}
+                        onAddProduct={handleOpenModifiers}
                     ></List>
 
                     {paginationInfo?.totalPages > 1 && (
@@ -217,6 +241,13 @@ export default function Home() {
             <div className="checkout-container">
                 <OrderPanel />
             </div>
+
+            <ModifiersModal
+                isOpen={isModifiersOpen}
+                onClose={() => setIsModifiersOpen(false)}
+                product={selectedProduct}
+                onConfirm={handleConfirmAddOrder}
+            />
         </div>
     )
 };
