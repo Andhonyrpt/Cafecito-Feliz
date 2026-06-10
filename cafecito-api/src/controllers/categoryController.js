@@ -7,7 +7,7 @@ async function getCategories(req, res, next) {
         if (!page || !limit) {
             const categories = await Category.find()
                 .populate('parentCategory')
-                .sort({ name: 1 });
+                .sort({ createdAt: 1 });
 
             return res.status(200).json({ categories });
         }
@@ -18,7 +18,7 @@ async function getCategories(req, res, next) {
 
         const categories = await Category.find()
             .populate('parentCategory')
-            .sort({ name: 1 })
+            .sort({ createdAt: 1 })
             .skip(skip)
             .limit(limitInt);
 

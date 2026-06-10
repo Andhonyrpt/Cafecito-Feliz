@@ -33,6 +33,10 @@
     margin: 0 0 6px 0;
     color: var(--text);
     line-height: 1.4;
+    white-space: nowrap;     /* 🚫 Prohíbe saltar a un nuevo renglón */
+    overflow: hidden;        /* ✂️ Corta lo que se salga de la tarjeta */
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .product-card-price {

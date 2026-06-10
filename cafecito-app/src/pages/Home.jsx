@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import productsData from "../data/products.json";
-import categoriesData from "../data/categories.json";
+import { fetchProducts } from "../services/productService";
+import { fetchCategories } from "../services/categoryService";
+// import productsData from "../data/products.json";
+// import categoriesData from "../data/categories.json";
 import DynamicIcon from "../components/common/DynamicIcon/DynamicIcon";
 import List from "../components/List/List";
 import Button from "../components/common/Button/Button";
@@ -8,29 +10,110 @@ import OrderPanel from "../components/Order/OrderPanel";
 import CashSession from "../components/CashSession/CashSession";
 import { useSession } from "../context/SessionContext";
 import './Home.css';
+import Icon from "../components/common/Icon";
 
 export default function Home() {
 
-    const [products, setProducts] = useState(productsData);
-    const [categories, setCategories] = useState(categoriesData);
-    const [activeCategoryId, setActiveCategoryId] = useState(categoriesData[0]?._id);
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [activeCategoryId, setActiveCategoryId] = useState(null);
     const [viewLayout, setViewLayout] = useState("grid");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [paginationInfo, setPaginationInfo] = useState({});
+
 
     const { isModalOpen, sessionMode, handleSessionSubmit, expectedCash } = useSession();
 
-    const categoryCounts = products.reduce((acc, product) => {
-        const catId = product.parentCategory?._id;
+    useEffect(() => {
+        let isMounted = true;
 
-        if (catId) {
-            acc[catId] = (acc[catId] || 0) + 1;
+        const loadCategories = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const categoriesData = await fetchCategories();
+                console.log("CATEGORÍAS DE MONGO:", categoriesData);
+
+                if (isMounted) {
+                    setCategories(categoriesData);
+
+                    if (categoriesData.length > 0) {
+                        setActiveCategoryId(categoriesData[0]._id)
+                    }
+
+                }
+
+            } catch (error) {
+                console.error(error);
+
+                if (isMounted) {
+                    setError('No se pudo cargar la información del menú');
+                    setCategories([]);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadCategories();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const productsPerPage = viewLayout === "grid" ? 12 : 4;
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadProducts = async () => {
+            try {
+                setLoading(true);
+
+                const productsData = await fetchProducts(currentPage, productsPerPage, activeCategoryId);
+                console.log("PRODUCTOS DE MONGO:", productsData);
+
+                if (isMounted) {
+                    setProducts(productsData?.products || []);
+
+                    setPaginationInfo(productsData?.pagination || {});
+                }
+
+            } catch (error) {
+                console.error(error);
+
+                if (isMounted) {
+                    setProducts([]);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        if (activeCategoryId) {
+            loadProducts();
         }
-        return acc;
-    }, {});
+
+        return () => {
+            isMounted = false;
+        };
+
+    }, [currentPage, activeCategoryId, viewLayout]);
 
     const activeCategory = categories.find((cat) => cat._id === activeCategoryId);
-    const filteredProducts = products.filter(
-        (product) => product.parentCategory?._id === activeCategoryId
-    );
+
+    const handleCategory = (categoryId) => {
+        setActiveCategoryId(categoryId);
+        setCurrentPage(1);
+    };
 
 
     return (
@@ -42,11 +125,13 @@ export default function Home() {
                 expectedCash={expectedCash}
             />
 
+            {loading && <div className="loading-overlay">Cargando menú...</div>}
+
             <div className="category-menu">
                 {categories.map((category) => (
 
                     <button key={category._id}
-                        onClick={() => setActiveCategoryId(category._id)}
+                        onClick={() => handleCategory(category._id)}
                         className={`category-btn ${category._id === activeCategoryId ? 'active' : ''}`}
                     >
                         <div className="category-menu__info">
@@ -57,7 +142,6 @@ export default function Home() {
                             />
                             <h2>{category.name}</h2>
                         </div>
-                        <p className="category-badge">{categoryCounts[category._id] || 0}</p>
                     </button>
                 ))}
             </div>
@@ -96,10 +180,40 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                <List
-                    products={filteredProducts}
-                    layout={viewLayout}
-                ></List>
+
+                <div className="product-list-wrapper">
+                    <List
+                        products={products}
+                        layout={viewLayout}
+                    ></List>
+
+                    {paginationInfo?.totalPages > 1 && (
+                        <div className="pagination-controls">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                disabled={!paginationInfo.hasPrev}
+                                onClick={() => setCurrentPage((prev) => prev - 1)}
+                            >
+                                <Icon name="chevronLeft" size={12} />
+                            </Button>
+
+                            <span className="pagination-info">
+                                Página {paginationInfo.currentPage} de {paginationInfo.totalPages}
+                            </span>
+
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                disabled={!paginationInfo.hasNext}
+                                onClick={() => setCurrentPage((prev) => prev + 1)}
+                            >
+                                <Icon name="chevronRight" size={12} />
+
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="checkout-container">
