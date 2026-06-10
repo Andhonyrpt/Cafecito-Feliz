@@ -2,10 +2,16 @@ import Product from "../models/product.js";
 
 async function getProducts(req, res, next) {
     try {
-        const { page, limit } = req.query;
+        const { page, limit, category } = req.query;
+
+        const filterQuery = {};
+        
+        if (category) {
+            filterQuery.parentCategory = category;
+        }
 
         if (!page || !limit) {
-            const products = await Product.find()
+            const products = await Product.find(filterQuery)
                 .populate('parentCategory')
                 .sort({ name: 1 });
 
@@ -24,16 +30,16 @@ async function getProducts(req, res, next) {
         }
 
         const pageInt = parseInt(page) || 1;
-        const limitInt = parseInt(limit) || 10;
+        const limitInt = parseInt(limit) || 12;
         const skip = (pageInt - 1) * limitInt;
 
-        const products = await Product.find()
+        const products = await Product.find(filterQuery)
             .populate('parentCategory')
+            .sort({ name: 1 })
             .skip(skip)
-            .limit(limitInt)
-            .sort({ name: 1 });
+            .limit(limitInt);
 
-        const totalResults = await Product.countDocuments();
+        const totalResults = await Product.countDocuments(filterQuery);
         const totalPages = Math.ceil(totalResults / limitInt);
 
         res.json({

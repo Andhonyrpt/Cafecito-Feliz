@@ -40,3 +40,36 @@
     -ReferenceError: Cannot access 'categories' before initialization
     at getCategories (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/categoryController.js:12:43)
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-09T22:20:25.548Z
+    -POST
+    -/api/products
+    -Product validation failed: stock: Path `stock` is required.
+    -ValidationError: Product validation failed: stock: Path `stock` is required.
+    at model.validate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\document.js:2864:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:393:7)
+    at async model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at async createProduct (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/productController.js:99:9)
+2026-06-09T22:20:52.768Z
+    -POST
+    -/api/products
+    -Product validation failed: stock: Path `stock` is required.
+    -ValidationError: Product validation failed: stock: Path `stock` is required.
+    at model.validate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\document.js:2864:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:393:7)
+    at async model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at async createProduct (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/productController.js:99:9)
+2026-06-09T22:26:02.175Z
+    -POST
+    -/api/products
+    -E11000 duplicate key error collection: cafecito-db.products index: name_1 dup key: { name: "Macchiato Clásico" }
+    -MongoServerError: E11000 duplicate key error collection: cafecito-db.products index: name_1 dup key: { name: "Macchiato Clásico" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\lib\operations\execute_operation.js:194:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\lib\operations\execute_operation.js:83:16)
+    at async Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at async model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at async createProduct (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/productController.js:99:9)
