@@ -132,3 +132,23 @@ export const queryIsActiveValidation = () =>
         .optional()
         .isIn(["true", "false"])
         .withMessage("isActive must be true or false");
+
+// Validación de email en body
+export const emailValidation = (optional = false) => {
+    const validator = body("email")
+        .trim()
+        .normalizeEmail()
+        .isEmail()
+        .withMessage("Valid email is required");
+
+    return optional ? validator.optional() : validator.notEmpty().withMessage("Email is required");
+};
+
+// Validación de email en query (para check-email, búsquedas, etc.)
+export const queryEmailValidation = () =>
+    query("email")
+        .notEmpty()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Valid email is required")
+        .normalizeEmail();

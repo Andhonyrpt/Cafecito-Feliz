@@ -101,19 +101,6 @@ async function login(req, res, next) {
     }
 };
 
-// async function checkEmail(req, res, next) {
-//     try {
-//         const email = String(req.query.email || "")
-//             .trim()
-//             .toLowerCase();
-
-//         const user = await User.findOne({ email });
-//         res.json({ taken: !!user });
-//     } catch (err) {
-//         next(err);
-//     }
-// }
-
 async function refreshToken(req, res, next) {
     try {
         let token = req.body?.refreshToken;
