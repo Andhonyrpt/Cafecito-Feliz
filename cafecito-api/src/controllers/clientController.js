@@ -1,4 +1,4 @@
-import Client from "../models/client";
+import Client from "../models/client.js";
 
 async function getClients(req, res, next) {
     try {
@@ -112,9 +112,33 @@ async function checkEmail(req, res, next) {
     }
 };
 
+async function searchClient(req, res, next) {
+    try {
+        const { search } = req.query;
+
+        if (!search) {
+            return res.status(400).json({ message: 'El término de búsqueda es requerido' });
+        }
+
+        const cleanSearch = String(search).trim();
+
+        const clients = await Client.find({
+            $or: [
+                { displayName: { $regex: cleanSearch, $options: 'i' } },
+                { email: { $regex: cleanSearch, $options: 'i' } },
+            ]
+        }).limit(5);
+
+        res.status(200).json({ clients });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export {
     getClients,
     createClient,
     updateClient,
-    checkEmail
+    checkEmail,
+    searchClient
 };

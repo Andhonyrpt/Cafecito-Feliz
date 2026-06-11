@@ -3,6 +3,7 @@ import { useOrder } from "../../context/OrderContext";
 import Button from "../common/Button/Button.jsx";
 import Icon from "../common/Icon";
 import ClientSelector from "./ClientSelector";
+import CreateClientModal from './Modals/CreateClientModal.jsx';
 import './OrderPanel.css';
 
 export default function OrderPanel() {
@@ -16,16 +17,17 @@ export default function OrderPanel() {
         addItemToOrder,
         updateItemQuantity,
         removeItemFromOrder,
+        setClientToOrder,
         removeClientFromOrder,
         resetPOSPanel
     } = useOrder();
 
     // Estado para controlar el método de pago seleccionado en la barra inferior
     const [paymentMethod, setPaymentMethod] = useState('efectivo');
+    const [isClientModalOpen, setIsClientModalOpen] = useState(false);
 
     const handleOpenModal = () => {
-        console.log("Abriendo modal para registrar un nuevo cliente en la BD");
-        // Aquí disparas tu estado para abrir un formulario emergente (Modal)
+        setIsClientModalOpen(true);
     };
 
     // Acción del botón principal "Cobrar (F2)"
@@ -62,6 +64,7 @@ export default function OrderPanel() {
         <div className="order-view">
             <ClientSelector
                 activeClient={activeClient}
+                onSelectClient={setClientToOrder}
                 onRemoveClient={removeClientFromOrder}
                 onOpenClientModal={handleOpenModal}
             />
@@ -99,7 +102,7 @@ export default function OrderPanel() {
                                         <span>{item.quantity}</span>
                                     </div>
 
-                                    <div  className="item-quantity-controls">
+                                    <div className="item-quantity-controls">
                                         <button
                                             variant="third"
                                             size="xsm"
@@ -181,6 +184,16 @@ export default function OrderPanel() {
                     </button>
                 </div>
             </div>
+
+            {isClientModalOpen && (
+                <CreateClientModal
+                    onClose={() => setIsClientModalOpen(false)}
+                    onClientCreated={(newClient) => {
+                        setClientToOrder(newClient); // Lo asigna directo a la orden al crearse
+                        setIsClientModalOpen(false); // Cierra el modal
+                    }}
+                />
+            )}
         </div>
     );
 };
