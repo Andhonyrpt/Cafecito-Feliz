@@ -3,11 +3,12 @@ import {
     getClients,
     createClient,
     updateClient,
-    checkEmail
-} from '../controllers/clientController';
-import validate from '../middlewares/validation';
-import isAdmin from '../middlewares/isAdminMiddleware';
-import authMiddleware from '../middlewares/authMiddleware';
+    checkEmail,
+    searchClient
+} from '../controllers/clientController.js';
+import validate from '../middlewares/validation.js';
+import isAdmin from '../middlewares/isAdminMiddleware.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
 import {
     userDisplayNameValidation,
     paginationValidation,
@@ -15,11 +16,11 @@ import {
     mongoIdValidation,
     queryEmailValidation,
 
-} from '../middlewares/validators';
+} from '../middlewares/validators.js';
 
 const router = express.Router();
 
-router.get('/check-email', [queryEmailValidation()], validate, checkEmail);
+router.get('/clients/check-email', [queryEmailValidation()], validate, checkEmail);
 
 router.get('/clients', authMiddleware, isAdmin, [
     ...paginationValidation()
@@ -36,5 +37,6 @@ router.put('/clients/:clientId', authMiddleware, [
     emailValidation()
 ], validate, updateClient);
 
+router.get('/clients/search', authMiddleware, searchClient);
 
 export default router;

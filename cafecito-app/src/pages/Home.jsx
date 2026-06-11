@@ -8,7 +8,7 @@ import OrderPanel from "../components/Order/OrderPanel";
 import CashSession from "../components/CashSession/CashSession";
 import { useSession } from "../context/SessionContext";
 import { useOrder } from "../context/OrderContext";
-import ModifiersModal from "../components/Order/ModifiersModal/ModifiersModal";
+import ModifiersModal from "../components/Order/Modals/ModifiersModal";
 import './Home.css';
 import Icon from "../components/common/Icon";
 

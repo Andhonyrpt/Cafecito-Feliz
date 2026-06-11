@@ -33,7 +33,7 @@ export function OrderProvider({ children }) {
             const localClient = storageService.get(STORAGE_KEYS.CLIENT);
 
             if (localItems.length > 0 && state.items.length === 0) {
-                dispatchEvent({ type: ORDER_ACTIONS.INIT, payload: localItems })
+                dispatch({ type: ORDER_ACTIONS.INIT, payload: localItems })
             }
 
             if (localClient) {
@@ -53,6 +53,11 @@ export function OrderProvider({ children }) {
 
     const removeItemFromOrder = (_id) => {
         dispatch({ type: ORDER_ACTIONS.REMOVE, payload: { _id } });
+    };
+
+    const setClientToOrder = (client) => {
+        setActiveClient(client);
+        storageService.set(STORAGE_KEYS.CLIENT, client);
     };
 
     const removeClientFromOrder = () => {
@@ -76,6 +81,7 @@ export function OrderProvider({ children }) {
         totalItemsCount,
         addItemToOrder,
         updateItemQuantity,
+        setClientToOrder,
         removeItemFromOrder,
         removeClientFromOrder,
         resetPOSPanel
