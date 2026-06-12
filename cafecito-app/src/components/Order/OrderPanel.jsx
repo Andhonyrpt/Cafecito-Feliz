@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useOrder } from "../../context/OrderContext";
+import { useSession } from "../../context/SessionContext.jsx";
 import Button from "../common/Button/Button.jsx";
 import Icon from "../common/Icon";
 import ClientSelector from "./ClientSelector";
@@ -22,9 +23,17 @@ export default function OrderPanel() {
         resetPOSPanel
     } = useOrder();
 
+    const { currentUser } = useSession();
+
     // Estado para controlar el método de pago seleccionado en la barra inferior
     const [paymentMethod, setPaymentMethod] = useState('efectivo');
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (!currentUser) {
+            resetPOSPanel();
+        }
+    }, [currentUser, resetPOSPanel]);
 
     const handleOpenModal = () => {
         setIsClientModalOpen(true);
@@ -57,7 +66,10 @@ export default function OrderPanel() {
         // Aquí disparas tu fetch POST de tu API de registrar productos
 
         alert("¡Cobro realizado con éxito!");
+
+        removeClientFromOrder();
         resetPOSPanel();
+        setPaymentMethod('efectivo');
     };
 
     return (
