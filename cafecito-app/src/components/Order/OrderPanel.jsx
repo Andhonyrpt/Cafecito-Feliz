@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useOrder } from "../../context/OrderContext";
 import { useSession } from "../../context/SessionContext.jsx";
+import { clearProductsCache } from "../../services/productService.js";
 import Button from "../common/Button/Button.jsx";
 import Icon from "../common/Icon";
 import ClientSelector from "./ClientSelector";
 import CreateClientModal from './Modals/CreateClientModal.jsx';
 import './OrderPanel.css';
 
-export default function OrderPanel() {
+export default function OrderPanel(onOrderSuccess) {
 
     const {
         orderItems,
@@ -66,6 +67,12 @@ export default function OrderPanel() {
         // Aquí disparas tu fetch POST de tu API de registrar productos
 
         alert("¡Cobro realizado con éxito!");
+
+        clearProductsCache();
+
+        if (onOrderSuccess) {
+            onOrderSuccess();
+        }
 
         removeClientFromOrder();
         resetPOSPanel();
