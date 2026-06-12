@@ -1,5 +1,4 @@
 import { createContext, useState, useContext, useEffect } from "react";
-// import employeesData from '../data/employees.json';
 import { http } from "../services/http";
 import { getUserProfile } from "../services/userService";
 import { login, verifyEmployeePin } from "../services/auth";
@@ -13,6 +12,7 @@ export function SessionProvider({ children }) {
     const [sessionMode, setSessionMode] = useState('open');
     const [expectedCash, setExpectedCash] = useState(0);
     const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         const checkActiveSession = async () => {
@@ -77,22 +77,19 @@ export function SessionProvider({ children }) {
             try {
                 await verifyEmployeePin(currentUser.employeeId, data.pin);
 
-                console.log("Cierre de caja exitoso");
+                console.log("Cierre de caja - ¿Coincide?:", data.isCashCorrect, "Motivo descuadre:", data.discrepancyReason, "a las:", data.timestamp);
 
+                localStorage.removeItem('authToken');
                 setCurrentUser(null);
                 setSessionMode('open');
                 setIsModalOpen(true);
                 return true;
 
             } catch (error) {
+                console.error('Error en cierre de caja:', error);
                 return error.response?.data?.message;
             }
 
-            console.log("Cierre de caja - ¿Coincide?:", data.isCashCorrect, "Motivo descuadre:", data.discrepancyReason, "a las:", data.timestamp);
-            setCurrentUser(null);
-            setSessionMode('open');
-            setIsModalOpen(true);
-            return true;
         }
     };
 

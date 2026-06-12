@@ -63,7 +63,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
             return () => clearTimeout(forceClean);
         }
-    }, [isOpen, mode,isOpening]);
+    }, [isOpen, mode, isOpening]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
