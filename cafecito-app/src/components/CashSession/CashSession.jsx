@@ -17,6 +17,8 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
     const isAdmin = detectedRole === 'admin';
 
     useEffect(() => {
+        if (!isOpening) return;
+
         const verifyRole = async () => {
             const cleanId = employeeId.trim();
 
@@ -43,6 +45,26 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
     }, [employeeId]);
 
+    useEffect(() => {
+        if (isOpen) {
+            // Ponemos un micro-retraso para que actúe JUSTO DESPUÉS de que el navegador intente inyectar datos fijos
+            const forceClean = setTimeout(() => {
+                setEmployeeId('');
+                setPin('');
+                setAmount('');
+                setIsCashCorrect(null);
+                setDiscrepancyReason('');
+                setError('');
+
+                if (isOpening) {
+                    setDetectedRole('vendedor');
+                }
+            }, 50);
+
+            return () => clearTimeout(forceClean);
+        }
+    }, [isOpen, mode,isOpening]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setError('');
@@ -62,29 +84,36 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                 }
             }
         } else {
-            if (isCashCorrect === null) {
-                setError('Por favor, selecciona si el efectivo coincide o no.');
-                return;
-            }
+            if (isAdmin) {
+                if (!pin) {
+                    setError('Por favor, ingresa tu PIN para continuar.');
+                    return;
+                }
+            } else {
+                if (isCashCorrect === null) {
+                    setError('Por favor, selecciona si el efectivo coincide o no.');
+                    return;
+                }
 
-            if (isCashCorrect === false && !discrepancyReason.trim()) {
-                setError('Por favor, detalla el motivo del descuadre obligatoriamente.');
-                return;
-            }
+                if (isCashCorrect === false && !discrepancyReason.trim()) {
+                    setError('Por favor, detalla el motivo del descuadre obligatoriamente.');
+                    return;
+                }
 
-            if (!pin) {
-                setError('Por favor, ingresa tu PIN para continuar.');
-                return;
+                if (!pin) {
+                    setError('Por favor, ingresa tu PIN para continuar.');
+                    return;
+                }
             }
         }
 
         const sessionData = {
             employeeId: isOpening ? employeeId : null,
             pin,
-            amount: isOpening ? (isAdmin ? 0 : parseFloat(amount)) : expectedCash,
+            amount: isOpening ? (isAdmin ? 0 : parseFloat(amount)) : (isAdmin ? 0 : expectedCash),
             timestamp: new Date(),
-            isCashCorrect: isOpening ? null : isCashCorrect,
-            discrepancyReason: isOpening ? "" : discrepancyReason
+            isCashCorrect: isAdmin ? null : (isOpening ? null : isCashCorrect),
+            discrepancyReason: isAdmin ? "" : (isOpening ? '' : discrepancyReason)
         };
 
         const result = onSessionSubmit(sessionData);
@@ -97,6 +126,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
             setIsCashCorrect(null);
             setDiscrepancyReason('');
             setDetectedRole('vendedor');
+            setError('');
         } else {
             // Si el contexto devolvió un string de error, lo pintamos en pantalla
             setError(result);
@@ -112,19 +142,20 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                     <div className={`session-icon-badge ${isOpening ? 'open-badge' : 'close-badge'}`}>
                         <Icon name={isOpening ? "unlock" : "lock"} size={24} />
                     </div>
-                    <h2>{isOpening ? (isAdmin ? 'Acceso de Administrador' : 'Apertura de turno') : 'Cierre de turno y caja'}</h2>
+                    <h2>{isOpening ? (isAdmin ? 'Acceso de Administrador' : 'Apertura de turno') : (isAdmin ? 'Cerrar sesión' : 'Cierre de turno y caja')}</h2>
                     <p>
                         {
                             isOpening ?
                                 (isAdmin ?
                                     "Ingresa tus credenciales de administrador para acceder al panel de control."
                                     : "Ingresa tu PIN de empleado y el dinero en efectivo con el que inicia la caja.") :
-                                "Registra tu PIN para confirmar tu identidad y el efectivo total final en caja."
+                                (isAdmin ? "Confirma tu PIN para cerrar tu sesión de administración de forma segura."
+                                    : "Registra tu PIN para confirmar tu identidad y el efectivo total final en caja.")
                         }
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className='session-modal-form'>
+                <form onSubmit={handleSubmit} className='session-modal-form' autoComplete='off'>
                     {error && (typeof error === 'string' ? error.trim().length > 0 : error.message) && (
                         <div className='session-modal-error'>
                             <Icon name="alertTriangle" size={16} />
@@ -142,6 +173,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                                     placeholder="Ej. EMP-01"
                                     value={employeeId}
                                     onChange={(e) => setEmployeeId(e.target.value)}
+                                    autoComplete='off'
                                 />
                             </div>
                         </div>
@@ -157,6 +189,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                                 maxLength={6}
                                 value={pin}
                                 onChange={(e) => setPin(e.target.value)}
+                                autoComplete='new-password'
                             />
                         </div>
                     </div>
@@ -178,7 +211,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                         </div>
                     )}
 
-                    {!isOpening && (
+                    {!isOpening && !isAdmin && (
                         <div className="session-input-group">
                             <label>¿El dinero físico en caja coincide con el total esperado?</label>
                             <div className='session-buttons-container'>
@@ -189,6 +222,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                                 >
                                     SÍ, COINCIDE
                                 </button>
+
                                 <button
                                     type="button"
                                     className={`btn-session-audit btn-audit-no ${isCashCorrect === false ? 'active' : ''}`}
@@ -200,7 +234,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                         </div>
                     )}
 
-                    {!isOpening && isCashCorrect === false && (
+                    {!isOpening && !isAdmin && isCashCorrect === false && (
                         <div className="session-input-group">
                             <label>Detalla el motivo del descuadre obligatoriamente</label>
                             <div className="session-input-wrapper">
@@ -218,11 +252,11 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                     <button
                         type='submit'
                         className={`btn-session-submit ${isOpening ? 'btn-open' : 'btn-close'}`}
-                        disabled={!isOpening && (isCashCorrect === null ||
-                            pin.trim() === '' || (isCashCorrect === false && !discrepancyReason.trim()))
+                        disabled={isOpening ? (isAdmin ? (!employeeId.trim() || !pin.trim()) : (!employeeId.trim() || !pin.trim() || !amount.trim()))
+                            : (isAdmin ? !pin.trim() : (isCashCorrect === null || pin.trim() === '' || (isCashCorrect === false && !discrepancyReason.trim())))
                         }
                     >
-                        {isOpening ? 'Abrir Caja y Comenzar' : 'Realizar Corte y Cierre de Caja'}
+                        {isOpening ? 'Abrir Caja y Comenzar' : (isAdmin ? 'Cerrar sesión' : 'Realizar Corte y Cierre de Caja')}
                     </button>
                 </form>
             </div>
