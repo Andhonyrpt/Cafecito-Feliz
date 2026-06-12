@@ -38,3 +38,12 @@ export const fetchProducts = async (page, limit, category) => {
 
     return result;
 };
+
+export const clearProductsCache = () => {
+    Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith("products_page_")) {
+            sessionStorage.removeItem(key);
+        }
+    });
+    console.log("Caché de productos eliminado para actualizar stocks.");
+};

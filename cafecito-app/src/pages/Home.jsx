@@ -24,6 +24,7 @@ export default function Home() {
     const [paginationInfo, setPaginationInfo] = useState({});
     const [isModifiersOpen, setIsModifiersOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
 
     const { isModalOpen, sessionMode, handleSessionSubmit, expectedCash } = useSession();
@@ -109,7 +110,7 @@ export default function Home() {
             isMounted = false;
         };
 
-    }, [currentPage, activeCategoryId, viewLayout]);
+    }, [currentPage, activeCategoryId, viewLayout, refreshTrigger]);
 
     const activeCategory = categories.find((cat) => cat._id === activeCategoryId);
 
@@ -239,7 +240,9 @@ export default function Home() {
             </div>
 
             <div className="checkout-container">
-                <OrderPanel />
+                <OrderPanel
+                    onOrderSuccess={() => setRefreshTrigger(prev => prev + 1)}
+                />
             </div>
 
             <ModifiersModal
