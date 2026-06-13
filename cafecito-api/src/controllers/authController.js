@@ -92,7 +92,8 @@ async function login(req, res, next) {
                 id: userExist._id,
                 displayName: userExist.displayName,
                 employeeId: userExist.employeeId,
-                role: userExist.role
+                role: userExist.role,
+                avatar: userExist.avatar
             }
         });
 
