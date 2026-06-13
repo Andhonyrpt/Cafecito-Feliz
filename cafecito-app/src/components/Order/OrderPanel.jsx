@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useOrder } from "../../context/OrderContext";
 import { useSession } from "../../context/SessionContext.jsx";
 import { clearProductsCache } from "../../services/productService.js";
@@ -8,7 +8,7 @@ import ClientSelector from "./ClientSelector";
 import CreateClientModal from './Modals/CreateClientModal.jsx';
 import './OrderPanel.css';
 
-export default function OrderPanel(onOrderSuccess) {
+export default function OrderPanel({ onOrderSuccess }) {
 
     const {
         orderItems,
@@ -29,6 +29,10 @@ export default function OrderPanel(onOrderSuccess) {
     // Estado para controlar el método de pago seleccionado en la barra inferior
     const [paymentMethod, setPaymentMethod] = useState('efectivo');
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+    const [orderType, setOrderType] = useState('local');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         if (!currentUser) {
@@ -36,8 +40,29 @@ export default function OrderPanel(onOrderSuccess) {
         }
     }, [currentUser, resetPOSPanel]);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Si el menú está abierto y el clic NO fue dentro del contenedor del dropdown, lo cerramos
+            if (isDropdownOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        // Escuchamos los clics en toda la pantalla del navegador
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            // Limpiamos el evento al desmontar el componente
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isDropdownOpen]);
+
     const handleOpenModal = () => {
         setIsClientModalOpen(true);
+    };
+
+    const handleSelectOrderType = (type) => {
+        setOrderType(type);
+        setIsDropdownOpen(false); // Cierra el menú automáticamente
     };
 
     // Acción del botón principal "Cobrar (F2)"
@@ -61,7 +86,8 @@ export default function OrderPanel(onOrderSuccess) {
             subtotal,
             iva,
             total: totalToPay,
-            paymentMethod
+            paymentMethod,
+            orderType
         };
         console.log("Enviando orden de venta al Backend:", orderPayload);
         // Aquí disparas tu fetch POST de tu API de registrar productos
@@ -77,6 +103,7 @@ export default function OrderPanel(onOrderSuccess) {
         removeClientFromOrder();
         resetPOSPanel();
         setPaymentMethod('efectivo');
+        setOrderType('local');
     };
 
     return (
@@ -91,6 +118,50 @@ export default function OrderPanel(onOrderSuccess) {
             <div className="order-view-info">
                 <div className="order-view-header">
                     <h2>Pedidos</h2>
+
+                    <div className="order-type-container" ref={dropdownRef}>
+                        <button
+                            type="button"
+                            className="dropdown-btn"
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        >
+                            <Icon name={orderType === 'local' ? 'shop' : 'bag'}
+                                size={16}
+                                className="dropdown-inline-icon"
+                            />
+
+                            <span>{orderType === 'local' ? 'Consumir aquí' : 'Para llevar'}</span>
+
+                            <Icon
+                                name='chevronDown'
+                                size={14}
+                                className="dropdown-arrow-icon"
+                            />
+                        </button>
+
+                        {isDropdownOpen && (
+                            <div className="dropdown-menu">
+                                <button
+                                    type="button"
+                                    className={`dropdown-menu-item ${orderType === 'local' ? 'selected' : ''}`}
+                                    onClick={() => handleSelectOrderType('local')}
+                                >
+                                    <Icon name="shop" size={14} />
+                                    <span>Consumir aquí</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className={`dropdown-menu-item ${orderType === 'llevar' ? 'selected' : ''}`}
+                                    onClick={() => handleSelectOrderType('llevar')}
+                                >
+                                    <Icon name="bag" size={14} />
+                                    <span>Para llevar</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     {orderItems.length > 0 && (
                         <Button
                             variant="ghost"
