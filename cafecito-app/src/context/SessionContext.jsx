@@ -8,7 +8,7 @@ const SessionContext = createContext();
 
 export function SessionProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [sessionMode, setSessionMode] = useState('open');
     const [expectedCash, setExpectedCash] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -25,7 +25,10 @@ export function SessionProvider({ children }) {
                     setIsModalOpen(false);
                 } catch (error) {
                     localStorage.removeItem('authToken');
+                    setIsModalOpen(true);
                 }
+            } else {
+                setIsModalOpen(true);
             }
             setLoading(false);
         };
@@ -92,6 +95,23 @@ export function SessionProvider({ children }) {
 
         }
     };
+
+    if (loading) {
+        return (
+            <div style={{
+                height: "100vh",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "var(--background, #fcf9f7)",
+                color: "#4e342e",
+                fontFamily: "sans-serif",
+                fontWeight: "500"
+            }}>
+                Cargando sesión...
+            </div>
+        );
+    }
 
     return (
         <SessionContext.Provider value={{

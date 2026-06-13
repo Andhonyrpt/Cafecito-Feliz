@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Icon from '../common/Icon';
 import { checkEmployeeRole } from '../../services/auth';
+import { useSession } from '../../context/SessionContext';
 import './CashSession.css';
 
 export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, expectedCash }) {
@@ -12,9 +13,11 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
     const [discrepancyReason, setDiscrepancyReason] = useState('');
     const [detectedRole, setDetectedRole] = useState('vendedor');
 
+    const { currentUser, setIsModalOpen } = useSession();
+
     const isOpening = mode === 'open';
 
-    const isAdmin = detectedRole === 'admin';
+    const isAdmin = isOpening ? (detectedRole === 'admin') : (currentUser?.role === 'admin');
 
     useEffect(() => {
         if (!isOpening) return;
@@ -56,14 +59,17 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                 setDiscrepancyReason('');
                 setError('');
 
-                if (isOpening) {
+                if (!isOpening && currentUser) {
+                    setDetectedRole(currentUser.role);
+                } else {
                     setDetectedRole('vendedor');
                 }
+
             }, 50);
 
             return () => clearTimeout(forceClean);
         }
-    }, [isOpen, mode, isOpening]);
+    }, [isOpen, mode, isOpening, currentUser]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -138,6 +144,16 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
     return (
         <div className='session-modal-overlay'>
             <div className='session-modal-container'>
+                {!isOpening && (
+                    <button
+                        type='button'
+                        className='session-modal-close-btn'
+                        onClick={() => setIsModalOpen(false)}
+                    >
+                        <Icon name='x' size={20} />
+                    </button>
+                )}
+
                 <div className='session-modal-header'>
                     <div className={`session-icon-badge ${isOpening ? 'open-badge' : 'close-badge'}`}>
                         <Icon name={isOpening ? "unlock" : "lock"} size={24} />

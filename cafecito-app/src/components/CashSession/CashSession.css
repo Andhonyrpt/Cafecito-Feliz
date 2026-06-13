@@ -13,6 +13,7 @@
 }
 
 .session-modal-container {
+    position: relative;
     background: var(--bg);
     padding: 32px;
     border-radius: var(--r8);
@@ -20,6 +21,32 @@
     max-width: 90%;
     box-shadow: var(--elev-4);
     border: 1px solid var(--border);
+}
+
+.session-modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a1887f;
+    /* Color café claro/mutilado original de tu paleta */
+    transition: all 0.2s ease;
+    z-index: 10;
+    /* Asegura que flote por encima del header */
+}
+
+.session-modal-close-btn:hover {
+    background-color: #f5f0ec;
+    /* Fondo suave al pasar el mouse */
+    color: #5d4037;
+    /* Oscurece el color del icono */
 }
 
 .session-modal-header {
