@@ -74,6 +74,11 @@ async function getOrdersByClient(req, res, next) {
 };
 
 async function createOrder(req, res, next) {
+    console.log("--- DEBUG START ---");
+    console.log("Cuerpo recibido (req.body):", req.body);
+    console.log("Usuario desde el token (req.user):", req.user);
+    console.log("Usuario desde el body (req.body.user):", req.body.user);
+    console.log("--- DEBUG END ---");
     try {
         const {
             client,
@@ -82,7 +87,12 @@ async function createOrder(req, res, next) {
             orderType
         } = req.body;
 
-        const userId = req.user?.id;
+        console.log("DEBUG: Cabeceras recibidas:", req.headers);
+        console.log("DEBUG: ¿Existe req.user?:", req.user);
+
+        const userId = req.user?.userId;
+
+        console.log("DEBUG: ID del vendedor recibido:", userId);
 
         if (!userId) {
             return res.status(401).json({ message: 'No se pudo identificar al cajero que realiza la venta.' });
@@ -208,7 +218,7 @@ async function createOrder(req, res, next) {
 
             await Promise.all(
                 products.map(async (item) => {
-                    return Product.findByIDAndUpdate(
+                    return Product.findByIdAndUpdate(
                         item.productId, { $inc: { stock: item.quantity } }
                     );
                 })
@@ -272,7 +282,7 @@ async function previewOrder(req, res, next) {
             return res.status(404).json({ message: "One or more products not found" });
         }
 
-        let discounPercentage = 0;
+        let discountPercentage = 0;
 
         if (client) {
             const clientData = await Client.findById(client);
@@ -294,7 +304,12 @@ async function previewOrder(req, res, next) {
         });
 
     } catch (err) {
-        next(err);
+        console.error("🔥 ERROR DETECTADO EN PREVIEW-ORDER:", err);
+        res.status(500).json({
+            message: err.message,
+            stack: err.stack
+        });
+        // next(err);
     }
 };
 

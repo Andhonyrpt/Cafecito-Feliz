@@ -12,7 +12,7 @@ export const TAX_RATE = 0.16; // IVA 16%
  * @param {Array} products - Lista de productos normalizados con {price, quantity}
  * @returns {Object} { subtotal, tax, shippingCost, total }
  */
-export function calculateOrderFinancials(products, discount = 0) {
+export function calculateOrderFinancials(products, discountPercentage = 0) {
     const subtotal = products.reduce(
         (acc, item) => acc + (item.price * item.quantity),
         0

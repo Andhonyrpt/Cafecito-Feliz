@@ -9,7 +9,7 @@ export const ORDER_ACTIONS = {
 };
 
 export const orderInitialState = {
-    items: storageService.get("current_order") || [],
+    items: storageService.get("order") || [],
 };
 
 export function orderReducer(state, action) {
@@ -21,23 +21,47 @@ export function orderReducer(state, action) {
         case ORDER_ACTIONS.ADD: {
             const p = action.payload;
 
-            const exists = state.items.find((i) => i._id === p._id);
+            const notaNueva = p.orderNotes ? p.orderNotes.trim() : "";
+            const cantidadAAgregar = p.quantity || 1;
+
+            const cantidadActualTotal = state.items
+                .filter((item) => item._id === p._id)
+                .reduce((sum, item) => sum + item.quantity, 0);
+
+            // Verificamos si la suma supera el stock máximo de MongoDB
+            if (cantidadActualTotal + cantidadAAgregar > p.stock) {
+                alert(`¡Inventario alcanzado! El stock máximo es de ${p.stock} unidades y ya tienes ${cantidadActualTotal} en el carrito.`);
+                return state;
+            }
+
+            const exists = state.items.find((i) => i._id === p._id && (i.orderNotes || "") === notaNueva);
+
             const items = exists ?
-                state.items.map((i) => i._id === p._id ?
-                    { ...i, quantity: i.quantity + (p.quantity || 1) } : i)
-                : [...state.items, { ...p, quantity: p.quantity || 1 }];
+                state.items.map((i) => (i._id === p._id && (i.orderNotes || "") === notaNueva) ?
+                    { ...i, quantity: i.quantity + cantidadAAgregar } : i)
+                : [...state.items, { ...p, orderNotes: notaNueva, quantity: cantidadAAgregar }];
             return { ...state, items };
         }
         case ORDER_ACTIONS.REMOVE: {
-            const { _id } = action.payload;
-            return { ...state, items: state.items.filter((i) => !(i._id === _id)) };
-        }
-        case ORDER_ACTIONS.SET_QTY: {
-            const { _id, quantity } = action.payload;
-            const q = Math.max(1, quantity);
+            const { _id, orderNotes } = action.payload;
+
+            const notaABorrar = orderNotes ? orderNotes.trim() : "";
+
             return {
                 ...state,
-                items: state.items.map((i) => (i._id === _id ? { ...i, quantity: q } : i))
+                items: state.items.filter((i) => !(i._id === _id && (i.orderNotes || "") === notaABorrar))
+            };
+        }
+        case ORDER_ACTIONS.SET_QTY: {
+            const { _id, orderNotes, quantity } = action.payload;
+
+            const notaQty = orderNotes ? orderNotes.trim() : "";
+
+            const q = Math.max(1, quantity);
+
+            return {
+                ...state,
+                items: state.items.map((i) => (i._id === _id && (i.orderNotes || "") === notaQty) ? { ...i, quantity: q } : i)
             }
         }
         case ORDER_ACTIONS.CLEAR: {

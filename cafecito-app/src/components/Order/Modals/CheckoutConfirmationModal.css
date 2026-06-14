@@ -1,0 +1,354 @@
+.pos-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.checkout-modal-container {
+    background-color: #1e1e24;
+    color: white;
+    width: 850px;
+    max-width: 95%;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.checkout-modal-header {
+    background-color: #141419;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2d2d35;
+}
+
+.header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-title-group h2 {
+    font-size: 1.25rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.close-x-btn {
+    background: none;
+    border: none;
+    color: #a0a0ab;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-x-btn:hover:not(:disabled) {
+    color: #ef4444;
+}
+
+.checkout-modal-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.checkout-summary-section h3,
+.checkout-actions-section h3 {
+    font-size: 1rem;
+    color: #a0a0ab;
+    margin-top: 0;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.checkout-items-review {
+    background-color: #141419;
+    border-radius: 8px;
+    padding: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #2d2d35;
+}
+
+.review-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid #2d2d35;
+}
+
+.review-item-row:last-child {
+    border-bottom: none;
+}
+
+.review-item-main {
+    display: flex;
+    gap: 12px;
+}
+
+.review-item-qty {
+    color: #eab308;
+    /* Amarillo para resaltar la cantidad */
+    font-weight: bold;
+}
+
+.review-item-details {
+    display: flex;
+    flex-direction: column;
+    /* 👑 Envía las notas abajo del nombre */
+    gap: 4px;
+}
+
+.review-item-name {
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.review-item-notes {
+    font-size: 0.85rem;
+    color: #ca8a04;
+    /* Amarillo quemado para que se lea perfecto */
+    color: '#ca8a04';
+}
+
+.review-item-price {
+    font-weight: 500;
+}
+
+.checkout-financials-box {
+    margin-top: 16px;
+    background-color: #25252d;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.financial-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.discount-text {
+    color: #10b981;
+    /* Verde para descuentos */
+    font-weight: 500;
+}
+
+.total-row {
+    border-top: 2px dashed #3f3f46;
+    padding-top: 12px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.client-vip-tag {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: #3b82f6;
+    /* Azul para clientes VIP */
+    font-weight: 500;
+}
+
+.checkout-actions-section {
+    background-color: #141419;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #2d2d35;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.cash-payment-flow,
+.card-payment-flow {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.input-group-cash label {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: #d4d4d8;
+}
+
+.cash-input-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: #1e1e24;
+    border: 2px solid #3f3f46;
+    border-radius: 8px;
+    padding: 0 16px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #eab308;
+}
+
+.cash-input-wrapper input {
+    background: none;
+    border: none;
+    color: #ffffff;
+    padding: 12px 8px;
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    outline: none;
+}
+
+.change-display-box {
+    margin-top: auto;
+    background-color: #1e1e24;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #2d2d35;
+}
+
+.change-display-box span {
+    font-size: 0.9rem;
+    color: #a0a0ab;
+}
+
+.change-display-box h2 {
+    margin: 8px 0 0 0;
+    font-size: 2rem;
+    color: #a0a0ab;
+}
+
+.change-display-box h2.positive-change {
+    color: #10b981;
+    /* Verde brillante si ya le debemos cambio */
+}
+
+.terminal-state-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+    flex-grow: 1;
+    padding: 20px 0;
+}
+
+.terminal-state-box p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.terminal-state-box span {
+    font-size: 0.85rem;
+    color: #a0a0ab;
+}
+
+.spinner-loader {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.success-icon {
+    color: #10b981;
+    animation: popCheck 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popCheck {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.checkout-modal-footer {
+    background-color: #141419;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #2d2d35;
+}
+
+.checkout-modal-footer .modal-cancel-btn {
+    background-color: #ef4444 !important;
+    /* Rojo elegante */
+    color: #ffffff !important;
+    /* Letras blancas */
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+    border: none !important;
+    border-radius: 6px !important;
+}
+
+.checkout-modal-footer .modal-cancel-btn:hover {
+    background-color: #dc2626 !important;
+}
+
+/* 👑 CORREGIDO: TEXTO BLANCO EN EL BOTÓN VERDE ACEPTAR */
+.checkout-modal-footer .modal-submit-btn:not(:disabled) {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+    /* Blanco sólido garantizado */
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+    border-radius: 6px !important;
+    border: none !important;
+}
+
+.checkout-modal-footer .modal-submit-btn:hover:not(:disabled) {
+    background-color: #15803d !important;
+}
+
+.checkout-modal-footer .modal-submit-btn:disabled {
+    background-color: #27272a !important;
+    color: #71717a !important;
+    cursor: not-allowed;
+}

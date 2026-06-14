@@ -3,6 +3,7 @@
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: var(--r4);
+    box-shadow: var(--elev-2);
 }
 
 .client-title {
