@@ -2,10 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useOrder } from "../../context/OrderContext";
 import { useSession } from "../../context/SessionContext.jsx";
 import { clearProductsCache } from "../../services/productService.js";
+import { createOrder, previewOrder } from "../../services/orderSevice.js";
+import { getUserProfile } from "../../services/userService.js";
 import Button from "../common/Button/Button.jsx";
 import Icon from "../common/Icon";
 import ClientSelector from "./ClientSelector";
 import CreateClientModal from './Modals/CreateClientModal.jsx';
+import CheckoutConfirmationModal from "./Modals/CheckoutConfirmationModal.jsx";
 import './OrderPanel.css';
 
 export default function OrderPanel({ onOrderSuccess }) {
@@ -14,6 +17,7 @@ export default function OrderPanel({ onOrderSuccess }) {
         orderItems,
         activeClient,
         subtotal,
+        discount,
         iva,
         totalToPay,
         addItemToOrder,
@@ -31,6 +35,9 @@ export default function OrderPanel({ onOrderSuccess }) {
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
     const [orderType, setOrderType] = useState('local');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const dropdownRef = useRef(null);
 
@@ -66,44 +73,94 @@ export default function OrderPanel({ onOrderSuccess }) {
     };
 
     // Acción del botón principal "Cobrar (F2)"
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
 
         if (orderItems.length === 0) {
             alert("El pedido está vacío.");
             return;
         }
 
-        const orderPayload = {
-            clienteId: activeClient?._id || null,
-            items: orderItems.map((item) => {
+        setIsLoading(true);
+
+        try {
+            const normalizedProducts = orderItems.map((item) => {
                 const p = item.product || item;
+
                 return {
                     productId: p._id,
                     quantity: item.quantity,
-                    price: p.price || item.price
+                    notes: item.orderNotes || item.notes || ''
                 };
-            }),
-            subtotal,
-            iva,
-            total: totalToPay,
-            paymentMethod,
-            orderType
-        };
-        console.log("Enviando orden de venta al Backend:", orderPayload);
-        // Aquí disparas tu fetch POST de tu API de registrar productos
+            });
 
-        alert("¡Cobro realizado con éxito!");
+            const dataCalculated = await previewOrder(normalizedProducts, activeClient?._id || null);
 
-        clearProductsCache();
-
-        if (onOrderSuccess) {
-            onOrderSuccess();
+            setPreviewData(dataCalculated);
+            setIsCheckoutModalOpen(true);
+        } catch (error) {
+            alert(error.message || "Error al simular los totales.");
+        } finally {
+            setIsLoading(false);
         }
+    };
 
-        removeClientFromOrder();
-        resetPOSPanel();
-        setPaymentMethod('efectivo');
-        setOrderType('local');
+    const handleConfirmPayment = async () => {
+        try {
+            setIsLoading(true);
+
+            const userProfile = await getUserProfile();
+            const userId = userProfile?._id;
+
+            console.log("DEBUG: ID extraído del perfil:", userId);
+
+            if (!userId) {
+                throw new Error("No se pudo obtener el perfil del cajero");
+            }
+
+            const finalProducts = orderItems.map((item) => {
+                const p = item.product || item;
+
+                return {
+                    productId: p._id,
+                    quantity: item.quantity,
+                    notes: item.orderNotes || item.notes || ''
+                };
+            });
+
+            const orderPayload = {
+                user: userId,
+                client: activeClient?._id || null,
+                products: finalProducts,
+                paymentMethod: paymentMethod,
+                orderType: orderType,
+                subtotal: previewData?.subtotal || subtotal,
+                discount: previewData?.discount || 0,
+                tax: previewData?.tax || iva,
+                total: previewData?.total || totalToPay
+            };
+
+            await createOrder(orderPayload);
+
+            alert('Cobro realizado con éxito');
+
+            clearProductsCache();
+
+            if (onOrderSuccess) {
+                onOrderSuccess();
+            }
+
+            setIsCheckoutModalOpen(false);
+            setPreviewData(null);
+            removeClientFromOrder();
+            resetPOSPanel();
+            setPaymentMethod('efectivo');
+            setOrderType('local');
+
+        } catch (error) {
+            console.error("Error al guardar la orden en el servidor:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -184,6 +241,14 @@ export default function OrderPanel({ onOrderSuccess }) {
                         const itemQuantity = item?.quantity || 0;
                         const totalItem = itemPrice * itemQuantity;
 
+                        const totalAcumuladoEnCarrito = orderItems
+                            .filter((i) => (i.product?._id || i._id) === currentItemId)
+                            .reduce((sum, i) => sum + i.quantity, 0);
+
+                        // 2. Creamos los booleanos limpios para los botones
+                        const esMaximoStock = totalAcumuladoEnCarrito >= availableStock;
+                        const esMinimoStock = item.quantity <= 1;
+
                         return (
                             <div className="order-item" key={currentItemId}>
 
@@ -194,20 +259,16 @@ export default function OrderPanel({ onOrderSuccess }) {
 
                                     <div className="item-quantity-controls">
                                         <button
-                                            variant="third"
-                                            size="xsm"
-                                            onClick={() => {
-                                                if (item.quantity < availableStock) {
-                                                    updateItemQuantity(currentItemId, item.quantity + 1)
-                                                }
-                                            }}
+                                            type="button"
+                                            onClick={() => updateItemQuantity(currentItemId, item.quantity + 1, item.orderNotes, availableStock)}
+                                            disabled={esMaximoStock}
                                         >
                                             <Icon name="chevronUp" size={15}></Icon>
                                         </button>
                                         <button
-                                            variant="third"
-                                            size="xsm"
-                                            onClick={() => updateItemQuantity(currentItemId, item.quantity - 1)}
+                                            type="button"
+                                            onClick={() => updateItemQuantity(currentItemId, item.quantity - 1, item.orderNotes)}
+                                            disabled={esMinimoStock}
                                         >
                                             <Icon name="chevronDown" size={15}></Icon>
                                         </button>
@@ -224,7 +285,7 @@ export default function OrderPanel({ onOrderSuccess }) {
                                 </div>
 
                                 <Button variant="ghost" className="danger" size="sm"
-                                    onClick={() => removeItemFromOrder(currentItemId)}
+                                    onClick={() => removeItemFromOrder({ _id: currentItemId, orderNotes: item.orderNotes })}
                                     title="Eliminar articulo"
                                 >
                                     <Icon name="trash" size={15} />
@@ -239,10 +300,19 @@ export default function OrderPanel({ onOrderSuccess }) {
                         <span>Subtotal</span>
                         <span>${subtotal.toFixed(2)}</span>
                     </div>
+
+                    {discount > 0 && (
+                        <div className="summary-row discount">
+                            <span>Descuento:</span>
+                            <span>-${discount.toFixed(2)}</span>
+                        </div>
+                    )}
+
                     <div>
                         <span>IVA (16%)</span>
                         <span>${iva.toFixed(2)}</span>
                     </div>
+
                     <div >
                         <span>Total a pagar</span>
                         <span >${totalToPay.toFixed(2)}</span>
@@ -253,8 +323,9 @@ export default function OrderPanel({ onOrderSuccess }) {
                     variant="primary"
                     size="lg"
                     onClick={handleCheckout}
+                    disabled={isLoading || orderItems.length === 0}
                 >
-                    Cobrar
+                    {isLoading ? 'Calculando' : 'Cobrar'}
                 </Button>
 
                 <div className="payment-grid">
@@ -282,6 +353,21 @@ export default function OrderPanel({ onOrderSuccess }) {
                         setClientToOrder(newClient); // Lo asigna directo a la orden al crearse
                         setIsClientModalOpen(false); // Cierra el modal
                     }}
+                />
+            )}
+
+            {isCheckoutModalOpen && (
+                <CheckoutConfirmationModal
+                    onClose={() => {
+                        setIsCheckoutModalOpen(false);
+                        setPreviewData(null);
+                    }}
+                    onConfirm={handleConfirmPayment}
+                    previewData={previewData}
+                    orderType={orderType}
+                    activeClient={activeClient}
+                    orderItems={orderItems}
+                    paymentMethod={paymentMethod}
                 />
             )}
         </div>

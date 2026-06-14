@@ -73,3 +73,26 @@
     at async model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
     at async model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
     at async createProduct (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/productController.js:99:9)
+2026-06-14T00:11:17.522Z
+    -POST
+    -/api/orders/preview
+    -discountPercentage is not defined
+    -ReferenceError: discountPercentage is not defined
+    at previewOrder (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/orderController.js:288:66)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14T00:15:50.102Z
+    -POST
+    -/api/orders/preview
+    -discountPercentage is not defined
+    -ReferenceError: discountPercentage is not defined
+    at calculateOrderFinancials (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/utils/orderHelper.js:21:47)
+    at previewOrder (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/orderController.js:288:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-06-14T00:17:06.157Z
+    -POST
+    -/api/orders/preview
+    -discountPercentage is not defined
+    -ReferenceError: discountPercentage is not defined
+    at calculateOrderFinancials (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/utils/orderHelper.js:21:47)
+    at previewOrder (file:///C:/Users/Usuario/Documents/GitHub/Cafecito-Feliz/cafecito-api/src/controllers/orderController.js:288:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)

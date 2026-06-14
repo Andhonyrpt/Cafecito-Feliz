@@ -35,8 +35,16 @@ http.interceptors.response.use(
     (res) => { return res },
     async (err) => {
         const originalRequest = err.config;
+        const esErrorDeAuth = (err.response?.status === 401 || err.response?.status === 403);
 
-        if ((err.response?.status === 401 || err.response.status === 403 && !originalRequest._retry)) {
+        if (esErrorDeAuth && originalRequest && !originalRequest._retry) {
+
+            // 👑 CANDADO ADICIONAL: Si ya estamos en una ruta de auth/refresh, no reintentar
+            if (originalRequest.url?.includes('/refresh') || originalRequest.url?.includes('/login')) {
+                if (logoutCallback) logoutCallback();
+                return Promise.reject(err);
+            }
+
             originalRequest._retry = true;
 
             try {

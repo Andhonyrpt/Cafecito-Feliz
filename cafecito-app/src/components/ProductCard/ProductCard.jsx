@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from "react";
 import Button from "../common/Button/Button";
 import './ProductCard.css';
 
-const ProductCard = memo(({ product, orientation, priority = false, onAdd }) => {
+const ProductCard = memo(({ product, orientation, priority = false, onAdd, isButtonDisabled }) => {
     const { name, price, imageUrl } = product;
 
     const cardClass = `product-card product-card--${orientation}`;
@@ -25,6 +25,7 @@ const ProductCard = memo(({ product, orientation, priority = false, onAdd }) => 
 
                     <Button variant="secondary" size="sm"
                         onClick={onAdd}
+                        disabled={isButtonDisabled}
                     >
                         +
                     </Button>

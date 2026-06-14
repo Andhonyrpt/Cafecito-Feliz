@@ -241,7 +241,13 @@ export default function Home() {
 
             <div className="checkout-container">
                 <OrderPanel
-                    onOrderSuccess={() => setRefreshTrigger(prev => prev + 1)}
+                    onOrderSuccess={() => {
+                        // Retrasamos el refresco una fracción de segundo para que el modal se cierre primero
+                        // y limpie la memoria de React antes de recargar los productos de MongoDB
+                        setTimeout(() => {
+                            setRefreshTrigger(prev => prev + 1);
+                        }, 300);
+                    }}
                 />
             </div>
 

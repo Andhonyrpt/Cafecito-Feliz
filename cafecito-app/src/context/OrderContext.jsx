@@ -18,8 +18,20 @@ export function OrderProvider({ children }) {
         return sum + (price * (i.quantity || 0));
     }, 0);
 
-    const iva = subtotal * 0.16;
-    const totalToPay = subtotal + iva;
+    let discountPercentage = 0;
+
+    if (activeClient) {
+        const purchases = activeClient.totalPurchaseCount || 0;
+
+        if (purchases >= 1 && purchases <= 4) discountPercentage = 0.05;
+        else if (purchases >= 5 && purchases <= 9) discountPercentage = 0.10;
+        else if (purchases >= 10) discountPercentage = 0.15;
+    }
+
+    const discount = subtotal * discountPercentage;
+    const subtotalDescuento = subtotal - discount;
+    const iva = subtotalDescuento * 0.16;
+    const totalToPay = subtotalDescuento + iva;
     const totalItemsCount = state.items.reduce((sum, i) => sum + (i.quantity || 0), 0);
 
     useEffect(() => {
@@ -47,12 +59,12 @@ export function OrderProvider({ children }) {
         dispatch({ type: ORDER_ACTIONS.ADD, payload: { ...product, quantity } });
     };
 
-    const updateItemQuantity = (_id, quantity) => {
-        dispatch({ type: ORDER_ACTIONS.SET_QTY, payload: { _id, quantity } });
+    const updateItemQuantity = (_id, quantity, orderNotes = "", stock) => {
+        dispatch({ type: ORDER_ACTIONS.SET_QTY, payload: { _id, quantity, orderNotes, stock } });
     };
 
-    const removeItemFromOrder = (_id) => {
-        dispatch({ type: ORDER_ACTIONS.REMOVE, payload: { _id } });
+    const removeItemFromOrder = (payloadData) => {
+        dispatch({ type: ORDER_ACTIONS.REMOVE, payload: payloadData });
     };
 
     const setClientToOrder = (client) => {
@@ -76,6 +88,7 @@ export function OrderProvider({ children }) {
         orderItems: state.items,
         activeClient,
         subtotal,
+        discount,
         iva,
         totalToPay,
         totalItemsCount,
