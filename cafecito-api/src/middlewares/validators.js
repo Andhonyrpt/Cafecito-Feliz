@@ -84,7 +84,7 @@ export const urlValidation = (field = "url") =>
 export const bodyMongoIdValidation = (field, label, optional = false) => {
     const validator = body(field).isMongoId().withMessage(`Invalid ${label} format`);
 
-    return optional ? validator.optional() : validator.notEmpty().withMessage(`${label} is required`);
+    return optional ? validator.optional({ nullable: true }) : validator.notEmpty().withMessage(`${label} is required`);
 };
 
 // Validación de MongoID en param 
@@ -152,3 +152,28 @@ export const queryEmailValidation = () =>
         .isEmail()
         .withMessage("Valid email is required")
         .normalizeEmail();
+
+export const quantityValidation = (field = "quantity", optional = false) => {
+    const validator = body(field).isInt({ min: 1 }).withMessage(`${field} must be at least 1`);
+
+    return optional ? validator.optional() : validator.notEmpty().withMessage(`${field} is required`);
+};
+
+export const priceValidation = (field = "price") =>
+    body(field).isFloat({ min: 0 }).withMessage(`${field} must be a positive number`);
+
+export const priceOptionalValidation = (field = "price") =>
+    body(field)
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage(`${field} must be a positive number`);
+
+export const orderStatusValidation = (optional = false) => {
+    const validator = body("status")
+        .trim()
+        .toLowerCase()
+        .isIn(["pending", "processing", "shipped", "delivered", "cancelled"])
+        .withMessage("Invalid status value");
+
+    return optional ? validator.optional() : validator.notEmpty().withMessage("Status is required");
+};

@@ -74,11 +74,6 @@ async function getOrdersByClient(req, res, next) {
 };
 
 async function createOrder(req, res, next) {
-    console.log("--- DEBUG START ---");
-    console.log("Cuerpo recibido (req.body):", req.body);
-    console.log("Usuario desde el token (req.user):", req.user);
-    console.log("Usuario desde el body (req.body.user):", req.body.user);
-    console.log("--- DEBUG END ---");
     try {
         const {
             client,
@@ -87,12 +82,8 @@ async function createOrder(req, res, next) {
             orderType
         } = req.body;
 
-        console.log("DEBUG: Cabeceras recibidas:", req.headers);
-        console.log("DEBUG: ¿Existe req.user?:", req.user);
-
         const userId = req.user?.userId;
 
-        console.log("DEBUG: ID del vendedor recibido:", userId);
 
         if (!userId) {
             return res.status(401).json({ message: 'No se pudo identificar al cajero que realiza la venta.' });
