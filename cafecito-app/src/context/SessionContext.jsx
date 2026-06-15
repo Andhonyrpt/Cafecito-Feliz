@@ -3,6 +3,7 @@ import { http } from "../services/http";
 import { getUserProfile } from "../services/userService";
 import { login, verifyEmployeePin } from "../services/auth";
 import ordersData from '../data/orders.json';
+import Loading from '../components/common/Loading/Loading';
 
 const SessionContext = createContext();
 
@@ -98,18 +99,7 @@ export function SessionProvider({ children }) {
 
     if (loading) {
         return (
-            <div style={{
-                height: "100vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "var(--background, #fcf9f7)",
-                color: "#4e342e",
-                fontFamily: "sans-serif",
-                fontWeight: "500"
-            }}>
-                Cargando sesión...
-            </div>
+            <Loading>Cargando Sesión</Loading>
         );
     }
 
