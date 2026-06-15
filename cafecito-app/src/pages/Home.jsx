@@ -147,7 +147,6 @@ export default function Home() {
                 expectedCash={expectedCash}
             />
 
-            {loading && <div className="loading-overlay">Cargando menú...</div>}
 
             <div className="category-menu">
                 {categories.map((category) => (
