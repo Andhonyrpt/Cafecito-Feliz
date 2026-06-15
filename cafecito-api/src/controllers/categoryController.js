@@ -43,7 +43,7 @@ async function getCategories(req, res, next) {
 
 async function getCategoryById(req, res, next) {
     try {
-        const category = await Category.findById(req.params.id).populate('parentcategory');
+        const category = await Category.findById(req.params.categoryId).populate('parentcategory');
 
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
@@ -77,7 +77,8 @@ async function createCategory(req, res, next) {
 async function updateCategory(req, res, next) {
     try {
         const { name, imageUrl, parentCategory } = req.body;
-        const idCategory = req.params.id;
+
+        const { categoryId } = req.params;
 
         if (
             name === undefined &&
@@ -93,10 +94,11 @@ async function updateCategory(req, res, next) {
         if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
         if (parentCategory !== undefined) updateData.parentCategory = parentCategory;
 
-        const updatedCategory = await Categpry.findByIdAndUpdate(
-            idCategory,
-            updateData, { new: true }
-        );
+        const updatedCategory = await Category.findByIdAndUpdate(
+            categoryId,
+            updateData,
+            { new: true }
+        ).populate('parentCategory');
 
         if (!updatedCategory) {
             return res.status(404).json({ message: "Category not found" });
@@ -111,9 +113,9 @@ async function updateCategory(req, res, next) {
 
 async function deleteCategory(req, res, next) {
     try {
-        const idCategory = req.params.id;
+        const { categoryId } = req.params;
 
-        const deletedCategory = await Category.findByIdAndDelete(idCategory);
+        const deletedCategory = await Category.findByIdAndDelete(categoryId);
 
         if (!deletedCategory) {
             return res.status(404).json({ message: "Category not found" });
