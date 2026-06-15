@@ -177,3 +177,49 @@ export const orderStatusValidation = (optional = false) => {
 
     return optional ? validator.optional() : validator.notEmpty().withMessage("Status is required");
 };
+
+export const productNameValidation = (required = true) => {
+    const validator = body("name")
+        .isLength({ min: 2, max: 100 })
+        .withMessage("Name must be between 2 and 100 characters")
+        .trim();
+
+    return required ? validator.notEmpty().withMessage("Name is required") : validator.optional();
+};
+
+// Validación de stock
+export const stockValidation = (field = "stock") =>
+    body(field)
+        .notEmpty()
+        .withMessage(`${field} is required`)
+        .isInt({ min: 0 })
+        .withMessage(`${field} must be a non-negative integer`);
+
+export const imageUrlValidation = (field = "imageUrl", required = true) => {
+    const validator = body(field)
+        .trim()
+        .custom((value) => {
+            if (!value || typeof value !== "string" || value.trim().length === 0) {
+                throw new Error("La URL de la imagen debe ser una cadena de texto no vacía.");
+            }
+            const isRelative = value.trim().startsWith("/");
+            const isFullUrl = /^(https?:\/\/)/.test(value);
+
+            if (!isRelative && !isFullUrl) {
+                throw new Error("La imagen debe ser una URL válida o una ruta relativa que empiece con /");
+            }
+            return true;
+        });
+
+    return required ? validator.notEmpty().withMessage("La URL de la imagen es obligatoria") : validator.optional();
+};
+
+// Validación de nombre general
+export const generalNameValidation = (field = "name", required = true, maxLength = 100) => {
+    const validator = body(field)
+        .trim()
+        .isLength({ min: 1, max: maxLength })
+        .withMessage(`${field} must be between 1 and ${maxLength} characters`);
+
+    return required ? validator.notEmpty().withMessage(`${field} is required`) : validator.optional();
+};

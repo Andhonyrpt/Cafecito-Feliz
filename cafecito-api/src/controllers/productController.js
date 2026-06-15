@@ -5,7 +5,7 @@ async function getProducts(req, res, next) {
         const { page, limit, category } = req.query;
 
         const filterQuery = {};
-        
+
         if (category) {
             filterQuery.parentCategory = category;
         }
@@ -60,7 +60,7 @@ async function getProducts(req, res, next) {
 
 async function getProductById(req, res, next) {
     try {
-        const productId = req.params.id
+        const { productId } = req.params
 
         const product = await Product.findById(productId).populate('parentCategory');
 
@@ -77,7 +77,7 @@ async function getProductById(req, res, next) {
 
 async function getProductByCategory(req, res, next) {
     try {
-        const categoryId = req.params.idCategory;
+        const { categoryId } = req.params;
 
         const products = await Product.find({ parentCategory: categoryId })
             .populate('parentCategory')
@@ -152,7 +152,7 @@ async function updateProduct(req, res, next) {
 
 async function deleteProduct(req, res, next) {
     try {
-        const { productId } = req.body;
+        const { productId } = req.params;
 
         const deletedProduct = await Product.findByIdAndDelete(productId);
 
