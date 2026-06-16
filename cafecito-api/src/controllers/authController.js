@@ -12,7 +12,7 @@ const generateToken = (userId, displayName, employeeId, role) => {
 const generateRefreshToken = (userId, displayName, employeeId, role) => {
     return jwt.sign({ userId, displayName, employeeId, role },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: '8h' }
+        { expiresIn: '1d' }
     );
 };
 

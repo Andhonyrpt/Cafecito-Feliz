@@ -223,3 +223,28 @@ export const generalNameValidation = (field = "name", required = true, maxLength
 
     return required ? validator.notEmpty().withMessage(`${field} is required`) : validator.optional();
 };
+
+export const cashInitialValidation = () =>
+    body("initialCash")
+        .notEmpty().withMessage("El monto de fondo inicial es obligatorio.")
+        .isFloat({ min: 0 }).withMessage("El fondo inicial debe ser un número positivo.");
+
+export const cashOpenedAtValidation = () =>
+    query("openedAt")
+        .notEmpty().withMessage("La fecha de apertura 'openedAt' es obligatoria.")
+        .isISO8601().withMessage("La fecha 'openedAt' debe ser un formato de fecha ISO8601 válido.");
+
+export const cashCloseValidation = () => [
+    body("pin")
+        .trim()
+        .notEmpty().withMessage("El PIN es obligatorio para el cierre.")
+        .isNumeric().withMessage("El PIN solo debe contener números.")
+        .isLength({ min: 5 }).withMessage("El PIN debe tener al menos 5 dígitos."),
+    body("isCashCorrect")
+        .notEmpty().withMessage("Debe especificar si el efectivo coincide.")
+        .isBoolean().withMessage("El campo 'isCashCorrect' debe ser un booleano."),
+    body("discrepancyReason")
+        .optional({ checkFalsy: true })
+        .trim()
+        .isLength({ max: 250 }).withMessage("El motivo del descuadre no puede exceder los 250 caracteres.")
+];

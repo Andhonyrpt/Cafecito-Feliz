@@ -1,15 +1,15 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const cashSessionSchema = new mongoose.Schema({
-    employeeId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Employee',
+        ref: 'User',
         required: true
     },
     openedAt: {
         type: Date,
-        required: true, default:
-            Date.now
+        required: true,
+        default: Date.now
     },
     closedAt: {
         type: Date

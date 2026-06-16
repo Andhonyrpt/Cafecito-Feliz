@@ -229,6 +229,14 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
                     {!isOpening && !isAdmin && (
                         <div className="session-input-group">
+                            <div className="session-expected-cash-box">
+                                <span className="session-expected-label">Efectivo esperado en caja:</span>
+                                <span className="session-expected-amount">
+                                    {/* Formateamos el número a dos decimales de forma limpia */}
+                                    ${new Intl.NumberFormat('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(expectedCash || 0)}
+                                </span>
+                            </div>
+
                             <label>¿El dinero físico en caja coincide con el total esperado?</label>
                             <div className='session-buttons-container'>
                                 <button
@@ -272,7 +280,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                             : (isAdmin ? !pin.trim() : (isCashCorrect === null || pin.trim() === '' || (isCashCorrect === false && !discrepancyReason.trim())))
                         }
                     >
-                        {isOpening ? 'Abrir Caja y Comenzar' : (isAdmin ? 'Cerrar sesión' : 'Realizar Corte y Cierre de Caja')}
+                        {isOpening ? (isAdmin ? 'Iniciar sesión' : 'Abrir Caja y Comenzar') : (isAdmin ? 'Cerrar sesión' : 'Realizar Corte y Cierre de Caja')}
                     </button>
                 </form>
             </div>

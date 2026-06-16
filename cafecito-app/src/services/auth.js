@@ -62,24 +62,6 @@ export const refresh = async () => {
     }
 }
 
-// export const checkEmail = async (email) => {
-//     try {
-//         const response = await http.get(`auth/check-email?email=${email}`);
-//         const { taken } = response.data;
-//         console.log(response.data);
-
-//         if (response.status === 200) {
-//             return taken;
-//         } else {
-//             return null;
-//         }
-
-//     } catch (error) {
-//         console.error("Error al consultar la disponibilidad del email", error.message, email);
-//         return false;
-//     }
-// };
-
 export const logout = async () => {
     try {
         await http.post("/auth/logout");
@@ -98,8 +80,7 @@ export const verifyEmployeePin = async (employeeId, pin) => {
         console.log("DATOS ENVIADOS AL CIERRE:", { employeeId, password: pin });
         const response = await http.post('/auth/verify-pin', { employeeId, password: pin });
 
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("refreshToken");
+
 
         return response.data;
     } catch (error) {
