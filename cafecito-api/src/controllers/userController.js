@@ -1,6 +1,5 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
-import mongoose from 'mongoose';
 
 // Obtener perfil del usuario autenticado
 const getUserProfile = async (req, res, next) => {

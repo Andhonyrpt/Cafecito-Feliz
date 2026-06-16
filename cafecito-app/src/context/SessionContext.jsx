@@ -2,8 +2,8 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { http } from "../services/http";
 import { getUserProfile } from "../services/userService";
 import { login, verifyEmployeePin } from "../services/auth";
-import ordersData from '../data/orders.json';
 import Loading from '../components/common/Loading/Loading';
+import { fetchTurnoTotals, createCashSession, closeCashSession } from "../services/cashSessionService";
 
 const SessionContext = createContext();
 
@@ -22,7 +22,14 @@ export function SessionProvider({ children }) {
             if (token) {
                 try {
                     const user = await getUserProfile();
-                    setCurrentUser(user);
+                    const savedOpenedAt = localStorage.getItem('openedAt');
+                    const savedInitialCash = localStorage.getItem('initialCash');
+
+                    setCurrentUser({
+                        ...user,
+                        initialCash: savedInitialCash ? Number(savedInitialCash) : 0,
+                        openedAt: savedOpenedAt || null
+                    });
                     setIsModalOpen(false);
                 } catch (error) {
                     localStorage.removeItem('authToken');
@@ -36,18 +43,28 @@ export function SessionProvider({ children }) {
         checkActiveSession();
     }, []);
 
-    const calculateExpectedTotals = () => {
-        if (!currentUser) return;
+    const calculateExpectedTotals = async () => {
+        if (!currentUser || !currentUser.openedAt) return;
 
-        // Filtra las ventas que coincidan con el ID del empleado activo
-        const currentSales = ordersData.filter((order) => order.employeeId === currentUser.employeeId && order.paymentMethod === 'cash');
+        try {
+            const orderData = await fetchTurnoTotals(currentUser.openedAt);
 
-        // Suma los totales de las ventas
-        const totalSales = currentSales.reduce((sum, order) => sum + order.total, 0);
+            const cashSales = orderData?.cashSales || 0;
+            const initialCash = currentUser.initialCash || 0;
+            const expectedTotal = initialCash + cashSales;
 
-        // Suma el fondo inicial con el que abrió la caja
-        const expectedTotal = currentUser.initialCash + totalSales;
-        setExpectedCash(expectedTotal);
+            console.log("📊 ARQUEO DE CAJA DESDE SERVICIO:", {
+                fondoInicial: initialCash,
+                ventasDelTurno: cashSales,
+                totalEsperado: expectedTotal
+            });
+
+            setExpectedCash(expectedTotal);
+        } catch (error) {
+            console.error("Error al calcular el dinero esperado a través del servicio:", error);
+            // Fallback: si el servidor falla, al menos mostramos el fondo inicial
+            setExpectedCash(currentUser.initialCash || 0);
+        }
     };
 
     const handleSessionSubmit = async (data) => {
@@ -61,12 +78,18 @@ export function SessionProvider({ children }) {
 
                 const { token, user } = res.data;
 
+                const nowIsoString = new Date(data.timestamp).toISOString();
+
                 localStorage.setItem('authToken', token);
+                localStorage.setItem('openedAt', nowIsoString);
+                localStorage.setItem('initialCash', data.amount);
+
+                await createCashSession(Number(data.amount), nowIsoString);
 
                 setCurrentUser({
                     ...user,
                     initialCash: Number(data.amount),
-                    openedAt: data.timestamp
+                    openedAt: nowIsoString
                 });
 
                 setIsModalOpen(false);
@@ -74,16 +97,30 @@ export function SessionProvider({ children }) {
 
             } catch (error) {
                 console.error('Error en login:', error);
+                localStorage.removeItem('authToken');
                 return error.response?.data?.message;
             }
 
         } else {
             try {
+                console.log("🔐 Verificando PIN de empleado para el cierre...");
                 await verifyEmployeePin(currentUser.employeeId, data.pin);
 
                 console.log("Cierre de caja - ¿Coincide?:", data.isCashCorrect, "Motivo descuadre:", data.discrepancyReason, "a las:", data.timestamp);
 
+                console.log("💾 Guardando arqueo final en MongoDB...");
+                await closeCashSession({
+                    pin: data.pin,
+                    isCashCorrect: data.isCashCorrect,
+                    discrepancyReason: data.discrepancyReason,
+                    timestamp: data.timestamp
+                });
+
+                console.log("🧹 Limpiando datos locales del turno concluido...");
                 localStorage.removeItem('authToken');
+                localStorage.removeItem('openedAt');
+                localStorage.removeItem('initialCash');
+
                 setCurrentUser(null);
                 setSessionMode('open');
                 setIsModalOpen(true);
@@ -93,7 +130,6 @@ export function SessionProvider({ children }) {
                 console.error('Error en cierre de caja:', error);
                 return error.response?.data?.message;
             }
-
         }
     };
 
@@ -127,4 +163,4 @@ export function useSession() {
     }
 
     return context
-}
+};

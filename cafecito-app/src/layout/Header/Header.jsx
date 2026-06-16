@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Icon from '../../components/common/Icon';
 import { useSession } from '../../context/SessionContext';
+import { useOrder } from '../../context/OrderContext';
 import './Header.css';
 
 export default function Header() {
@@ -9,6 +10,7 @@ export default function Header() {
 
     // Simulación de autenticación 
     const { currentUser, setIsModalOpen, setSessionMode, calculateExpectedTotals } = useSession();
+    const { orders } = useOrder();
     const isAuth = !!currentUser;
 
     useEffect(() => {
@@ -40,8 +42,10 @@ export default function Header() {
         }).format(date);
     };
 
-    const handleLogout = () => {
-        calculateExpectedTotals();
+    const handleLogout = async () => {
+        console.log("🚀 Botón de cierre presionado. Iniciando arqueo...");
+
+        await calculateExpectedTotals();
         setSessionMode('close'); // Setea el modal en modo Cierre de Caja
         setIsModalOpen(true);    // Despliega el modal encima de la app
     };

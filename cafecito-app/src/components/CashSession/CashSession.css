@@ -15,10 +15,13 @@
 .session-modal-container {
     position: relative;
     background: var(--bg);
-    padding: 32px;
+    padding: 24px;
     border-radius: var(--r8);
     width: 380px;
     max-width: 90%;
+    height: auto;
+    /* 1. Le permitimos encogerse si hay poco contenido */
+    max-height: 580px;
     box-shadow: var(--elev-4);
     border: 1px solid var(--border);
 }
@@ -90,7 +93,9 @@
 .session-modal-form {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .session-input-group {
@@ -135,6 +140,31 @@
 .session-input-wrapper input:focus {
     border-color: #d4a373;
     box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.15);
+}
+
+.session-expected-cash-box {
+    background-color: #f4f6f9;
+    border-left: 4px solid var(--success);
+    /* Un borde azul de atención */
+    padding: 5px;
+    border-radius: 6px;
+    margin-bottom: 1px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.session-expected-label {
+    font-size: 0.85rem;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.session-expected-amount {
+    font-size: 1.6rem;
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
 .session-balance-badge {
@@ -244,4 +274,9 @@
     align-items: center;
     gap: 8px;
     font-weight: 500;
+}
+
+.session-modal-form .session-discrepancy-input {
+    padding: 12px 14px !important;
+    text-align: left;
 }
