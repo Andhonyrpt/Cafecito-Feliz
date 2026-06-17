@@ -1,38 +1,29 @@
-import request from 'supertest';
-import { app } from '../server.js';
-import mongoose from 'mongoose';
+import { makeUserPayload } from './helpers/factories.js';
+import { api } from './helpers/http.js';
 
-// Usaremos datos en duro para crear un usuario directamente en Mongoose o llamando al endpoint.
-// Como el entorno de pruebas está limpio, probaremos el registro primero.
 describe('Auth Module Tests', () => {
-    let authToken = '';
     let refreshToken = '';
-    const employeeId = 'EMP-99';
-    const testPin = '12345';
+    const userPayload = makeUserPayload({
+        displayName: 'Test Employee',
+        employeeId: 'EMP-99'
+    });
 
     describe('POST /api/auth/register', () => {
         it('should register a new employee successfully', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/auth/register')
-                .send({
-                    displayName: 'Test Employee',
-                    employeeId: employeeId,
-                    password: testPin,
-                    avatar: 'http://example.com/avatar.jpg'
-                });
+                .send(userPayload);
             
             expect(res.status).toBe(201);
-            expect(res.body).toHaveProperty('employeeId', employeeId);
+            expect(res.body).toHaveProperty('employeeId', userPayload.employeeId);
         });
 
         it('should fail to register if employeeId is missing', async () => {
-            const res = await request(app)
+            const { employeeId, ...payloadWithoutEmployeeId } = makeUserPayload();
+
+            const res = await api()
                 .post('/api/auth/register')
-                .send({
-                    displayName: 'Test Employee',
-                    password: testPin,
-                    avatar: 'http://example.com/avatar.jpg'
-                });
+                .send(payloadWithoutEmployeeId);
             
             expect(res.status).toBe(422);
             expect(res.body).toHaveProperty('errors');
@@ -41,26 +32,25 @@ describe('Auth Module Tests', () => {
 
     describe('POST /api/auth/login', () => {
         it('should login the employee successfully', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/auth/login')
                 .send({
-                    employeeId: employeeId,
-                    password: testPin // the test validator checks this as password
+                    employeeId: userPayload.employeeId,
+                    password: userPayload.password
                 });
             
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('token');
             expect(res.body).toHaveProperty('refreshToken');
             
-            authToken = res.body.token;
             refreshToken = res.body.refreshToken;
         });
 
         it('should fail login with invalid credentials', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/auth/login')
                 .send({
-                    employeeId: employeeId,
+                    employeeId: userPayload.employeeId,
                     password: 'wrong'
                 });
             
@@ -71,11 +61,11 @@ describe('Auth Module Tests', () => {
 
     describe('POST /api/auth/verify-pin', () => {
         it('should verify pin successfully', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/auth/verify-pin')
                 .send({
-                    employeeId: employeeId,
-                    password: testPin
+                    employeeId: userPayload.employeeId,
+                    password: userPayload.password
                 });
             
             expect(res.status).toBe(200);
@@ -86,7 +76,7 @@ describe('Auth Module Tests', () => {
 
     describe('POST /api/auth/refresh', () => {
         it('should get a new access token using a valid refresh token', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/auth/refresh')
                 .send({
                     refreshToken: refreshToken
@@ -99,7 +89,7 @@ describe('Auth Module Tests', () => {
 
     describe('POST /api/auth/logout', () => {
         it('should logout successfully', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/auth/logout')
                 .send({
                     token: refreshToken

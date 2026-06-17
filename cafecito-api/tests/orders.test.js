@@ -1,6 +1,6 @@
-import request from 'supertest';
-import { app } from '../server.js';
-import mongoose from 'mongoose';
+import { createAdminWithToken } from './helpers/auth.js';
+import { makeCategoryPayload, makeClientPayload, makeOrderPayload, makeProductPayload } from './helpers/factories.js';
+import { api, authHeader } from './helpers/http.js';
 
 describe('Orders Module Tests', () => {
     let empToken = '';
@@ -10,48 +10,41 @@ describe('Orders Module Tests', () => {
     let categoryId = '';
 
     beforeAll(async () => {
-        // Setup employee
-        await request(app).post('/api/auth/register').send({
+        const admin = await createAdminWithToken({
             displayName: 'Emp Order',
-            employeeId: 'EMP-06',
-            password: '12345',
-            avatar: 'http://example.com/emp.jpg'
+            employeeId: 'EMP-06'
         });
-        // Convert to admin to create product
-        const User = mongoose.model('User');
-        await User.findOneAndUpdate({ employeeId: 'EMP-06' }, { role: 'admin' });
-        const resEmp = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-06', password: '12345' });
-        empToken = resEmp.body.token;
+        empToken = admin.token;
 
-        const resCat = await request(app).post('/api/categories').set('Authorization', `Bearer ${empToken}`).send({
-            name: 'Ordenes',
-            imageUrl: 'http://example.com/orders.jpg'
-        });
+        const resCat = await api()
+            .post('/api/categories')
+            .set(authHeader(empToken))
+            .send(makeCategoryPayload({ name: 'Ordenes' }));
         categoryId = resCat.body._id;
 
-        // Setup product
-        const resProd = await request(app).post('/api/products').set('Authorization', `Bearer ${empToken}`).send({
-            name: 'Coffee',
-            price: 20,
-            stock: 100,
-            imageUrl: 'http://example.com/coffee.jpg',
-            parentCategory: categoryId
-        });
+        const resProd = await api()
+            .post('/api/products')
+            .set(authHeader(empToken))
+            .send(makeProductPayload(categoryId, {
+                name: 'Coffee',
+                price: 20,
+                stock: 100,
+                imageUrl: 'http://example.com/coffee.jpg'
+            }));
         productId = resProd.body._id;
 
-        // Setup client
-        const resCli = await request(app).post('/api/clients').set('Authorization', `Bearer ${empToken}`).send({
-            displayName: 'Order Client',
-            email: 'order@example.com'
-        });
+        const resCli = await api()
+            .post('/api/clients')
+            .set(authHeader(empToken))
+            .send(makeClientPayload({ displayName: 'Order Client' }));
         clientId = resCli.body.client._id;
     });
 
     describe('POST /api/orders/preview', () => {
         it('should preview order total', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/orders/preview')
-                .set('Authorization', `Bearer ${empToken}`)
+                .set(authHeader(empToken))
                 .send({
                     products: [{ productId, quantity: 2 }]
             });
@@ -62,39 +55,37 @@ describe('Orders Module Tests', () => {
 
     describe('POST /api/orders', () => {
         it('should create an order', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/orders')
-                .set('Authorization', `Bearer ${empToken}`)
-                .send({
+                .set(authHeader(empToken))
+                .send(makeOrderPayload({
                     client: clientId,
-                    products: [{ productId, quantity: 2 }],
-                    paymentMethod: 'efectivo',
-                    orderType: 'local'
-            });
+                    productId,
+                    quantity: 2
+                }));
             expect(res.status).toBe(201);
             expect(res.body).toHaveProperty('totalPrice', 46.4);
             orderId = res.body._id;
         });
 
         it('should fail if products array is empty', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/orders')
-                .set('Authorization', `Bearer ${empToken}`)
-                .send({
+                .set(authHeader(empToken))
+                .send(makeOrderPayload({
                     client: clientId,
                     products: [],
-                    paymentMethod: 'efectivo',
-                    orderType: 'local'
-                });
+                    productId
+                }));
             expect(res.status).toBe(422);
         });
     });
 
     describe('GET /api/orders', () => {
         it('should list orders', async () => {
-            const res = await request(app)
+            const res = await api()
                 .get('/api/orders')
-                .set('Authorization', `Bearer ${empToken}`);
+                .set(authHeader(empToken));
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('orders');
         });
@@ -102,9 +93,9 @@ describe('Orders Module Tests', () => {
 
     describe('PATCH /api/orders/:orderId/status', () => {
         it('should update order status', async () => {
-            const res = await request(app)
+            const res = await api()
                 .patch(`/api/orders/${orderId}/status`)
-                .set('Authorization', `Bearer ${empToken}`)
+                .set(authHeader(empToken))
                 .send({ status: 'completado' });
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('status', 'completado');

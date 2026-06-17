@@ -1,52 +1,52 @@
-import request from 'supertest';
-import { app } from '../server.js';
-import mongoose from 'mongoose';
+import { createUserWithToken } from './helpers/auth.js';
+import { makeClientPayload } from './helpers/factories.js';
+import { api, authHeader } from './helpers/http.js';
 
 describe('Clients Module Tests', () => {
     let empToken = '';
     let clientId = '';
+    let createdClientEmail = '';
 
     beforeAll(async () => {
-        await request(app).post('/api/auth/register').send({
+        const employee = await createUserWithToken({
             displayName: 'Emp Client',
-            employeeId: 'EMP-05',
-            password: '12345',
-            avatar: 'http://example.com/emp.jpg'
+            employeeId: 'EMP-05'
         });
-        const resEmp = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-05', password: '12345' });
-        empToken = resEmp.body.token;
+        empToken = employee.token;
     });
 
     describe('POST /api/clients', () => {
         it('should create a client', async () => {
-            const res = await request(app)
+            const clientPayload = makeClientPayload({
+                displayName: 'John Doe',
+                email: 'john@example.com'
+            });
+
+            const res = await api()
                 .post('/api/clients')
-                .set('Authorization', `Bearer ${empToken}`)
-                .send({
-                    displayName: 'John Doe',
-                    email: 'john@example.com'
-                });
+                .set(authHeader(empToken))
+                .send(clientPayload);
             
             expect(res.status).toBe(201);
-            expect(res.body.client).toHaveProperty('email', 'john@example.com');
+            expect(res.body.client).toHaveProperty('email', clientPayload.email);
             clientId = res.body.client._id;
+            createdClientEmail = clientPayload.email;
         });
 
         it('should fail if email is invalid', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/clients')
-                .set('Authorization', `Bearer ${empToken}`)
-                .send({
-                    displayName: 'Jane Doe',
+                .set(authHeader(empToken))
+                .send(makeClientPayload({
                     email: 'invalid-email'
-                });
+                }));
             expect(res.status).toBe(422);
         });
     });
 
     describe('GET /api/clients/check-email', () => {
         it('should check if email exists', async () => {
-            const res = await request(app).get('/api/clients/check-email?email=john@example.com');
+            const res = await api().get(`/api/clients/check-email?email=${encodeURIComponent(createdClientEmail)}`);
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('taken');
         });
@@ -54,9 +54,9 @@ describe('Clients Module Tests', () => {
 
     describe('GET /api/clients/search', () => {
         it('should search clients', async () => {
-            const res = await request(app)
+            const res = await api()
                 .get('/api/clients/search?search=john')
-                .set('Authorization', `Bearer ${empToken}`);
+                .set(authHeader(empToken));
             expect(res.status).toBe(200);
             expect(Array.isArray(res.body.clients)).toBe(true);
         });
@@ -64,15 +64,17 @@ describe('Clients Module Tests', () => {
 
     describe('PUT /api/clients/:clientId', () => {
         it('should update client', async () => {
-            const res = await request(app)
+            const updatePayload = makeClientPayload({
+                displayName: 'John Updated',
+                email: 'john2@example.com'
+            });
+
+            const res = await api()
                 .put(`/api/clients/${clientId}`)
-                .set('Authorization', `Bearer ${empToken}`)
-                .send({
-                    displayName: 'John Updated',
-                    email: 'john2@example.com'
-                });
+                .set(authHeader(empToken))
+                .send(updatePayload);
             expect(res.status).toBe(200);
-            expect(res.body.client).toHaveProperty('displayName', 'John Updated');
+            expect(res.body.client).toHaveProperty('displayName', updatePayload.displayName);
         });
     });
 });
