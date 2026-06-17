@@ -1,68 +1,60 @@
-import request from 'supertest';
-import { app } from '../server.js';
-import mongoose from 'mongoose';
+import { createAdminWithToken } from './helpers/auth.js';
+import { makeCategoryPayload, makeProductPayload } from './helpers/factories.js';
+import { api, authHeader } from './helpers/http.js';
 
 describe('Products Module Tests', () => {
     let adminToken = '';
     let categoryId = '';
     let productId = '';
+    let productPayload;
 
     beforeAll(async () => {
-        // Setup admin
-        await request(app).post('/api/auth/register').send({
+        const admin = await createAdminWithToken({
             displayName: 'Admin Prod',
-            employeeId: 'EMP-04',
-            password: '12345',
-            avatar: 'http://example.com/admin.jpg'
+            employeeId: 'EMP-04'
         });
-        const User = mongoose.model('User');
-        await User.findOneAndUpdate({ employeeId: 'EMP-04' }, { role: 'admin' });
-        const resAdmin = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-04', password: '12345' });
-        adminToken = resAdmin.body.token;
+        adminToken = admin.token;
 
-        // Setup category
-        const resCat = await request(app).post('/api/categories').set('Authorization', `Bearer ${adminToken}`).send({
-            name: 'Postres',
-            imageUrl: 'http://example.com/postres.jpg'
-        });
+        const resCat = await api()
+            .post('/api/categories')
+            .set(authHeader(adminToken))
+            .send(makeCategoryPayload({ name: 'Postres' }));
         categoryId = resCat.body._id;
     });
 
     describe('POST /api/products', () => {
         it('should create a product if admin', async () => {
-            const res = await request(app)
+            productPayload = makeProductPayload(categoryId, {
+                name: 'Cheesecake',
+                price: 45.50,
+                stock: 10,
+                imageUrl: 'http://example.com/cake.jpg'
+            });
+
+            const res = await api()
                 .post('/api/products')
-                .set('Authorization', `Bearer ${adminToken}`)
-                .send({
-                    name: 'Cheesecake',
-                    price: 45.50,
-                    stock: 10,
-                    imageUrl: 'http://example.com/cake.jpg',
-                    parentCategory: categoryId
-                });
+                .set(authHeader(adminToken))
+                .send(productPayload);
             
             expect(res.status).toBe(201);
-            expect(res.body).toHaveProperty('name', 'Cheesecake');
+            expect(res.body).toHaveProperty('name', productPayload.name);
             productId = res.body._id;
         });
 
         it('should fail if price is negative', async () => {
-            const res = await request(app)
+            const res = await api()
                 .post('/api/products')
-                .set('Authorization', `Bearer ${adminToken}`)
-                .send({
-                    name: 'Cheesecake 2',
+                .set(authHeader(adminToken))
+                .send(makeProductPayload(categoryId, {
                     price: -10,
-                    stock: 10,
-                    imageUrl: 'http://example.com/cake.jpg'
-                });
+                }));
             expect(res.status).toBe(422);
         });
     });
 
     describe('GET /api/products', () => {
         it('should list products', async () => {
-            const res = await request(app).get('/api/products');
+            const res = await api().get('/api/products');
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('products');
             expect(Array.isArray(res.body.products)).toBe(true);
@@ -72,7 +64,7 @@ describe('Products Module Tests', () => {
 
     describe('GET /api/products/:id', () => {
         it('should get product by id', async () => {
-            const res = await request(app).get(`/api/products/${productId}`);
+            const res = await api().get(`/api/products/${productId}`);
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('_id', productId);
         });
@@ -80,9 +72,9 @@ describe('Products Module Tests', () => {
 
     describe('PUT /api/products/:id', () => {
         it('should update product', async () => {
-            const res = await request(app)
+            const res = await api()
                 .put(`/api/products/${productId}`)
-                .set('Authorization', `Bearer ${adminToken}`)
+                .set(authHeader(adminToken))
                 .send({
                     price: 50.00
                 });
@@ -93,9 +85,9 @@ describe('Products Module Tests', () => {
 
     describe('DELETE /api/products/:id', () => {
         it('should delete product', async () => {
-            const res = await request(app)
+            const res = await api()
                 .delete(`/api/products/${productId}`)
-                .set('Authorization', `Bearer ${adminToken}`);
+                .set(authHeader(adminToken));
             expect(res.status).toBe(204);
         });
     });

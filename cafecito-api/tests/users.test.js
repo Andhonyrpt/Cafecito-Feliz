@@ -1,60 +1,41 @@
-import request from 'supertest';
-import { app } from '../server.js';
-import mongoose from 'mongoose';
+import { createAdminWithToken, createUserWithToken } from './helpers/auth.js';
+import { makeUserPayload } from './helpers/factories.js';
+import { api, authHeader } from './helpers/http.js';
 
 describe('Users Module Tests', () => {
     let adminToken = '';
     let userToken = '';
     let testUserId = '';
+    let normalUserPayload;
 
     beforeAll(async () => {
-        // Register an admin
-        let res = await request(app).post('/api/auth/register').send({
+        const admin = await createAdminWithToken({
             displayName: 'Admin User',
-            employeeId: 'EMP-01',
-            password: '12345',
-            avatar: 'http://example.com/admin.jpg'
+            employeeId: 'EMP-01'
         });
-        
-        // Let's assume there is a way to make them admin or we can mock the isAdmin middleware later.
-        // Actually, we must manually update the user to admin in the DB for integration testing.
-        const User = mongoose.model('User');
-        await User.findOneAndUpdate({ employeeId: 'EMP-01' }, { role: 'admin' });
+        adminToken = admin.token;
 
-        res = await request(app).post('/api/auth/login').send({
-            employeeId: 'EMP-01',
-            password: '12345'
-        });
-        adminToken = res.body.token;
-
-        // Register a normal user
-        res = await request(app).post('/api/auth/register').send({
+        const normalUser = await createUserWithToken({
             displayName: 'Normal User',
-            employeeId: 'EMP-02',
-            password: '12345',
-            avatar: 'http://example.com/user.jpg'
+            employeeId: 'EMP-02'
         });
-        
-        res = await request(app).post('/api/auth/login').send({
-            employeeId: 'EMP-02',
-            password: '12345'
-        });
-        userToken = res.body.token;
+        normalUserPayload = normalUser.payload;
+        userToken = normalUser.token;
     });
 
     describe('GET /api/users/profile', () => {
         it('should get current user profile', async () => {
-            const res = await request(app)
+            const res = await api()
                 .get('/api/users/profile')
-                .set('Authorization', `Bearer ${userToken}`);
+                .set(authHeader(userToken));
             
             expect(res.status).toBe(200);
-            expect(res.body.user).toHaveProperty('employeeId', 'EMP-02');
+            expect(res.body.user).toHaveProperty('employeeId', normalUserPayload.employeeId);
             testUserId = res.body.user._id;
         });
 
         it('should fail if no token provided', async () => {
-            const res = await request(app)
+            const res = await api()
                 .get('/api/users/profile');
             
             expect(res.status).toBe(401);
@@ -63,9 +44,9 @@ describe('Users Module Tests', () => {
 
     describe('GET /api/users', () => {
         it('should get list of users if admin', async () => {
-            const res = await request(app)
+            const res = await api()
                 .get('/api/users')
-                .set('Authorization', `Bearer ${adminToken}`);
+                .set(authHeader(adminToken));
             
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('users');
@@ -73,9 +54,9 @@ describe('Users Module Tests', () => {
         });
 
         it('should fail if normal user tries to get list', async () => {
-            const res = await request(app)
+            const res = await api()
                 .get('/api/users')
-                .set('Authorization', `Bearer ${userToken}`);
+                .set(authHeader(userToken));
             
             expect(res.status).toBe(403);
         });
@@ -83,9 +64,9 @@ describe('Users Module Tests', () => {
 
     describe('GET /api/users/:userId', () => {
         it('should get user by id if admin', async () => {
-            const res = await request(app)
+            const res = await api()
                 .get(`/api/users/${testUserId}`)
-                .set('Authorization', `Bearer ${adminToken}`);
+                .set(authHeader(adminToken));
             
             expect(res.status).toBe(200);
             expect(res.body.user).toHaveProperty('_id', testUserId);
@@ -94,27 +75,29 @@ describe('Users Module Tests', () => {
 
     describe('PUT /api/users/:userId', () => {
         it('should update user if admin', async () => {
-            const res = await request(app)
+            const updatePayload = makeUserPayload({
+                displayName: 'Updated User',
+                employeeId: normalUserPayload.employeeId,
+                role: 'vendedor',
+                isActive: true,
+                avatar: 'http://example.com/new.jpg'
+            });
+
+            const res = await api()
                 .put(`/api/users/${testUserId}`)
-                .set('Authorization', `Bearer ${adminToken}`)
-                .send({
-                    displayName: 'Updated User',
-                    employeeId: 'EMP-02',
-                    role: 'vendedor',
-                    isActive: true,
-                    avatar: 'http://example.com/new.jpg'
-                });
+                .set(authHeader(adminToken))
+                .send(updatePayload);
             
             expect(res.status).toBe(200);
-            expect(res.body.user).toHaveProperty('displayName', 'Updated User');
+            expect(res.body.user).toHaveProperty('displayName', updatePayload.displayName);
         });
     });
 
     describe('PATCH /api/toggle-status/:userId', () => {
         it('should toggle user status if admin', async () => {
-            const res = await request(app)
+            const res = await api()
                 .patch(`/api/toggle-status/${testUserId}`)
-                .set('Authorization', `Bearer ${adminToken}`);
+                .set(authHeader(adminToken));
             
             expect(res.status).toBe(200);
             expect(res.body.user.isActive).toBe(false);
