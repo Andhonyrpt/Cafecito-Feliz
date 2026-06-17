@@ -5,8 +5,10 @@ dotenv.config();
 
 
 const dbConnection = async () => {
+    if (process.env.NODE_ENV === 'test') {
+        return;
+    }
     try {
-
         const dbUri = process.env.MONGODB_URI;
         const dbName = process.env.MONGODB_DB;
 

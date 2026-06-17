@@ -61,6 +61,9 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on http:localhost:${process.env.PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
+}
