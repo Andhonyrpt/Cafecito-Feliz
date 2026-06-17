@@ -10,5 +10,12 @@ export default {
   forceExit: true,
   clearMocks: true,
   resetMocks: true,
-  restoreMocks: true
+  restoreMocks: true,
+  coverageThreshold: {
+    global: {
+      statements: 80,
+      lines: 80,
+      functions: 80
+    }
+  }
 };

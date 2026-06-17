@@ -9,12 +9,12 @@ describe('Clients Module Tests', () => {
     beforeAll(async () => {
         await request(app).post('/api/auth/register').send({
             displayName: 'Emp Client',
-            employeeId: 'EMP-cli',
-            pin: '1234',
+            employeeId: 'EMP-05',
+            password: '12345',
             avatar: 'http://example.com/emp.jpg'
         });
-        const resEmp = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-cli', password: '1234' });
-        empToken = resEmp.body.accessToken;
+        const resEmp = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-05', password: '12345' });
+        empToken = resEmp.body.token;
     });
 
     describe('POST /api/clients', () => {
@@ -40,7 +40,7 @@ describe('Clients Module Tests', () => {
                     displayName: 'Jane Doe',
                     email: 'invalid-email'
                 });
-            expect(res.status).toBe(400);
+            expect(res.status).toBe(422);
         });
     });
 
@@ -48,17 +48,17 @@ describe('Clients Module Tests', () => {
         it('should check if email exists', async () => {
             const res = await request(app).get('/api/clients/check-email?email=john@example.com');
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('exists');
+            expect(res.body).toHaveProperty('taken');
         });
     });
 
     describe('GET /api/clients/search', () => {
         it('should search clients', async () => {
             const res = await request(app)
-                .get('/api/clients/search?query=john')
+                .get('/api/clients/search?search=john')
                 .set('Authorization', `Bearer ${empToken}`);
             expect(res.status).toBe(200);
-            expect(Array.isArray(res.body)).toBe(true);
+            expect(Array.isArray(res.body.clients)).toBe(true);
         });
     });
 

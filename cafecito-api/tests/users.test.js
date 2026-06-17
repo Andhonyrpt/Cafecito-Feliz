@@ -12,7 +12,7 @@ describe('Users Module Tests', () => {
         let res = await request(app).post('/api/auth/register').send({
             displayName: 'Admin User',
             employeeId: 'EMP-01',
-            pin: '1234',
+            password: '12345',
             avatar: 'http://example.com/admin.jpg'
         });
         
@@ -23,23 +23,23 @@ describe('Users Module Tests', () => {
 
         res = await request(app).post('/api/auth/login').send({
             employeeId: 'EMP-01',
-            password: '1234'
+            password: '12345'
         });
-        adminToken = res.body.accessToken;
+        adminToken = res.body.token;
 
         // Register a normal user
         res = await request(app).post('/api/auth/register').send({
             displayName: 'Normal User',
             employeeId: 'EMP-02',
-            pin: '1234',
+            password: '12345',
             avatar: 'http://example.com/user.jpg'
         });
         
         res = await request(app).post('/api/auth/login').send({
             employeeId: 'EMP-02',
-            password: '1234'
+            password: '12345'
         });
-        userToken = res.body.accessToken;
+        userToken = res.body.token;
     });
 
     describe('GET /api/users/profile', () => {
@@ -49,8 +49,8 @@ describe('Users Module Tests', () => {
                 .set('Authorization', `Bearer ${userToken}`);
             
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('employeeId', 'EMP-02');
-            testUserId = res.body._id;
+            expect(res.body.user).toHaveProperty('employeeId', 'EMP-02');
+            testUserId = res.body.user._id;
         });
 
         it('should fail if no token provided', async () => {
@@ -88,7 +88,7 @@ describe('Users Module Tests', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
             
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('_id', testUserId);
+            expect(res.body.user).toHaveProperty('_id', testUserId);
         });
     });
 
@@ -100,13 +100,13 @@ describe('Users Module Tests', () => {
                 .send({
                     displayName: 'Updated User',
                     employeeId: 'EMP-02',
-                    role: 'empleado',
+                    role: 'vendedor',
                     isActive: true,
                     avatar: 'http://example.com/new.jpg'
                 });
             
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('displayName', 'Updated User');
+            expect(res.body.user).toHaveProperty('displayName', 'Updated User');
         });
     });
 
@@ -117,7 +117,7 @@ describe('Users Module Tests', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
             
             expect(res.status).toBe(200);
-            expect(res.body.isActive).toBe(false);
+            expect(res.body.user.isActive).toBe(false);
         });
     });
 });

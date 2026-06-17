@@ -60,7 +60,7 @@ async function getProducts(req, res, next) {
 
 async function getProductById(req, res, next) {
     try {
-        const { productId } = req.params
+        const { productId } = req.params;
 
         const product = await Product.findById(productId).populate('parentCategory');
 

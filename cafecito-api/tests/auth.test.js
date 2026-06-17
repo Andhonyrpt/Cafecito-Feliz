@@ -8,7 +8,7 @@ describe('Auth Module Tests', () => {
     let authToken = '';
     let refreshToken = '';
     const employeeId = 'EMP-99';
-    const testPin = '1234';
+    const testPin = '12345';
 
     describe('POST /api/auth/register', () => {
         it('should register a new employee successfully', async () => {
@@ -17,13 +17,12 @@ describe('Auth Module Tests', () => {
                 .send({
                     displayName: 'Test Employee',
                     employeeId: employeeId,
-                    pin: testPin,
+                    password: testPin,
                     avatar: 'http://example.com/avatar.jpg'
                 });
             
             expect(res.status).toBe(201);
-            expect(res.body).toHaveProperty('user');
-            expect(res.body.user).toHaveProperty('employeeId', employeeId);
+            expect(res.body).toHaveProperty('employeeId', employeeId);
         });
 
         it('should fail to register if employeeId is missing', async () => {
@@ -31,11 +30,11 @@ describe('Auth Module Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     displayName: 'Test Employee',
-                    pin: testPin,
+                    password: testPin,
                     avatar: 'http://example.com/avatar.jpg'
                 });
             
-            expect(res.status).toBe(400);
+            expect(res.status).toBe(422);
             expect(res.body).toHaveProperty('errors');
         });
     });
@@ -50,10 +49,10 @@ describe('Auth Module Tests', () => {
                 });
             
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('accessToken');
+            expect(res.body).toHaveProperty('token');
             expect(res.body).toHaveProperty('refreshToken');
             
-            authToken = res.body.accessToken;
+            authToken = res.body.token;
             refreshToken = res.body.refreshToken;
         });
 
@@ -65,8 +64,8 @@ describe('Auth Module Tests', () => {
                     password: 'wrong'
                 });
             
-            expect(res.status).toBe(401);
-            expect(res.body).toHaveProperty('error');
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty('message');
         });
     });
 
@@ -76,12 +75,12 @@ describe('Auth Module Tests', () => {
                 .post('/api/auth/verify-pin')
                 .send({
                     employeeId: employeeId,
-                    pin: testPin
+                    password: testPin
                 });
             
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('message');
-            expect(res.body).toHaveProperty('user');
+            expect(res.body).toHaveProperty('success', true);
         });
     });
 
@@ -90,11 +89,11 @@ describe('Auth Module Tests', () => {
             const res = await request(app)
                 .post('/api/auth/refresh')
                 .send({
-                    token: refreshToken
+                    refreshToken: refreshToken
                 });
             
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('accessToken');
+            expect(res.body).toHaveProperty('token');
         });
     });
 

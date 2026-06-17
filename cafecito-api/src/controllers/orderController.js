@@ -239,7 +239,7 @@ async function updateOrderStatus(req, res, next) {
             });
         }
 
-        const updatedOrder = await Order.findByIdAndUpdate(id, { status }, { new: true })
+        const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { returnDocument: 'after' })
             .populate("client", "displayName")
             .populate("products.productId");
 

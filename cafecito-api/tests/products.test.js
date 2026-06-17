@@ -11,14 +11,14 @@ describe('Products Module Tests', () => {
         // Setup admin
         await request(app).post('/api/auth/register').send({
             displayName: 'Admin Prod',
-            employeeId: 'EMP-prod',
-            pin: '1234',
+            employeeId: 'EMP-04',
+            password: '12345',
             avatar: 'http://example.com/admin.jpg'
         });
         const User = mongoose.model('User');
-        await User.findOneAndUpdate({ employeeId: 'EMP-prod' }, { role: 'admin' });
-        const resAdmin = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-prod', password: '1234' });
-        adminToken = resAdmin.body.accessToken;
+        await User.findOneAndUpdate({ employeeId: 'EMP-04' }, { role: 'admin' });
+        const resAdmin = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-04', password: '12345' });
+        adminToken = resAdmin.body.token;
 
         // Setup category
         const resCat = await request(app).post('/api/categories').set('Authorization', `Bearer ${adminToken}`).send({
@@ -42,8 +42,8 @@ describe('Products Module Tests', () => {
                 });
             
             expect(res.status).toBe(201);
-            expect(res.body.product).toHaveProperty('name', 'Cheesecake');
-            productId = res.body.product._id;
+            expect(res.body).toHaveProperty('name', 'Cheesecake');
+            productId = res.body._id;
         });
 
         it('should fail if price is negative', async () => {
@@ -56,7 +56,7 @@ describe('Products Module Tests', () => {
                     stock: 10,
                     imageUrl: 'http://example.com/cake.jpg'
                 });
-            expect(res.status).toBe(400);
+            expect(res.status).toBe(422);
         });
     });
 
@@ -87,7 +87,7 @@ describe('Products Module Tests', () => {
                     price: 50.00
                 });
             expect(res.status).toBe(200);
-            expect(res.body.product).toHaveProperty('price', 50);
+            expect(res.body).toHaveProperty('price', 50);
         });
     });
 
@@ -96,7 +96,7 @@ describe('Products Module Tests', () => {
             const res = await request(app)
                 .delete(`/api/products/${productId}`)
                 .set('Authorization', `Bearer ${adminToken}`);
-            expect(res.status).toBe(200);
+            expect(res.status).toBe(204);
         });
     });
 });

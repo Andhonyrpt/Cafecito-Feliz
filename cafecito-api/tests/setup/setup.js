@@ -1,5 +1,6 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { jest } from '@jest/globals';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -18,13 +19,5 @@ afterAll(async () => {
     await mongoose.disconnect();
     if (mongoServer) {
         await mongoServer.stop();
-    }
-});
-
-afterEach(async () => {
-    const collections = mongoose.connection.collections;
-    for (const key in collections) {
-        const collection = collections[key];
-        await collection.deleteMany();
     }
 });
