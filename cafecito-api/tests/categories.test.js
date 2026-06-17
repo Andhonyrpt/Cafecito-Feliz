@@ -10,19 +10,19 @@ describe('Categories Module Tests', () => {
         // Register an admin
         let res = await request(app).post('/api/auth/register').send({
             displayName: 'Admin Category',
-            employeeId: 'EMP-cat',
-            pin: '1234',
+            employeeId: 'EMP-03',
+            password: '12345',
             avatar: 'http://example.com/admin.jpg'
         });
         
         const User = mongoose.model('User');
-        await User.findOneAndUpdate({ employeeId: 'EMP-cat' }, { role: 'admin' });
+        await User.findOneAndUpdate({ employeeId: 'EMP-03' }, { role: 'admin' });
 
         res = await request(app).post('/api/auth/login').send({
-            employeeId: 'EMP-cat',
-            password: '1234'
+            employeeId: 'EMP-03',
+            password: '12345'
         });
-        adminToken = res.body.accessToken;
+        adminToken = res.body.token;
     });
 
     describe('POST /api/categories', () => {
@@ -48,7 +48,7 @@ describe('Categories Module Tests', () => {
                     imageUrl: 'http://example.com/bebidas.jpg'
                 });
             
-            expect(res.status).toBe(400);
+            expect(res.status).toBe(422);
         });
     });
 
@@ -56,8 +56,8 @@ describe('Categories Module Tests', () => {
         it('should get all categories', async () => {
             const res = await request(app).get('/api/categories');
             expect(res.status).toBe(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
+            expect(Array.isArray(res.body.categories)).toBe(true);
+            expect(res.body.categories.length).toBeGreaterThan(0);
         });
     });
 
@@ -89,8 +89,7 @@ describe('Categories Module Tests', () => {
                 .delete(`/api/categories/${categoryId}`)
                 .set('Authorization', `Bearer ${adminToken}`);
             
-            expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('message');
+            expect(res.status).toBe(204);
         });
     });
 });

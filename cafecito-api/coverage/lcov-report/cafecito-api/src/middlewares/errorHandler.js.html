@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/15</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">61.53% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>8/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/15</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -107,35 +107,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,33 +151,33 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 &nbsp;
 // eslint-disable-next-line no-unused-vars
-const errorHandler = <span class="fstat-no" title="function not covered" >(e</span>rr, req, res, next) =&gt; {
+const errorHandler = (err, req, res, next) =&gt; {
 &nbsp;
-    const dateTime = <span class="cstat-no" title="statement not covered" >new Date();</span>
-    const logFilePath = <span class="cstat-no" title="statement not covered" >path.join(__dirname, "../../logs/error.log");</span>
-    const logMessage = <span class="cstat-no" title="statement not covered" >`${new Date().toISOString()}</span>
+    const dateTime = new Date();
+    const logFilePath = path.join(__dirname, "../../logs/error.log");
+    const logMessage = `${new Date().toISOString()}
     -${req.method}
     -${req.url}
     -${err.message}
     -${err.stack}\n`;
 &nbsp;
     // Crear directorio si no existe
-    const logDir = <span class="cstat-no" title="statement not covered" >path.dirname(logFilePath);</span>
-<span class="cstat-no" title="statement not covered" >    if (!fs.existsSync(logDir)) {</span>
+    const logDir = path.dirname(logFilePath);
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!fs.existsSync(logDir)) {
 <span class="cstat-no" title="statement not covered" >        fs.mkdirSync(logDir, { recursive: true });</span>
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    fs.appendFile(logFilePath, logMessage, <span class="fstat-no" title="function not covered" >(f</span>sErr) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (fsErr) {</span>
+    fs.appendFile(logFilePath, logMessage, (fsErr) =&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (fsErr) {
 <span class="cstat-no" title="statement not covered" >            console.error('Failed to write into log file', fsErr);</span>
         }
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!res.headersSent) {</span>
-        const statusCode = <span class="cstat-no" title="statement not covered" >err.statusCode || err.status || 500;</span>
-<span class="cstat-no" title="statement not covered" >        res.status(statusCode).json({</span>
-            status: statusCode &gt;= 500 ? 'error' : 'fail',
-            message: statusCode &gt;= 500 ? 'Internal Server Error' : err.message
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (!res.headersSent) {
+        const statusCode = err.statusCode || err.status || 500;
+        res.status(statusCode).json({
+            status: statusCode &gt;= 500 ? 'error' : <span class="branch-1 cbranch-no" title="branch not covered" >'fail',</span>
+            message: statusCode &gt;= 500 ? 'Internal Server Error' : <span class="branch-1 cbranch-no" title="branch not covered" >err.message</span>
         });
     }
 &nbsp;
@@ -190,7 +190,7 @@ export default errorHandler;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-17T00:47:10.599Z
+                at 2026-06-17T02:36:48.559Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

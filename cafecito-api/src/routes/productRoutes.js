@@ -27,11 +27,11 @@ router.get('/products', [
     paginationValidation()
 ], validate, getProducts);
 
-router.get('/products/:id', [
+router.get('/products/:productId', [
     mongoIdValidation('productId', 'Product ID')
 ], validate, getProductById);
 
-router.get('/products/category/:idCategory', [
+router.get('/products/category/:categoryId', [
     mongoIdValidation('categoryId', 'Category ID')
 ], validate, getProductByCategory);
 
@@ -43,11 +43,11 @@ router.post('/products', authMiddleware, isAdmin, [
     bodyMongoIdValidation('parentCategory', 'Parent category ID')
 ], validate, createProduct);
 
-router.put('/products/:id', authMiddleware, isAdmin, [
+router.put('/products/:productId', authMiddleware, isAdmin, [
     mongoIdValidation('productId', 'Product ID'),
     productNameValidation(false),
     priceOptionalValidation('price'),
-    stockValidation('stock'),
+    stockValidation('stock', false),
     imageUrlValidation('imageUrl', false),
     bodyMongoIdValidation('parentCategory', 'Parent category ID', true)
 ], validate, updateProduct);

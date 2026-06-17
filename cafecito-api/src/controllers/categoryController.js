@@ -43,7 +43,7 @@ async function getCategories(req, res, next) {
 
 async function getCategoryById(req, res, next) {
     try {
-        const category = await Category.findById(req.params.categoryId).populate('parentcategory');
+        const category = await Category.findById(req.params.categoryId).populate('parentCategory');
 
         if (!category) {
             return res.status(404).json({ message: "Category not found" });

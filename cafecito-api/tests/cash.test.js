@@ -7,12 +7,12 @@ describe('Cash Module Tests', () => {
     beforeAll(async () => {
         await request(app).post('/api/auth/register').send({
             displayName: 'Emp Cash',
-            employeeId: 'EMP-cash',
-            pin: '1234',
+            employeeId: 'EMP-07',
+            password: '12345',
             avatar: 'http://example.com/emp.jpg'
         });
-        const resEmp = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-cash', password: '1234' });
-        empToken = resEmp.body.accessToken;
+        const resEmp = await request(app).post('/api/auth/login').send({ employeeId: 'EMP-07', password: '12345' });
+        empToken = resEmp.body.token;
     });
 
     describe('POST /api/total-cash/open', () => {
@@ -21,7 +21,7 @@ describe('Cash Module Tests', () => {
                 .post('/api/total-cash/open')
                 .set('Authorization', `Bearer ${empToken}`)
                 .send({
-                    initialAmount: 500
+                    initialCash: 500
                 });
             // Depending on logic, it might return 200 or 201
             expect([200, 201]).toContain(res.status);
@@ -33,9 +33,9 @@ describe('Cash Module Tests', () => {
                 .post('/api/total-cash/open')
                 .set('Authorization', `Bearer ${empToken}`)
                 .send({
-                    initialAmount: -100
+                    initialCash: -100
                 });
-            expect(res.status).toBe(400);
+            expect(res.status).toBe(422);
         });
     });
 
@@ -46,7 +46,7 @@ describe('Cash Module Tests', () => {
                 .get(`/api/total-cash/orders?openedAt=${openedAt}`)
                 .set('Authorization', `Bearer ${empToken}`);
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('cashSales');
         });
     });
 
@@ -56,7 +56,8 @@ describe('Cash Module Tests', () => {
                 .post('/api/total-cash/close')
                 .set('Authorization', `Bearer ${empToken}`)
                 .send({
-                    finalAmount: 1000
+                    pin: '12345',
+                    isCashCorrect: true
                 });
             expect([200, 201]).toContain(res.status);
         });

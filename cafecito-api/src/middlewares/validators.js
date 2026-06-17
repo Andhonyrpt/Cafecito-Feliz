@@ -172,7 +172,7 @@ export const orderStatusValidation = (optional = false) => {
     const validator = body("status")
         .trim()
         .toLowerCase()
-        .isIn(["pending", "processing", "shipped", "delivered", "cancelled"])
+        .isIn(["pendiente", "completado"])
         .withMessage("Invalid status value");
 
     return optional ? validator.optional() : validator.notEmpty().withMessage("Status is required");
@@ -188,12 +188,13 @@ export const productNameValidation = (required = true) => {
 };
 
 // Validación de stock
-export const stockValidation = (field = "stock") =>
-    body(field)
-        .notEmpty()
-        .withMessage(`${field} is required`)
+export const stockValidation = (field = "stock", required = true) => {
+    const validator = body(field)
         .isInt({ min: 0 })
         .withMessage(`${field} must be a non-negative integer`);
+
+    return required ? validator.notEmpty().withMessage(`${field} is required`) : validator.optional();
+};
 
 export const imageUrlValidation = (field = "imageUrl", required = true) => {
     const validator = body(field)
