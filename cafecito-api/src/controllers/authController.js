@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt, { decode } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 
 const generateToken = (userId, displayName, employeeId, role) => {
@@ -28,7 +28,8 @@ const generatePassword = async (password) => {
 
 async function register(req, res, next) {
     try {
-        const { displayName, employeeId, password, role, avatar } = req.body;
+        const { displayName, employeeId, password, avatar } = req.body;
+        const role = 'vendedor';
 
         const userExist = await checkUserExist(employeeId);
 
@@ -63,6 +64,10 @@ async function login(req, res, next) {
 
         if (!userExist) {
             return res.status(400).json({ message: "User doesn't exist. You have to sign in" });
+        }
+
+        if (!userExist.isActive) {
+            return res.status(403).json({ message: 'User is inactive' });
         }
 
         const isMatch = await bcrypt.compare(password, userExist.hashPassword);
@@ -121,11 +126,17 @@ async function refreshToken(req, res, next) {
             });
         });
 
+        const activeUser = await User.findById(decoded.userId).select('displayName employeeId role isActive');
+
+        if (!activeUser || !activeUser.isActive) {
+            return res.status(403).json({ message: 'Invalid or expired refresh token' });
+        }
+
         const newAccessToken = generateToken(
-            decoded.userId,
-            decoded.displayName,
-            decoded.employeeId,
-            decoded.role
+            activeUser._id,
+            activeUser.displayName,
+            activeUser.employeeId,
+            activeUser.role
         );
 
         res.status(200).json({ token: newAccessToken, refreshToken: token });

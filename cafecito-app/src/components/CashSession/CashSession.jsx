@@ -24,9 +24,10 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
         const verifyRole = async () => {
             const cleanId = employeeId.trim();
+            const token = localStorage.getItem('authToken');
 
             if (cleanId.length >= 6) {
-                const role = await checkEmployeeRole(cleanId);
+                const role = await checkEmployeeRole(cleanId, token);
 
                 if (role === 'unknown') {
                     setError('El número de empleado no está registrado.');

@@ -89,13 +89,17 @@ export const verifyEmployeePin = async (employeeId, pin) => {
     }
 };
 
-export const checkEmployeeRole = async (employeeId) => {
+export const checkEmployeeRole = async (employeeId, token = localStorage.getItem('authToken')) => {
     try {
-        const response = await http.get(`/auth/check-role/${employeeId}`);
+        if (!token) return 'error';
+
+        const response = await http.get(`/auth/check-role/${employeeId}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
 
         return response.data.role;
     } catch (error) {
         console.error("Error al consultar el rol del empleado:", error.message);
-        return error;
+        return 'error';
     }
 };

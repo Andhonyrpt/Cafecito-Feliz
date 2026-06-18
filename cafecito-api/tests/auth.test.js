@@ -1,7 +1,9 @@
 import { makeUserPayload } from './helpers/factories.js';
 import { api } from './helpers/http.js';
+import mongoose from 'mongoose';
 
 describe('Auth Module Tests', () => {
+    let accessToken = '';
     let refreshToken = '';
     const userPayload = makeUserPayload({
         displayName: 'Test Employee',
@@ -43,6 +45,7 @@ describe('Auth Module Tests', () => {
             expect(res.body).toHaveProperty('token');
             expect(res.body).toHaveProperty('refreshToken');
             
+            accessToken = res.body.token;
             refreshToken = res.body.refreshToken;
         });
 
@@ -57,12 +60,30 @@ describe('Auth Module Tests', () => {
             expect(res.status).toBe(400);
             expect(res.body).toHaveProperty('message');
         });
+
+        it('should reject login when the user is inactive', async () => {
+            const User = mongoose.model('User');
+            await User.findOneAndUpdate({ employeeId: userPayload.employeeId }, { isActive: false });
+
+            const res = await api()
+                .post('/api/auth/login')
+                .send({
+                    employeeId: userPayload.employeeId,
+                    password: userPayload.password
+                });
+
+            expect(res.status).toBe(403);
+            expect(res.body).toHaveProperty('message', 'User is inactive');
+
+            await User.findOneAndUpdate({ employeeId: userPayload.employeeId }, { isActive: true });
+        });
     });
 
     describe('POST /api/auth/verify-pin', () => {
         it('should verify pin successfully', async () => {
             const res = await api()
                 .post('/api/auth/verify-pin')
+                .set('Authorization', `Bearer ${accessToken}`)
                 .send({
                     employeeId: userPayload.employeeId,
                     password: userPayload.password
@@ -84,6 +105,22 @@ describe('Auth Module Tests', () => {
             
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('token');
+        });
+
+        it('should reject refresh when the user is inactive', async () => {
+            const User = mongoose.model('User');
+            await User.findOneAndUpdate({ employeeId: userPayload.employeeId }, { isActive: false });
+
+            const res = await api()
+                .post('/api/auth/refresh')
+                .send({
+                    refreshToken: refreshToken
+                });
+
+            expect(res.status).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Invalid or expired refresh token');
+
+            await User.findOneAndUpdate({ employeeId: userPayload.employeeId }, { isActive: true });
         });
     });
 

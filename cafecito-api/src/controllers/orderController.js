@@ -295,12 +295,7 @@ async function previewOrder(req, res, next) {
         });
 
     } catch (err) {
-        console.error("🔥 ERROR DETECTADO EN PREVIEW-ORDER:", err);
-        res.status(500).json({
-            message: err.message,
-            stack: err.stack
-        });
-        // next(err);
+        next(err);
     }
 };
 

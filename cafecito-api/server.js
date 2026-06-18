@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dbConnection from './src/config/database.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import helmet from 'helmet';
 import errorHandler from './src/middlewares/errorHandler.js';
 import setupGlobalErrorHandlers from "./src/middlewares/globalerrorHandler.js";
 import routes from './src/routes/index.js';
@@ -19,7 +20,8 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN?.split(',')
 }));
 
-app.use(express.json());
+app.use(helmet());
+app.use(express.json({ limit: '100kb' }));
 
 // Health check endpoint
 app.get("/health", async (req, res) => {
