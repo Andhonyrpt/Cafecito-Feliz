@@ -104,30 +104,40 @@ describe('Coverage extra integration paths', () => {
             });
             expect(duplicate.status).toBe(201);
 
-            const knownRole = await request(app).get('/api/auth/check-role/EMP-80');
+            const knownRole = await request(app)
+                .get('/api/auth/check-role/EMP-80')
+                .set('Authorization', `Bearer ${adminToken}`);
             expect(knownRole.status).toBe(200);
             expect(knownRole.body).toHaveProperty('role', 'admin');
 
-            const role = await request(app).get('/api/auth/check-role/EMP-404');
+            const role = await request(app)
+                .get('/api/auth/check-role/EMP-404')
+                .set('Authorization', `Bearer ${adminToken}`);
             expect(role.status).toBe(200);
             expect(role.body).toHaveProperty('role', 'unknown');
 
             const refresh = await request(app).post('/api/auth/refresh').send({});
             expect(refresh.status).toBe(401);
 
-            const pin = await request(app).post('/api/auth/verify-pin').send({
-                employeeId: 'EMP-81',
-                password: '99999'
-            });
+            const pin = await request(app)
+                .post('/api/auth/verify-pin')
+                .set('Authorization', `Bearer ${empToken}`)
+                .send({
+                    employeeId: 'EMP-81',
+                    password: '99999'
+                });
             expect(pin.status).toBe(401);
 
             const User = mongoose.model('User');
             await User.findOneAndUpdate({ employeeId: 'EMP-81' }, { isActive: false });
-            const inactivePin = await request(app).post('/api/auth/verify-pin').send({
-                employeeId: 'EMP-81',
-                password: '12345'
-            });
-            expect(inactivePin.status).toBe(404);
+            const inactivePin = await request(app)
+                .post('/api/auth/verify-pin')
+                .set('Authorization', `Bearer ${empToken}`)
+                .send({
+                    employeeId: 'EMP-81',
+                    password: '12345'
+                });
+            expect(inactivePin.status).toBe(403);
             await User.findOneAndUpdate({ employeeId: 'EMP-81' }, { isActive: true });
         });
     });

@@ -2,12 +2,26 @@ import { body, param, query } from "express-validator";
 
 export const employeeIdValidation = (optional = false) => {
     const validator = body("employeeId")
+        .isString()
+        .withMessage('El ID de empleado debe ser una cadena de texto')
         .trim()
         .toUpperCase()
         .matches(/^EMP-\d+$/)
         .withMessage('El ID de empleado debe tener el formato correcto (Ej: EMP-01)');
 
     return optional ? validator.optional() : validator.notEmpty().withMessage('El ID de empleado es obligatorio')
+};
+
+export const employeeIdParamValidation = (optional = false) => {
+    const validator = param("employeeId")
+        .isString()
+        .withMessage('El ID de empleado debe ser una cadena de texto')
+        .trim()
+        .toUpperCase()
+        .matches(/^EMP-\d+$/)
+        .withMessage('El ID de empleado debe tener el formato correcto (Ej: EMP-01)');
+
+    return optional ? validator.optional() : validator.notEmpty().withMessage('El ID de empleado es obligatorio');
 };
 
 export const passwordValidation = () =>
@@ -34,10 +48,15 @@ export const fullPasswordValidation = (required = true) => {
 
 // Validación de password para login (solo verifica que no esté vacío)
 export const passwordLoginValidation = () =>
-    body("password").notEmpty().withMessage("Password is required");
+    body("password")
+        .isString()
+        .withMessage("Password is required")
+        .notEmpty().withMessage("Password is required");
 
 export const pinValidation = () =>
     body('password') // O 'pin', dependiendo de cómo caches el campo en el req.body
+        .isString()
+        .withMessage('El PIN debe ser una cadena de texto.')
         .trim()
         .isNumeric()
         .withMessage('El PIN solo debe contener números.')
@@ -46,6 +65,8 @@ export const pinValidation = () =>
 
 export const displayNameValidation = (optional = false) => {
     const validator = body('displayName')
+        .isString()
+        .withMessage('Display name must be a string')
         .isLength({ min: 2, max: 50 })
         .withMessage("Display name must be between 2 and 50 characters")
         .trim()
@@ -57,6 +78,8 @@ export const displayNameValidation = (optional = false) => {
 // Validación de displayName con caracteres especiales permitidos
 export const userDisplayNameValidation = (required = true) => {
     const validator = body("displayName")
+        .isString()
+        .withMessage("Display name must be a string")
         .isLength({ min: 2, max: 50 })
         .withMessage("Display name must be between 2 and 50 characters")
         .matches(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/)
@@ -78,11 +101,18 @@ export const paginationValidation = () => [
 ];
 
 export const urlValidation = (field = "url") =>
-    body(field).optional().isURL().withMessage(`${field} must be a valid URL`);
+    body(field)
+        .optional()
+        .isString()
+        .withMessage(`${field} must be a valid URL`)
+        .isURL().withMessage(`${field} must be a valid URL`);
 
 // Validación de MongoID en body
 export const bodyMongoIdValidation = (field, label, optional = false) => {
-    const validator = body(field).isMongoId().withMessage(`Invalid ${label} format`);
+    const validator = body(field)
+        .isString()
+        .withMessage(`Invalid ${label} format`)
+        .isMongoId().withMessage(`Invalid ${label} format`);
 
     return optional ? validator.optional({ nullable: true }) : validator.notEmpty().withMessage(`${label} is required`);
 };
@@ -90,7 +120,10 @@ export const bodyMongoIdValidation = (field, label, optional = false) => {
 // Validación de MongoID en param 
 export const mongoIdValidation = (field = "id", customLabel = null) => {
     const label = customLabel || field;
-    return param(field).isMongoId().withMessage(`${label} must be a valid MongoDB ObjectId`);
+    return param(field)
+        .isString()
+        .withMessage(`${label} must be a valid MongoDB ObjectId`)
+        .isMongoId().withMessage(`${label} must be a valid MongoDB ObjectId`);
 };
 
 // Validación de MongoID en query
@@ -136,6 +169,8 @@ export const queryIsActiveValidation = () =>
 // Validación de email en body
 export const emailValidation = (optional = false) => {
     const validator = body("email")
+        .isString()
+        .withMessage("Valid email is required")
         .trim()
         .normalizeEmail()
         .isEmail()
@@ -147,6 +182,8 @@ export const emailValidation = (optional = false) => {
 // Validación de email en query (para check-email, búsquedas, etc.)
 export const queryEmailValidation = () =>
     query("email")
+        .isString()
+        .withMessage("Valid email is required")
         .notEmpty()
         .withMessage("Email is required")
         .isEmail()
@@ -180,6 +217,8 @@ export const orderStatusValidation = (optional = false) => {
 
 export const productNameValidation = (required = true) => {
     const validator = body("name")
+        .isString()
+        .withMessage("Name is required")
         .isLength({ min: 2, max: 100 })
         .withMessage("Name must be between 2 and 100 characters")
         .trim();
@@ -198,6 +237,8 @@ export const stockValidation = (field = "stock", required = true) => {
 
 export const imageUrlValidation = (field = "imageUrl", required = true) => {
     const validator = body(field)
+        .isString()
+        .withMessage("La URL de la imagen debe ser una cadena de texto no vacía.")
         .trim()
         .custom((value) => {
             if (!value || typeof value !== "string" || value.trim().length === 0) {

@@ -8,11 +8,13 @@ import {
     checkRole
 } from '../controllers/authController.js';
 import validate from '../middlewares/validation.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import { loginRateLimit, refreshRateLimit, verifyPinRateLimit } from '../middlewares/rateLimit.js';
 import {
     displayNameValidation,
-    passwordValidation,
     passwordLoginValidation,
     employeeIdValidation,
+    employeeIdParamValidation,
     urlValidation
     , pinValidation
 } from '../middlewares/validators.js';
@@ -29,17 +31,19 @@ router.post('/register', [
 router.post('/login', [
     employeeIdValidation(),
     passwordLoginValidation()
-], validate, login);
+], validate, loginRateLimit, login);
 
-router.post('/refresh', refreshToken);
+router.post('/refresh', refreshRateLimit, refreshToken);
 
 router.post('/logout', logout);
 
-router.post('/verify-pin', [
+router.post('/verify-pin', authMiddleware, [
     employeeIdValidation(), // Valida formato EMP-XX
     pinValidation()         // Valida que sean exactamente 4 números (enviado como 'password' o 'pin' según tu validador)
-], validate, verifyPin);
+], validate, verifyPinRateLimit, verifyPin);
 
-router.get('/check-role/:employeeId', checkRole);
+router.get('/check-role/:employeeId', authMiddleware, [
+    employeeIdParamValidation()
+], validate, checkRole);
 
 export default router;

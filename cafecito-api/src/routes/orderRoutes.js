@@ -51,6 +51,7 @@ router.post('/orders', authMiddleware, [
 ], validate, createOrder);
 
 router.post('/orders/preview', authMiddleware, [
+    bodyMongoIdValidation('client', 'Client ID', true),
     body('products').notEmpty()
         .withMessage('Products are required')
         .isArray({ min: 1 })
