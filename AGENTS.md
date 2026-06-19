@@ -39,7 +39,7 @@
 
 ## Frontend
 - `cafecito-app` is a Create React App frontend using React 19, React Router DOM 7, Axios, and `lucide-react`.
-- `src/components/App/App.jsx` is the app wiring point. It wraps the app as `OrderProvider -> SessionProvider -> BrowserRouter -> Layout -> Routes` and currently defines only the `/` route to `Home`.
+- `src/components/templates/App/App.jsx` is the app wiring point. It wraps the app as `OrderProvider -> SessionProvider -> BrowserRouter -> Layout -> Routes` and currently defines only the `/` route to `Home`.
 - Do not assume this is a multi-route dashboard. The current frontend is a flat POS flow centered on `Home` unless the user asks for routing changes.
 - All API calls should go through modules in `src/services/` that use the shared `src/services/http.js` Axios instance.
 - Do not call `fetch` or raw `axios` directly from components; using `http` keeps base URL, auth header, timeout, and token refresh behavior consistent.
