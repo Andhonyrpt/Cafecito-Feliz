@@ -1,4 +1,4 @@
-import { createAdminWithToken } from './helpers/auth.js';
+import { createAdminWithToken, createUserWithToken } from './helpers/auth.js';
 import { makeCategoryPayload, makeClientPayload, makeOrderPayload, makeProductPayload } from './helpers/factories.js';
 import { api, authHeader } from './helpers/http.js';
 
@@ -14,17 +14,21 @@ describe('Orders Module Tests', () => {
             displayName: 'Emp Order',
             employeeId: 'EMP-06'
         });
-        empToken = admin.token;
+        const seller = await createUserWithToken({
+            displayName: 'Order Seller',
+            employeeId: 'EMP-060'
+        });
+        empToken = seller.token;
 
         const resCat = await api()
             .post('/api/categories')
-            .set(authHeader(empToken))
+            .set(authHeader(admin.token))
             .send(makeCategoryPayload({ name: 'Ordenes' }));
         categoryId = resCat.body._id;
 
         const resProd = await api()
             .post('/api/products')
-            .set(authHeader(empToken))
+            .set(authHeader(admin.token))
             .send(makeProductPayload(categoryId, {
                 name: 'Coffee',
                 price: 20,

@@ -89,6 +89,10 @@ async function createOrder(req, res, next) {
             return res.status(401).json({ message: 'No se pudo identificar al cajero que realiza la venta.' });
         }
 
+        if (req.user?.role !== 'vendedor') {
+            return res.status(403).json({ message: 'Solo los vendedores pueden registrar ventas.' });
+        }
+
         if (!products || products.length === 0) {
             return res.status(400).json({ message: 'El carrito no puede estar vacío.' });
         }
@@ -253,6 +257,10 @@ async function updateOrderStatus(req, res, next) {
 async function previewOrder(req, res, next) {
     try {
         const { products, client } = req.body;
+
+        if (req.user?.role !== 'vendedor') {
+            return res.status(403).json({ message: 'Solo los vendedores pueden simular ventas.' });
+        }
 
         if (!products || !Array.isArray(products) || products.length === 0) {
             return res.status(400).json({ message: "Products array is required" });

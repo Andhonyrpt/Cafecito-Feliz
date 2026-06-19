@@ -1,0 +1,165 @@
+.client-selector {
+    background: var(--card);
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--r4);
+    box-shadow: var(--elev-2);
+}
+
+.client-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.client-search-container-relative {
+    position: relative;
+    width: 100%;
+}
+
+.client-search-container {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.client-search-container input {
+    padding: 10px;
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--r1);
+    outline: none;
+    margin-right: 7px;
+}
+
+.search-error-msg {
+    position: absolute;
+    bottom: -18px;
+    /* Lo posiciona abajito del input para que no mueva la lupa */
+    left: 4px;
+    font-size: 0.75rem;
+    color: #ef4444;
+    /* Rojo de error estándar */
+    font-weight: 500;
+}
+
+.client-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: var(--elev-1);
+    z-index: 1000;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: var(--card);
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.item-email {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.item-icon {
+    color: #888;
+    display: flex;
+    align-items: center;
+}
+
+.active-client-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #fff8e1;
+    /* Ese tono amarillento de cliente seleccionado */
+    border-radius: 12px;
+}
+
+.client-avatar-icon {
+    background: #fef3c7; /* Un fondo amarillo un poco más oscuro que el del badge (#fff8e1) */
+    color: #d97706;      /* Icono en tono naranja/dorado quemado para buen contraste */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;  /* Lo hace completamente redondo */
+    flex-shrink: 0;      /* Evita que se aplaste si el nombre del cliente es muy largo */
+}
+
+.client-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px; /* Espaciado mínimo entre el nombre y el correo */
+}
+
+.client-details h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #7c2d12; /* Texto marrón oscuro que combina con el look cálido */
+    line-height: 1.2;
+}
+
+.client-details p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #b45309; /* Correo en un tono dorado más suave */
+    line-height: 1.2;
+}
+
+.remove-client-btn {
+    background: transparent;
+    border: none;
+    color: #9a3412; /* Un tono café/óxido oscuro que resalta sobre el fondo amarillo #fff8e1 */
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    margin-left: auto; /* Empuja la X totalmente a la derecha dentro del badge */
+}
+
+/* Hover para la X: un sutil cambio de fondo al pasar el cursor o el dedo */
+.remove-client-btn:hover {
+    background: rgba(254, 243, 199, 0.8); /* Un fondo amarillento un poco más oscuro */
+    color: #7c2d12;
+}

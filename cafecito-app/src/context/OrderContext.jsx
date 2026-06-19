@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, useState, useRef } from "react";
+import { createContext, useCallback, useContext, useEffect, useReducer, useState } from "react";
 import storageService from "../services/storageService";
 import { orderReducer, orderInitialState, ORDER_ACTIONS } from "./orderReducer";
 
@@ -44,7 +44,7 @@ export function OrderProvider({ children }) {
             const localItems = storageService.get(STORAGE_KEYS.ORDER) || [];
             const localClient = storageService.get(STORAGE_KEYS.CLIENT);
 
-            if (localItems.length > 0 && state.items.length === 0) {
+            if (localItems.length > 0) {
                 dispatch({ type: ORDER_ACTIONS.INIT, payload: localItems })
             }
 
@@ -77,12 +77,12 @@ export function OrderProvider({ children }) {
         storageService.remove(STORAGE_KEYS.CLIENT);
     };
 
-    const resetPOSPanel = () => {
+    const resetPOSPanel = useCallback(() => {
         dispatch({ type: ORDER_ACTIONS.CLEAR });
         setActiveClient(null);
         storageService.remove(STORAGE_KEYS.ORDER);
         storageService.remove(STORAGE_KEYS.CLIENT);
-    };
+    }, []);
 
     const value = {
         orderItems: state.items,

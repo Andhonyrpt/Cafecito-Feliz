@@ -1,8 +1,23 @@
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import App from './components/templates/App/App';
 
-test('renders learn react link', () => {
+jest.mock('react-router-dom', () => ({
+  BrowserRouter: ({ children }) => <div>{children}</div>,
+  Routes: ({ children }) => <div>{children}</div>,
+  Route: ({ element }) => element,
+}), { virtual: true });
+
+jest.mock('./services/categoryService', () => ({
+  fetchCategories: jest.fn().mockResolvedValue([]),
+}));
+
+jest.mock('./services/productService', () => ({
+  fetchProducts: jest.fn().mockResolvedValue({ products: [], pagination: {} }),
+  clearProductsCache: jest.fn(),
+}));
+
+test('renders POS session entry point', async () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(await screen.findByText(/apertura de turno/i)).toBeInTheDocument();
 });

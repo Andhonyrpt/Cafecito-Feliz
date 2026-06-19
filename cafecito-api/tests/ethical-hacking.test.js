@@ -36,7 +36,7 @@ describe('Ethical hacking checks', () => {
         expect(adminOnly.body).toHaveProperty('message', 'Admin access required');
     });
 
-    it('protects employee role and PIN checks from unauthenticated requests', async () => {
+    it('allows limited role lookup but protects PIN checks from unauthenticated requests', async () => {
         const user = makeUserPayload({
             displayName: 'PIN Probe Target',
             employeeId: 'EMP-9002',
@@ -47,8 +47,8 @@ describe('Ethical hacking checks', () => {
 
         const roleProbe = await api().get(`/api/auth/check-role/${user.employeeId}`);
 
-        expect(roleProbe.status).toBe(401);
-        expect(roleProbe.body).toHaveProperty('message', 'Unauthorized');
+        expect(roleProbe.status).toBe(200);
+        expect(roleProbe.body).toHaveProperty('role', 'vendedor');
 
         const wrongPin = await api()
             .post('/api/auth/verify-pin')

@@ -9,7 +9,7 @@ import {
 } from '../controllers/authController.js';
 import validate from '../middlewares/validation.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
-import { loginRateLimit, refreshRateLimit, verifyPinRateLimit } from '../middlewares/rateLimit.js';
+import { checkRoleRateLimit, loginRateLimit, refreshRateLimit, verifyPinRateLimit } from '../middlewares/rateLimit.js';
 import {
     displayNameValidation,
     passwordLoginValidation,
@@ -42,7 +42,7 @@ router.post('/verify-pin', authMiddleware, [
     pinValidation()         // Valida que sean exactamente 4 números (enviado como 'password' o 'pin' según tu validador)
 ], validate, verifyPinRateLimit, verifyPin);
 
-router.get('/check-role/:employeeId', authMiddleware, [
+router.get('/check-role/:employeeId', checkRoleRateLimit, [
     employeeIdParamValidation()
 ], validate, checkRole);
 

@@ -500,3 +500,195 @@
     at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
     at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
     at createClient (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\clientController.js:57:9)
+2026-06-19T01:06:16.660Z
+    -GET
+    -/api/orders/client/6a349607ad9bf7c39992b234
+    -Cannot populate path `user,displayName` because it is not in your schema. Set the `strictPopulate` option to false to override.
+    -StrictPopulateError: Cannot populate path `user,displayName` because it is not in your schema. Set the `strictPopulate` option to false to override.
+    at getModelsMapForPopulate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\helpers\populate\getModelsMapForPopulate.js:55:12)
+    at _populatePath (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:4417:21)
+    at model.populate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:4384:21)
+    at model.Query._find (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\query.js:2509:20)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at model.Query.exec (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\query.js:4797:63)
+    at getOrdersByClient (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\orderController.js:50:24)
+2026-06-19T01:06:38.453Z
+    -POST
+    -/api/users
+    -E11000 duplicate key error collection: test.users index: employeeId_1 dup key: { employeeId: "EMP-503" }
+    -MongoServerError: E11000 duplicate key error collection: test.users index: employeeId_1 dup key: { employeeId: "EMP-503" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createUser (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\userController.js:165:9)
+2026-06-19T01:06:38.538Z
+    -POST
+    -/api/categories
+    -E11000 duplicate key error collection: test.categories index: name_1 dup key: { name: "Duplicate Category" }
+    -MongoServerError: E11000 duplicate key error collection: test.categories index: name_1 dup key: { name: "Duplicate Category" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createCategory (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\categoryController.js:69:9)
+2026-06-19T01:06:38.634Z
+    -POST
+    -/api/products
+    -E11000 duplicate key error collection: test.products index: name_1 dup key: { name: "Duplicate Product" }
+    -MongoServerError: E11000 duplicate key error collection: test.products index: name_1 dup key: { name: "Duplicate Product" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createProduct (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\productController.js:105:9)
+2026-06-19T01:06:38.719Z
+    -POST
+    -/api/clients
+    -E11000 duplicate key error collection: test.clients index: email_1 dup key: { email: "domain-client@example.com" }
+    -MongoServerError: E11000 duplicate key error collection: test.clients index: email_1 dup key: { email: "domain-client@example.com" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createClient (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\clientController.js:57:9)
+2026-06-19T01:08:08.827Z
+    -GET
+    -/api/orders/client/6a349677b2d4a968e2e19c95
+    -Cannot populate path `user,displayName` because it is not in your schema. Set the `strictPopulate` option to false to override.
+    -StrictPopulateError: Cannot populate path `user,displayName` because it is not in your schema. Set the `strictPopulate` option to false to override.
+    at getModelsMapForPopulate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\helpers\populate\getModelsMapForPopulate.js:55:12)
+    at _populatePath (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:4417:21)
+    at model.populate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:4384:21)
+    at model.Query._find (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\query.js:2509:20)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at model.Query.exec (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\query.js:4797:63)
+    at getOrdersByClient (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\orderController.js:50:24)
+2026-06-19T01:08:24.243Z
+    -POST
+    -/api/users
+    -E11000 duplicate key error collection: test.users index: employeeId_1 dup key: { employeeId: "EMP-503" }
+    -MongoServerError: E11000 duplicate key error collection: test.users index: employeeId_1 dup key: { employeeId: "EMP-503" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createUser (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\userController.js:165:9)
+2026-06-19T01:08:24.332Z
+    -POST
+    -/api/categories
+    -E11000 duplicate key error collection: test.categories index: name_1 dup key: { name: "Duplicate Category" }
+    -MongoServerError: E11000 duplicate key error collection: test.categories index: name_1 dup key: { name: "Duplicate Category" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createCategory (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\categoryController.js:69:9)
+2026-06-19T01:08:24.432Z
+    -POST
+    -/api/products
+    -E11000 duplicate key error collection: test.products index: name_1 dup key: { name: "Duplicate Product" }
+    -MongoServerError: E11000 duplicate key error collection: test.products index: name_1 dup key: { name: "Duplicate Product" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createProduct (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\productController.js:105:9)
+2026-06-19T01:08:24.538Z
+    -POST
+    -/api/clients
+    -E11000 duplicate key error collection: test.clients index: email_1 dup key: { email: "domain-client@example.com" }
+    -MongoServerError: E11000 duplicate key error collection: test.clients index: email_1 dup key: { email: "domain-client@example.com" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createClient (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\clientController.js:57:9)
+2026-06-19T01:28:20.233Z
+    -GET
+    -/api/orders/client/6a349b320aa51a3a942a8995
+    -Cannot populate path `user,displayName` because it is not in your schema. Set the `strictPopulate` option to false to override.
+    -StrictPopulateError: Cannot populate path `user,displayName` because it is not in your schema. Set the `strictPopulate` option to false to override.
+    at getModelsMapForPopulate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\helpers\populate\getModelsMapForPopulate.js:55:12)
+    at _populatePath (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:4417:21)
+    at model.populate (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:4384:21)
+    at model.Query._find (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\query.js:2509:20)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at model.Query.exec (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\query.js:4797:63)
+    at getOrdersByClient (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\orderController.js:50:24)
+2026-06-19T01:28:29.018Z
+    -POST
+    -/api/users
+    -E11000 duplicate key error collection: test.users index: employeeId_1 dup key: { employeeId: "EMP-503" }
+    -MongoServerError: E11000 duplicate key error collection: test.users index: employeeId_1 dup key: { employeeId: "EMP-503" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createUser (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\userController.js:165:9)
+2026-06-19T01:28:29.121Z
+    -POST
+    -/api/categories
+    -E11000 duplicate key error collection: test.categories index: name_1 dup key: { name: "Duplicate Category" }
+    -MongoServerError: E11000 duplicate key error collection: test.categories index: name_1 dup key: { name: "Duplicate Category" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createCategory (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\categoryController.js:69:9)
+2026-06-19T01:28:29.244Z
+    -POST
+    -/api/products
+    -E11000 duplicate key error collection: test.products index: name_1 dup key: { name: "Duplicate Product" }
+    -MongoServerError: E11000 duplicate key error collection: test.products index: name_1 dup key: { name: "Duplicate Product" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createProduct (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\productController.js:105:9)
+2026-06-19T01:28:29.337Z
+    -POST
+    -/api/clients
+    -E11000 duplicate key error collection: test.clients index: email_1 dup key: { email: "domain-client@example.com" }
+    -MongoServerError: E11000 duplicate key error collection: test.clients index: email_1 dup key: { email: "domain-client@example.com" }
+    at InsertOneOperation.handleOk (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\insert.ts:79:13)
+    at executeOperationWithRetries (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:267:26)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at executeOperation (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\operations\execute_operation.ts:127:12)
+    at Collection.insertOne (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongodb\src\collection.ts:294:12)
+    at model.$__save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:428:16)
+    at model.save (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\node_modules\mongoose\lib\model.js:667:5)
+    at createClient (C:\Users\Usuario\Documents\GitHub\Cafecito-Feliz\cafecito-api\src\controllers\clientController.js:57:9)

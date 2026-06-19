@@ -1,8 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { http } from "../services/http";
 import { getUserProfile } from "../services/userService";
 import { login, verifyEmployeePin } from "../services/auth";
-import Loading from '../components/common/Loading/Loading';
+import Loading from '../components/atoms/Loading/Loading';
 import { fetchTurnoTotals, createCashSession, closeCashSession } from "../services/cashSessionService";
 
 const SessionContext = createContext();
@@ -53,12 +52,6 @@ export function SessionProvider({ children }) {
             const initialCash = currentUser.initialCash || 0;
             const expectedTotal = initialCash + cashSales;
 
-            console.log("📊 ARQUEO DE CAJA DESDE SERVICIO:", {
-                fondoInicial: initialCash,
-                ventasDelTurno: cashSales,
-                totalEsperado: expectedTotal
-            });
-
             setExpectedCash(expectedTotal);
         } catch (error) {
             console.error("Error al calcular el dinero esperado a través del servicio:", error);
@@ -103,12 +96,8 @@ export function SessionProvider({ children }) {
 
         } else {
             try {
-                console.log("🔐 Verificando PIN de empleado para el cierre...");
                 await verifyEmployeePin(currentUser.employeeId, data.pin);
 
-                console.log("Cierre de caja - ¿Coincide?:", data.isCashCorrect, "Motivo descuadre:", data.discrepancyReason, "a las:", data.timestamp);
-
-                console.log("💾 Guardando arqueo final en MongoDB...");
                 await closeCashSession({
                     pin: data.pin,
                     isCashCorrect: data.isCashCorrect,
@@ -116,7 +105,6 @@ export function SessionProvider({ children }) {
                     timestamp: data.timestamp
                 });
 
-                console.log("🧹 Limpiando datos locales del turno concluido...");
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('openedAt');
                 localStorage.removeItem('initialCash');

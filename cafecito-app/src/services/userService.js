@@ -8,13 +8,12 @@ export function isAuthenticated() {
 export const getUserProfile = async () => {
 
     const res = await http.get('/users/profile');
-    const { message, user } = res.data;
+    const { user } = res.data;
 
     if (!user) {
         throw new Error('No se pudo obtener el perfil');
     }
 
-    console.log(message);
     return user;
 };
 

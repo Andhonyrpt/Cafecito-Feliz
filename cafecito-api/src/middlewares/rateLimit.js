@@ -35,6 +35,13 @@ export const verifyPinRateLimit = createRateLimiter({
     keyGenerator: (req) => `${req.ip || 'unknown'}:${String(req.body?.employeeId || req.user?.employeeId || '').toUpperCase()}`
 });
 
+export const checkRoleRateLimit = createRateLimiter({
+    windowMs: 60 * 1000,
+    max: 10,
+    message: 'Too many role checks. Try again later.',
+    keyGenerator: (req) => `${req.ip || 'unknown'}:${String(req.params?.employeeId || '').toUpperCase()}`
+});
+
 export const refreshRateLimit = createRateLimiter({
     windowMs: 60 * 1000,
     max: 20,

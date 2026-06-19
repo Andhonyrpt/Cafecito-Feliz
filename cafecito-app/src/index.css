@@ -47,6 +47,18 @@ body {
   --button-danger-hover: #bd2130;
   --button-danger-hover-bg: rgba(220, 53, 69, 0.1);
 
+  --surface: var(--card);
+  --muted: var(--text-light);
+  --accent: var(--primary);
+  --text-muted: var(--text-light);
+  --warning: var(--total-text);
+  --danger: var(--button-danger);
+  --danger-soft: var(--button-danger-hover-bg);
+  --danger-border: var(--button-danger);
+  --color-red: var(--button-danger);
+  --color-light-red: var(--card);
+  --pale-olive: var(--primary-soft);
+
   /* Variables adicionales */
   --radius: 8px;
   --r1: 4px;
