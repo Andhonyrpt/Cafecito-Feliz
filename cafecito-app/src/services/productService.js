@@ -45,5 +45,4 @@ export const clearProductsCache = () => {
             sessionStorage.removeItem(key);
         }
     });
-    console.log("Caché de productos eliminado para actualizar stocks.");
 };

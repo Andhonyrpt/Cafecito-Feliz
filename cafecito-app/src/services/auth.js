@@ -4,7 +4,7 @@ export const register = async (userData) => {
 
     try {
         const response = await http.post("/auth/register", userData);
-        const { message, user } = response.data;
+        const { user } = response.data;
 
         if (user) {
             return user;
@@ -21,7 +21,7 @@ export const register = async (userData) => {
 export const login = async (credentials) => {
     try {
         const response = await http.post("/auth/login", credentials);
-        const { token, refreshToken, user } = response.data;
+        const { token, refreshToken } = response.data;
 
         if (token) {
             localStorage.setItem("authToken", token);
@@ -77,7 +77,6 @@ export const logout = async () => {
 
 export const verifyEmployeePin = async (employeeId, pin) => {
     try {
-        console.log("DATOS ENVIADOS AL CIERRE:", { employeeId, password: pin });
         const response = await http.post('/auth/verify-pin', { employeeId, password: pin });
 
 
@@ -91,11 +90,9 @@ export const verifyEmployeePin = async (employeeId, pin) => {
 
 export const checkEmployeeRole = async (employeeId, token = localStorage.getItem('authToken')) => {
     try {
-        if (!token) return 'error';
-
-        const response = await http.get(`/auth/check-role/${employeeId}`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {}
-        });
+        const response = await http.get(`/auth/check-role/${employeeId}`, token ? {
+            headers: { Authorization: `Bearer ${token}` }
+        } : undefined);
 
         return response.data.role;
     } catch (error) {

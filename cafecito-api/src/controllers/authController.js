@@ -181,7 +181,7 @@ async function checkRole(req, res, next) {
         const { employeeId } = req.params;
         const user = await User.findOne({ employeeId });
 
-        if (!user) {
+        if (!user || !user.isActive) {
             return res.status(200).json({ role: 'unknown' });
         }
 

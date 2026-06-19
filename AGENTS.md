@@ -25,6 +25,7 @@
 - `server.js` calls `dotenv.config()`, exports `app`, mounts all API routes under `/api`, and only starts listening when `NODE_ENV !== "test"`.
 - `server.js` also defines `/health` and `/` before the `/api` router, then a 404 handler, then the global `errorHandler`.
 - API env keys are documented only in `cafecito-api/.env.example`: `PORT`, `NODE_ENV`, `MONGODB_URI`, `MONGODB_DB`, `CORS_ORIGIN`.
+- Auth code also reads `JWT_SECRET` and `REFRESH_TOKEN_SECRET`; they are required for token signing/verification even though they are not listed in `.env.example`.
 - `src/config/database.js` builds the Mongo connection from `MONGODB_URI` plus `MONGODB_DB`. In tests it returns early when `NODE_ENV === "test"`.
 - Jest setup in `tests/setup/setup.js` starts `mongodb-memory-server` and connects Mongoose to the in-memory URI, so API tests should not require a real MongoDB instance.
 - `jest.config.js` matches `tests/**/*.test.js`, uses `tests/setup/setup.js`, disables transforms, maps local `.js` imports for ESM, sets a 60s timeout in setup, and has coverage thresholds.
