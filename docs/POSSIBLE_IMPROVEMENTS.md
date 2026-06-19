@@ -42,7 +42,7 @@ Estas mejoras salen del análisis del código actual. No están implementadas en
 - Usar factories/helpers para crear usuarios, categorías, productos, clientes y tokens.
 - Aislar datos por test con `beforeEach` o fixtures explícitos; actualmente algunos tests dependen del orden dentro del archivo.
 - Agregar pruebas frontend para `OrderContext`, `SessionContext`, servicios HTTP y flujo de checkout.
-- Si Cypress se mantiene, agregar configuración y scripts; si no, remover dependencia para evitar confusión.
+- Ampliar Cypress desde el smoke POS mockeado hacia flujos con backend real, cierre de caja y barista.
 
 ## Mejoras recomendadas por cobertura
 
@@ -55,6 +55,7 @@ Estas mejoras salen del análisis del código actual. No están implementadas en
 
 ## Documentación
 
-- Mantener `SPECIFICATIONS.md` actualizado junto con cambios de API/flujo POS.
+- Mantener `docs/PRODUCT_SPEC.md`, `docs/BACKLOG.md` y `docs/KNOWN_ISSUES.md` actualizados junto con cambios de API/flujo POS.
+- Usar `docs/INDEX.md` y `docs/GOVERNANCE.md` como entrada documental y reglas de mantenimiento.
 - Documentar ejemplos de payload/respuesta por endpoint cuando se estabilicen los contratos.
 - Agregar una guía de datos semilla para pruebas manuales: usuario admin, vendedor, categorías y productos iniciales.

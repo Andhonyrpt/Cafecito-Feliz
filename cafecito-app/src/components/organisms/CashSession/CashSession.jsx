@@ -194,6 +194,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                             <div className="session-input-wrapper">
                                 <Icon name="user" size={18} className="session-input-icon" />
                                 <input
+                                    data-testid="cash-session-employee-id"
                                     type="text"
                                     placeholder="Ej. EMP-01"
                                     value={employeeId}
@@ -209,6 +210,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                         <div className='session-input-wrapper'>
                             <Icon name="key" size={18} className='session-input-icon' />
                             <input
+                                data-testid="cash-session-pin"
                                 type="password"
                                 placeholder="••••"
                                 maxLength={6}
@@ -225,6 +227,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                             <div className='session-input-wrapper'>
                                 <span className='session-currency-prefix'>$</span>
                                 <input
+                                    data-testid="cash-session-initial-cash"
                                     type="number"
                                     placeholder="0.00"
                                     min="0"
@@ -285,6 +288,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                     <button
                         type='submit'
                         className={`btn-session-submit ${isOpening ? 'btn-open' : 'btn-close'}`}
+                        data-testid={isOpening ? 'cash-session-open-submit' : 'cash-session-close-submit'}
                         disabled={isSubmitting || (isOpening ? (!role || (!isSeller ? (!employeeId.trim() || !pin.trim()) : (!employeeId.trim() || !pin.trim() || !amount.trim())))
                             : (!isSeller ? !pin.trim() : (isCashCorrect === null || pin.trim() === '' || (isCashCorrect === false && !discrepancyReason.trim()))))
                         }

@@ -42,7 +42,7 @@ app.get("/health", async (req, res) => {
 // Ruta raíz
 app.get('/', (req, res) => {
     res.json({
-        message: "E-commerce API",
+        message: "Cafecito Feliz POS API",
         version: "1.0.0",
         endpoints: {
             health: "/health",

@@ -46,24 +46,29 @@ Riesgos QA backend:
 
 Stack de pruebas:
 - Create React App / Jest.
-- `src/App.test.js` solamente.
+- `src/App.test.js`.
+- Cypress con smoke POS inicial en `cypress/e2e/pos-smoke.cy.js`.
 
 Comando no interactivo:
 - `npm test -- --watchAll=false`
+- `npm run cypress:open`
+- `npm run cypress:run`
+- `npm run e2e`
 
 Gaps frontend:
 - Sin tests para `OrderContext`.
 - Sin tests para `SessionContext`.
 - Sin tests para servicios HTTP/token refresh.
-- Sin test de checkout preview-create.
-- Cypress fue inicializado con `npx cypress open`; existen archivos generados, pero falta definir scripts, alcance y casos E2E utiles del POS.
+- Sin test unit/integration de checkout preview-create.
+- Cypress ya tiene un smoke POS mockeado; falta ampliar a backend real, cierre de caja, barista y cliente.
+- Los E2E no deben usar flujos de e-commerce como registro, envio, dashboard o checkout por pasos; deben cubrir el POS real.
 
 ## Performance
 
 Documentos fuente:
-- `QA_BACKEND_PERFORMANCE_TEST_PLAN.md`
-- `QA_BACKEND_PERFORMANCE_MATRIX.md`
-- `QA_BACKEND_PERFORMANCE_EVIDENCE.md`
+- `docs/qa/QA_BACKEND_PERFORMANCE_TEST_PLAN.md`
+- `docs/qa/QA_BACKEND_PERFORMANCE_MATRIX.md`
+- `docs/qa/QA_BACKEND_PERFORMANCE_EVIDENCE.md`
 
 Estado:
 - Corridas locales completadas con SLA local menor a 1 segundo.
@@ -73,7 +78,7 @@ Estado:
 
 1. Mantener API suite completa como gate antes de cambios backend relevantes.
 2. Agregar tests frontend unit/integration para contexts y checkout.
-3. Formalizar Cypress: agregar scripts y una suite E2E minima del POS, o removerlo si no se usara.
+3. Ampliar Cypress desde el smoke POS actual hacia casos E2E con backend real y flujos críticos restantes.
 4. Separar tests que documentan bugs de tests de comportamiento esperado.
 5. Evitar que tests modifiquen logs versionados.
 6. Ejecutar performance local despues de cambios en auth, catalogo u ordenes.
@@ -85,5 +90,5 @@ Estado:
 | Backend auth/security | `npm test -- tests/auth.test.js tests/authorization.test.js tests/ethical-hacking.test.js` |
 | Backend ordenes | `npm test -- tests/orders.test.js tests/regression/pos-flow.test.js` |
 | Backend caja | `npm test -- tests/cash.test.js tests/regression/pos-flow.test.js` |
-| Frontend POS | `npm test -- --watchAll=false` y futuros tests de contexts/checkout |
+| Frontend POS | `npm test -- --watchAll=false`, `npm run cypress:run` cuando el frontend esté levantado, y futuros tests de contexts/checkout |
 | Release local | API `npm test`, frontend `npm test -- --watchAll=false`, build frontend si aplica |

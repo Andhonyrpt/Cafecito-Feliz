@@ -16,7 +16,7 @@
 - Frontend setup/dev commands are run from `cafecito-app/`: `npm install`, `npm start`, `npm run build`.
 - Frontend tests are Create React App/Jest and default to watch mode. Use `npm test -- --watchAll=false` for a non-watch run.
 - Frontend focused test example: `npm test -- App.test.js --watchAll=false`.
-- Cypress is installed in `cafecito-app` devDependencies, but there is no Cypress script, config file, or `cypress/` tree. Do not assume an e2e test suite exists.
+- Cypress is configured in `cafecito-app` with `npm run cypress:open`, `npm run cypress:run`, and `npm run e2e`. The current E2E suite is a mocked POS smoke test at `cypress/e2e/pos-smoke.cy.js`; do not treat it as backend-real coverage.
 
 ## API
 - `cafecito-api` is an Express 5 + Mongoose REST API. `server.js` is the real entrypoint and `package.json` has `"type": "module"`.
@@ -46,7 +46,7 @@
 - `http.js` reads `REACT_APP_API_URL` for the API base URL, injects `localStorage.authToken` as a Bearer token, and retries eligible `401/403` responses through `auth.refresh()`.
 - `http.js` deliberately avoids retrying login/refresh requests and can trigger a logout callback if refresh fails.
 - Cashier/session state is managed by `SessionContext`. It uses localStorage keys including `authToken`, `refreshToken`, `openedAt`, and `initialCash`.
-- POS cart/client state is managed by `OrderContext` plus `orderReducer`. It persists through `storageService` using logical keys `order` and `active_client`.
+- POS order/client state is managed by `OrderContext` plus `orderReducer`. It persists through `storageService` using logical keys `order` and `active_client`.
 - `storageService` prefixes stored keys internally; use the service/context APIs rather than hand-editing localStorage keys from components.
 - Product lists are cached in `sessionStorage` by `productService.js` for 5 minutes using keys beginning with `products_page_`.
 - When product stock freshness matters after creating/updating orders or products, call or preserve `clearProductsCache()` behavior so stale catalog data is not shown.

@@ -137,32 +137,31 @@ async def test_create_user(client: AsyncClient):
 
 **Qué:** Testean flujos completos desde UI  
 **Herramientas:** Cypress, Playwright, Selenium  
-**Cuándo:** Flujos críticos (login, checkout, signup)
+**Cuándo:** Flujos críticos del POS (apertura de caja, venta, checkout de caja, cierre de caja)
 
 ```javascript
 // Cypress
-describe('User Registration', () => {
-  it('allows user to register', () => {
-    cy.visit('/register');
-    cy.get('[data-cy=name]').type('John Doe');
-    cy.get('[data-cy=email]').type('john@test.com');
-    cy.get('[data-cy=password]').type('password123');
-    cy.get('[data-cy=submit]').click();
+describe('POS cash opening', () => {
+  it('allows a cashier to open a shift', () => {
+    cy.visit('/');
+    cy.get('[data-cy=employee-id]').type('EMP-001');
+    cy.get('[data-cy=pin]').type('12345');
+    cy.get('[data-cy=initial-cash]').type('100');
+    cy.get('[data-cy=open-cash]').click();
     
-    cy.url().should('include', '/dashboard');
-    cy.contains('Welcome, John').should('be.visible');
+    cy.contains('Caja abierta').should('be.visible');
   });
 });
 
 // Playwright
-test('user can login', async ({ page }) => {
-  await page.goto('/login');
-  await page.fill('[name=email]', 'user@test.com');
-  await page.fill('[name=password]', 'password');
-  await page.click('button[type=submit]');
+test('cashier can open a shift', async ({ page }) => {
+  await page.goto('/');
+  await page.fill('[name=employeeId]', 'EMP-001');
+  await page.fill('[name=pin]', '12345');
+  await page.fill('[name=initialCash]', '100');
+  await page.click('[data-testid=open-cash]');
   
-  await expect(page).toHaveURL('/dashboard');
-  await expect(page.locator('text=Welcome')).toBeVisible();
+  await expect(page.locator('text=Caja abierta')).toBeVisible();
 });
 ```
 
@@ -262,31 +261,29 @@ class UserService {
 ### Gherkin Syntax
 
 ```gherkin
-Feature: User Registration
-  As a new user
-  I want to create an account
-  So that I can access the platform
+Feature: POS cash opening
+  As a cashier
+  I want to open a cash shift
+  So that I can start selling in the POS
 
-  Scenario: Successful registration
-    Given I am on the registration page
-    When I fill in "Name" with "John Doe"
-    And I fill in "Email" with "john@example.com"
-    And I fill in "Password" with "securepass123"
-    And I click "Register"
-    Then I should see "Welcome, John"
-    And I should be on the dashboard page
+  Scenario: Successful cash opening
+    Given I am on the POS home page
+    When I enter my employee ID and PIN
+    And I enter the initial cash amount
+    And I click "Abrir caja"
+    Then I should see the POS catalog
 
-  Scenario: Registration with existing email
-    Given a user exists with email "john@example.com"
-    When I try to register with email "john@example.com"
-    Then I should see "Email already exists"
+  Scenario: Cash opening with invalid PIN
+    Given I am on the POS home page
+    When I enter an invalid PIN
+    Then I should see an invalid credentials message
 ```
 
 ### Cucumber/Jest Implementation
 
 ```javascript
 // steps.js
-Given('I am on the registration page', async () => {
+Given('I am on the POS home page', async () => {
   await page.goto('/register');
 });
 

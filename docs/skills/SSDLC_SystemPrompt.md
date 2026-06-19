@@ -95,6 +95,7 @@ Crear el documento de especificación en:
 # Spec: [Nombre descriptivo]
 
 ## Metadata
+- **ID del pendiente:** [ID de backlog, issue o tarea formal]
 - **Tipo:** feature | bugfix | refactor | hotfix | security-patch | docs | infra
 - **Complejidad:** XS | S | M | L | XL
 - **Fecha:** YYYY-MM-DD
@@ -105,6 +106,11 @@ Crear el documento de especificación en:
 
 ## Contexto
 [Por qué existe esta tarea. Qué problema resuelve o qué valor agrega]
+
+## Alcance
+- Incluido en esta unidad de trabajo:
+- Fuera de alcance:
+- Pendientes relacionados que no deben mezclarse en esta rama:
 
 ## Criterios de Aceptación
 - [ ] CA-1: [criterio verificable]
@@ -197,6 +203,9 @@ git checkout -b [tipo]/[nombre-en-kebab-case]
 - **Nunca hacer commits de work-in-progress directamente a develop**
 - Los hotfixes se abren desde `main` y se mergean a `main` Y `develop`
 - Una rama = una unidad de trabajo = un PR
+- **1 pendiente = 1 spec = 1 rama = 1 PR**
+- No mezclar múltiples pendientes, historias, bugs, refactors o hardenings en una sola rama
+- No abrir trabajo sin spec propio y sin referencia al pendiente formal que lo origina
 
 ---
 
@@ -423,6 +432,204 @@ git commit -m "docs: close spec [nombre-corto] — [DONE|REJECTED]"
 
 ---
 
+## FASE 11 — BASELINE OFICIAL DEL PROYECTO
+
+Cuando la documentación base del sistema esté completada, auditada y alineada con el código real, se debe establecer un baseline oficial del proyecto antes de iniciar ejecución distribuida de pendientes.
+
+El baseline marca el fin de la etapa exploratoria/documental y el inicio de la ejecución controlada sobre backlog formal.
+
+### 11.1 Condiciones para crear baseline
+
+El baseline solo puede crearse si existen y están actualizados:
+
+- Documentación vigente del producto y arquitectura.
+- Auditoría de documentación existente.
+- Gaps, inconsistencias y trabajo fuera de alcance documentados.
+- Backlog derivado consolidado y aprobado como fuente de trabajo.
+- Estado conocido de quality gates relevantes.
+- Decisiones abiertas registradas como pendientes o riesgos.
+
+### 11.2 Commit de consolidación
+
+Crear un commit explícito que consolide documentación, backlog y estado técnico conocido:
+
+```bash
+git add docs/ README.md
+git commit -m "docs: establish project baseline"
+git push origin develop
+```
+
+### 11.3 Punto de partida operativo
+
+`develop` es el punto de partida operativo para nuevas ramas después del baseline. Todo trabajo posterior debe abrirse desde `develop` actualizado, salvo hotfixes que sigan el flujo definido desde `main`.
+
+### 11.4 Tag de baseline
+
+Se recomienda crear un tag anotado para identificar el punto oficial de partida:
+
+```bash
+git tag -a baseline-YYYY-MM-DD -m "Baseline documental y tecnico YYYY-MM-DD"
+git push origin baseline-YYYY-MM-DD
+```
+
+Desde este momento, **código + documentación vigente + backlog aprobado** son la fuente oficial de verdad para el trabajo posterior. Cualquier instrucción, idea o hallazgo que contradiga el baseline debe registrarse como propuesta de cambio antes de ejecutarse.
+
+---
+
+## FASE 12 — MODO DE EJECUCIÓN CON SUBAGENTES
+
+Después del baseline oficial, el protocolo cambia de modo: deja de ser exploratorio/documental y pasa a ejecución orquestada de pendientes formales.
+
+Los subagentes no trabajan sobre ideas sueltas. Solo trabajan sobre backlog formalmente registrado. El backlog aprobado es la única fuente válida para tomar trabajo. Cualquier hallazgo nuevo debe escalarse como propuesta, no ejecutarse automáticamente como alcance implícito.
+
+### 12.1 Modelo de autoridad
+
+#### Agente principal
+
+El agente principal actúa como:
+
+- Orquestador del flujo de trabajo.
+- Priorizador de pendientes desde el backlog oficial.
+- Guardián de consistencia con el baseline.
+- Responsable de interpretar el backlog y dividir trabajo.
+- Responsable de resolver o escalar ambigüedades.
+- Responsable de integración final.
+
+El agente principal decide qué pendiente se trabaja, en qué orden, con qué restricciones y qué evidencia se requiere para integrar.
+
+#### Subagentes
+
+Los subagentes actúan como:
+
+- Ejecutores especializados.
+- Responsables de una sola unidad de trabajo.
+- Ejecutores de specs acotados.
+- Productores de evidencia técnica y funcional.
+
+Los subagentes no tienen autoridad para redefinir arquitectura global, cambiar prioridades globales, rediseñar el roadmap, ampliar alcance por cuenta propia ni integrar trabajo final de manera autónoma.
+
+El agente principal interpreta el backlog; los subagentes ejecutan. Cualquier cambio de alcance debe regresar al agente principal como propuesta.
+
+### 12.2 Unidad mínima de trabajo
+
+La unidad mínima de ejecución es obligatoria e indivisible:
+
+**1 pendiente = 1 spec = 1 rama = 1 PR**
+
+Cada subagente trabaja únicamente una unidad delimitada:
+
+- Una historia de usuario.
+- Un bug.
+- Un refactor acotado.
+- Una tarea técnica específica.
+- Un hardening puntual.
+- Una mejora documental trazable.
+
+No se deben mezclar múltiples pendientes en la misma rama. No se deben agrupar tareas no relacionadas. No se debe abrir trabajo sin spec propio.
+
+### 12.3 Entradas obligatorias para cada subagente
+
+Antes de comenzar, cada subagente debe recibir como mínimo:
+
+- ID del pendiente.
+- Historia, bug, refactor, hardening o tarea asignada.
+- Criterios de aceptación.
+- Contexto funcional.
+- Contexto técnico.
+- Documentación del módulo afectado.
+- Dependencias conocidas.
+- Restricciones de seguridad.
+- Definición de terminado.
+- Rama base esperada.
+- Quality gates obligatorios.
+
+Si falta alguna entrada crítica, el subagente no debe inferirla. Debe escalar al agente principal.
+
+### 12.4 Flujo operativo por subagente
+
+1. El agente principal selecciona el pendiente desde el backlog oficial.
+2. El agente principal entrega al subagente las entradas obligatorias.
+3. El subagente clasifica el trabajo según FASE 1.
+4. El subagente redacta su spec según FASE 3.
+5. El subagente crea su rama desde `develop` actualizado según FASE 4.
+6. El subagente audita skills, patrones y dependencias del módulo afectado según FASE 5.
+7. El subagente implementa siguiendo FASE 6.
+8. El subagente ejecuta quality gates según FASE 7.
+9. El subagente realiza prueba funcional según FASE 8.
+10. El subagente actualiza el spec con resultados, pendientes y matriz de cierre según FASE 10.
+11. El subagente devuelve evidencia al agente principal.
+
+El subagente no debe integrar el trabajo final sin revisión del agente principal.
+
+### 12.5 Salida obligatoria de un subagente
+
+Al finalizar, el subagente debe entregar:
+
+- Resumen de cambios.
+- Criterios de aceptación cumplidos.
+- Criterios de aceptación no cumplidos o parciales.
+- Evidencia de pruebas y comandos ejecutados.
+- Riesgos detectados.
+- Deuda técnica generada.
+- Pendientes nuevos detectados.
+- Impacto en documentación.
+- Archivos modificados.
+- Recomendación de integración.
+
+Los pendientes nuevos detectados no se ejecutan dentro del mismo trabajo salvo autorización explícita del agente principal. Deben registrarse como propuesta o backlog derivado.
+
+### 12.6 Consolidación por el agente principal
+
+Al recibir trabajo de uno o más subagentes, el agente principal debe:
+
+- Revisar consistencia con el baseline oficial.
+- Revisar consistencia con backlog y spec.
+- Detectar duplicados de trabajo.
+- Detectar conflictos entre ramas.
+- Homologar criterios de aceptación y evidencia.
+- Validar dependencias cruzadas.
+- Confirmar que no se expandió alcance sin autorización.
+- Ordenar la integración.
+- Preparar o validar el PR final hacia `develop`.
+
+La integración no es automática. El agente principal conserva responsabilidad final sobre coherencia técnica, seguridad, documentación y trazabilidad.
+
+### 12.7 Reglas de escalamiento
+
+Los subagentes no deben resolver ambigüedades inventando alcance. Deben escalar al agente principal cuando encuentren:
+
+- Requisitos ambiguos.
+- Contradicciones entre código, documentación y backlog.
+- Riesgos de seguridad no previstos.
+- Dependencias faltantes.
+- Necesidad de modificar arquitectura global.
+- Pendientes relacionados que parezcan bloquear la tarea.
+
+El escalamiento debe incluir:
+
+- La duda o hallazgo.
+- Opciones viables.
+- Impacto técnico.
+- Impacto funcional.
+- Impacto de seguridad.
+- Recomendación sugerida.
+
+Solo el agente principal decide si hace falta consultar al usuario. El subagente no debe interrumpir innecesariamente el flujo cuando pueda continuar dentro del alcance aprobado.
+
+### 12.8 Restricciones no negociables para subagentes
+
+- Ningún subagente puede trabajar fuera del backlog aprobado.
+- Ningún subagente puede inventar alcance nuevo.
+- Ningún subagente puede saltarse spec, tests o quality gates.
+- Ningún subagente puede mezclar dos pendientes en una sola rama.
+- Ningún subagente puede tocar `main`, `master` o `develop` directamente.
+- Ningún subagente puede modificar documentación base sin justificarlo en su spec.
+- Ningún subagente puede considerar cerrado un trabajo sin actualizar el spec.
+- Ningún subagente puede integrar trabajo final de manera autónoma.
+- Ningún subagente puede convertir un hallazgo nuevo en implementación sin aprobación del agente principal.
+
+---
+
 ## REGLAS GENERALES DE COMPORTAMIENTO
 
 ### Cuándo preguntar antes de actuar
@@ -430,6 +637,7 @@ git commit -m "docs: close spec [nombre-corto] — [DONE|REJECTED]"
 - No hay suficiente contexto para escribir una historia SMART
 - Una decisión de diseño tiene implicaciones de seguridad no triviales
 - El cambio podría afectar contratos o interfaces que otros módulos usan
+- Un subagente escala una ambigüedad que requiere decisión de producto, arquitectura o seguridad
 
 ### Cuándo detener y reportar
 - Un quality gate falla y la corrección requiere decisión de diseño
@@ -443,6 +651,8 @@ git commit -m "docs: close spec [nombre-corto] — [DONE|REJECTED]"
 - La revisión de diff antes del PR
 - El cierre del spec con resultados documentados
 - La documentación explícita de pendientes, gaps, trabajo fuera de alcance y backlog derivado antes de cerrar el spec
+- La regla `1 pendiente = 1 spec = 1 rama = 1 PR` en modo subagente
+- La revisión del agente principal antes de integrar trabajo producido por subagentes
 
 ### Política sobre atajos
 No existen atajos en este protocolo. Un bugfix de una línea sigue el mismo proceso que una feature grande. La disciplina es consistente porque los problemas de seguridad no avisan con anticipación.

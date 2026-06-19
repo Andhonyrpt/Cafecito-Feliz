@@ -21,8 +21,8 @@ Lista de bugs, inconsistencias y deuda confirmada o altamente probable. No inclu
 | Caja duplicada local/backend | Alineacion | `openedAt` e `initialCash` en localStorage y `CashSession` en DB | Cierre con datos stale | Hidratar desde backend |
 | Posibles multiples sesiones de caja abiertas | Bug | No se evidencio bloqueo | Arqueos inconsistentes | Agregar regla y test si aplica |
 | Logout no revoca refresh token | Seguridad | `logout` responde exito sin invalidacion persistente | Sesion reutilizable | Definir token store o `tokenVersion` |
-| `AGENTS.testing.md` backend incorrecto | Documentacion | Habla de Vitest | Tests incompatibles | Archivar/reescribir |
-| `AGENTS.testing.md` frontend desactualizado | Documentacion | Cypress fue inicializado, pero la guia describe flujos/selectores no confirmados | Falsa expectativa E2E | Archivar/reescribir |
+| `AGENTS.testing.md` frontend requiere mantenimiento | Documentacion | Debe mantenerse alineado al POS y al smoke Cypress actual | Falsa expectativa E2E | Actualizar junto con nuevos E2E |
+| Documentacion QA/performance historica pendiente de consolidacion | Documentacion | `docs/qa/QA_BACKEND_*` convive con `docs/QA_STRATEGY.md` | Fuentes paralelas | Consolidar resumen canonico y archivar evidencia si aplica |
 
 ## Medios
 
@@ -32,7 +32,7 @@ Lista de bugs, inconsistencias y deuda confirmada o altamente probable. No inclu
 | `setLogoutCallback` no aparece registrado | Bug potencial | `http.js` lo soporta, no se evidencio uso | Refresh fallido no fuerza logout UI | Registrar callback o remover |
 | Paths de servicios inconsistentes | Refactor | Mezcla `/path` y `path` | Errores sutiles de URL | Normalizar estilo |
 | Frontend usa `alert()` | Deuda UX | Componentes de flujo POS | Mala experiencia/error handling | Estados de error y mensajes inline |
-| Cypress inicializado sin alcance E2E formal | Deuda QA | Existen archivos generados por `npx cypress open`, pero falta script y casos POS utiles | Confusion | Definir alcance, agregar script y pruebas o remover si no se usara |
+| E2E solo cubre smoke POS mockeado | Deuda QA | Existe `cypress/e2e/pos-smoke.cy.js`, pero falta backend real, cierre de caja y barista | Cobertura incompleta | Agregar E2E progresivos |
 | Frontend con cobertura minima | Deuda QA | Solo `src/App.test.js` | Regresiones UI/context | Agregar tests criticos |
 
 ## Bajos

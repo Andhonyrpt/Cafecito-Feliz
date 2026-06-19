@@ -6,7 +6,7 @@ Este spec describe el estado actual confirmado del sistema y los gaps para conti
 
 ## Descripcion General
 
-Cafecito Feliz es un POS para cafeteria con backend Express/MongoDB y frontend React. El sistema cubre autenticacion de empleados, apertura/cierre de caja, catalogo, carrito, clientes, checkout, ordenes pendientes y flujo basico de barista.
+Cafecito Feliz es un POS para cafeteria con backend Express/MongoDB y frontend React. No es un e-commerce multipagina. El sistema cubre autenticacion de empleados, apertura/cierre de caja, catalogo, pedido POS, clientes, checkout de caja, ordenes pendientes y flujo basico de barista.
 
 ## Objetivo del Producto
 
@@ -24,7 +24,7 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 | Ordenes | Implementado, con deuda de integridad |
 | Barista | Implementado basico con polling |
 | Admin UI | No confirmado como pantalla actual |
-| E2E | Cypress inicializado, pero sin alcance/pruebas POS formalizadas |
+| E2E | Cypress configurado con smoke POS mockeado; falta backend real/cierre/barista |
 
 ## Alcance Objetivo
 
@@ -153,6 +153,7 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 - Orden `completado` no debe reabrirse.
 - Caja suma ventas en efectivo desde apertura.
 - Tarjeta es simulada, no integrada a terminal real.
+- No existen flujos de envio, dashboard multipagina ni checkout por pasos tipo tienda online en el alcance actual; el flujo real trabaja con pedidos POS y ordenes.
 
 ## Inconsistencias Principales
 
@@ -160,7 +161,7 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 - Caja duplicada local/backend.
 - Stock cacheado en frontend frente a stock real backend.
 - Logout no revoca refresh token.
-- Cypress inicializado con archivos generados, pero sin scripts y pruebas POS formalizadas.
+- Cypress configurado con scripts y smoke POS mockeado; falta ampliar a backend real, cierre de caja y barista.
 - Guias testing obsoletas.
 
 ## Recomendacion de Cierre de Gaps

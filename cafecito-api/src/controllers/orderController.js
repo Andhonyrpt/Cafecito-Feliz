@@ -48,7 +48,7 @@ async function getOrdersByClient(req, res, next) {
         const skip = (page - 1) * limit;
 
         const orders = await Order.find({ client: clientId })
-            .populate('user,displayName')
+            .populate('user.displayName')
             .populate('products.productId')
             .populate('paymentMethod')
             .sort({ createdAt: 1 })

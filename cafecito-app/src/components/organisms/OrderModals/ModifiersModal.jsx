@@ -55,6 +55,7 @@ export default function ModifiersModal({ isOpen, onClose, product, onConfirm }) 
                     <Button variant='primary' size='sm'
                         onClick={handleSubmit}
                         className='btn-confirmar'
+                        data-testid='modifier-confirm-add'
 
                     >
                         Agregar a la orden

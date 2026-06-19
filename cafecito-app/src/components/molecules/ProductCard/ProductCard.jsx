@@ -26,6 +26,7 @@ const ProductCard = memo(({ product, orientation, priority = false, onAdd, isBut
                     <Button variant="secondary" size="sm"
                         onClick={onAdd}
                         disabled={isButtonDisabled}
+                        data-testid={`add-product-${product._id}`}
                     >
                         +
                     </Button>

@@ -2,7 +2,7 @@
 
 ## Alcance
 
-Este reporte resume las corridas locales ejecutadas contra `cafecito-api` usando `QA_BACKEND_PERFORMANCE_RUNNER.mjs`.
+Este reporte resume las corridas locales ejecutadas contra `cafecito-api` usando `QA_BACKEND_PERFORMANCE_RUNNER.mjs` desde la raíz del repositorio.
 
 ## Ambiente
 
