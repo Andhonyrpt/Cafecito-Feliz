@@ -47,8 +47,8 @@ async function openCashSession(req, res, next) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (role === 'admin') {
-            return res.status(200).json({ message: 'Acceso de administrador autorizado sin apertura de caja.' });
+        if (role !== 'vendedor') {
+            return res.status(200).json({ message: 'Acceso autorizado sin apertura de caja.' });
         }
 
         if (initialCash === undefined || initialCash === null) {
@@ -81,8 +81,8 @@ async function closeCashSession(req, res, next) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (role === 'admin') {
-            return res.status(200).json({ message: "Sesión de administración finalizada de manera limpia." });
+        if (role !== 'vendedor') {
+            return res.status(200).json({ message: "Sesión finalizada de manera limpia." });
         }
 
         const activeSession = await CashSession.findOne({ user: userId, status: 'open' });

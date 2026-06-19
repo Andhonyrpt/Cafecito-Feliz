@@ -1,4 +1,4 @@
-import { createUserWithToken } from './helpers/auth.js';
+import { createAdminWithToken, createUserWithToken } from './helpers/auth.js';
 import { api, authHeader } from './helpers/http.js';
 
 describe('Cash Module Tests', () => {
@@ -48,6 +48,25 @@ describe('Cash Module Tests', () => {
     });
 
     describe('POST /api/total-cash/close', () => {
+        it('should close admin session without cash audit fields', async () => {
+            const admin = await createAdminWithToken({
+                displayName: 'Admin Cash Close',
+                employeeId: 'EMP-073'
+            });
+
+            const res = await api()
+                .post('/api/total-cash/close')
+                .set(authHeader(admin.token))
+                .send({
+                    pin: '12345',
+                    isCashCorrect: null,
+                    discrepancyReason: ''
+                });
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('message', 'Sesión finalizada de manera limpia.');
+        });
+
         it('should close cash session', async () => {
             const res = await api()
                 .post('/api/total-cash/close')

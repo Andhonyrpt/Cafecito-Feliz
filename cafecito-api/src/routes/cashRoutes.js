@@ -14,6 +14,15 @@ import {
 
 const router = express.Router();
 
+const validateSellerCashClose = async (req, res, next) => {
+    if (req.user?.role !== 'vendedor') {
+        return next();
+    }
+
+    await Promise.all(cashCloseValidation().map((validation) => validation.run(req)));
+    next();
+};
+
 router.get('/total-cash/orders', authMiddleware, [
     cashOpenedAtValidation()
 ], validate, getTurnoTotal);
@@ -22,8 +31,6 @@ router.post('/total-cash/open', authMiddleware, [
     cashInitialValidation()
 ], validate, openCashSession);
 
-router.post('/total-cash/close', authMiddleware, [
-    cashCloseValidation()
-], validate, closeCashSession);
+router.post('/total-cash/close', authMiddleware, validateSellerCashClose, validate, closeCashSession);
 
 export default router;
