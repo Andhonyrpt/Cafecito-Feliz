@@ -7,7 +7,8 @@ export default function Button({
     disabled = false,
     variant = "primary",
     size = "base",
-    className = ""
+    className = "",
+    ...props
 }) {
 
     const buttonClasses = [
@@ -25,6 +26,7 @@ export default function Button({
             className={buttonClasses}
             onClick={onClick}
             disabled={disabled}
+            {...props}
         >
             {children}
         </button>

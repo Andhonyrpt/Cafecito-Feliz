@@ -10,7 +10,7 @@ export const TAX_RATE = 0.16; // IVA 16%
  * Calcula el desglose financiero de un pedido.
  * 
  * @param {Array} products - Lista de productos normalizados con {price, quantity}
- * @returns {Object} { subtotal, tax, shippingCost, total }
+ * @returns {Object} { subtotal, discount, tax, total }
  */
 export function calculateOrderFinancials(products, discountPercentage = 0) {
     const subtotal = products.reduce(

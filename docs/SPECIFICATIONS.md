@@ -4,7 +4,7 @@ Este documento describe el comportamiento observado en el código actual de Cafe
 
 ## Alcance
 
-- Sistema POS para cafetería con apertura/cierre de caja, catálogo, clientes, carrito, checkout y comandas.
+- Sistema POS para cafetería con apertura/cierre de caja, catálogo, clientes, pedido en curso, checkout de caja y comandas.
 - Arquitectura de dos paquetes independientes: API Express/MongoDB y frontend React.
 - No hay workspace raíz; cada paquete tiene su propio `package.json` y `package-lock.json`.
 
@@ -177,11 +177,11 @@ Rutas montadas en `/api`:
 ### Flujo POS
 
 - `Home` carga categorías desde `/categories` y productos desde `/products` filtrando por categoría.
-- `OrderContext` conserva carrito y cliente activo.
+- `OrderContext` conserva pedido en curso y cliente activo.
 - `OrderPanel` normaliza productos como `{ productId, quantity, notes }`.
 - Antes de cobrar llama `previewOrder()`.
 - Al confirmar, vuelve a normalizar productos, obtiene perfil de usuario y llama `createOrder()`.
-- Después de una venta limpia caché de productos, cliente activo y carrito.
+- Después de una venta limpia caché de productos, cliente activo y pedido en curso.
 
 ### Pagos
 
@@ -195,10 +195,12 @@ API:
 - Comando: `cd cafecito-api && npm test`.
 - Configuración: `jest.config.js`, `testEnvironment: node`, `setupFilesAfterEnv: tests/setup/setup.js`.
 - Base de datos: `mongodb-memory-server`.
-- Estado actual observado: 7 suites, 40 tests.
+- Estado actual observado: 17 suites, 123 tests.
 
 Frontend:
 
 - Comando recomendado no interactivo: `cd cafecito-app && npm test -- --watchAll=false`.
-- Existe `src/App.test.js` de CRA; no hay suite E2E configurada.
-- Cypress está instalado como dependencia de desarrollo, pero no hay `cypress.config.*`, scripts ni carpeta `cypress/`.
+- Existe `src/App.test.js` de CRA.
+- Estado actual observado: 1 suite, 1 test.
+- Cypress está configurado con scripts `cypress:open`, `cypress:run` y `e2e`.
+- La suite E2E actual contiene un smoke POS mockeado en `cypress/e2e/pos-smoke.cy.js`; aún no valida persistencia con backend real.

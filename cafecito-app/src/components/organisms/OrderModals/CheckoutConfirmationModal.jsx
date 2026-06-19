@@ -159,6 +159,7 @@ export default function CheckoutConfirmationModal({
                                         <span>$</span>
 
                                         <input
+                                            data-testid="cash-received-input"
                                             type="number"
                                             placeholder="0.00"
                                             value={montoRecibido}
@@ -230,6 +231,7 @@ export default function CheckoutConfirmationModal({
                         variant="primary"
                         onClick={handleSubmit}
                         className="modal-submit-btn"
+                        data-testid="confirm-sale-button"
                         disabled={
                             isSubmitting || (paymentMethod === 'tarjeta' && terminalStatus !== 'aprobado') ||
                             (paymentMethod === 'efectivo' && (!montoRecibido || parseFloat(montoRecibido) < totalAPagar))

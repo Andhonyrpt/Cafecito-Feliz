@@ -323,6 +323,7 @@ export default function OrderPanel({ onOrderSuccess }) {
                     size="lg"
                     onClick={handleCheckout}
                     disabled={isLoading || orderItems.length === 0 || !canSell}
+                    data-testid="order-checkout-button"
                 >
                     {isLoading ? 'Calculando' : (canSell ? 'Cobrar' : 'Cobro no disponible')}
                 </Button>
@@ -331,6 +332,7 @@ export default function OrderPanel({ onOrderSuccess }) {
                     <button
                         className={`payment-tile ${paymentMethod === 'efectivo' ? 'active' : ''}`}
                         onClick={() => setPaymentMethod('efectivo')}
+                        data-testid="payment-method-cash"
                     >
                         <Icon name="cash" size={24} />
                         <span>Efectivo</span>
@@ -338,6 +340,7 @@ export default function OrderPanel({ onOrderSuccess }) {
                     <button
                         className={`payment-tile ${paymentMethod === 'tarjeta' ? 'active' : ''}`}
                         onClick={() => setPaymentMethod('tarjeta')}
+                        data-testid="payment-method-card"
                     >
                         <Icon name="creditCard" size={24} />
                         <span>Tarjeta</span>

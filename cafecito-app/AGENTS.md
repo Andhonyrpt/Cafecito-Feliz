@@ -29,13 +29,13 @@ Maneja la sesión del cajero y la validación para abrir/cerrar caja.
 - `calculateExpectedTotals`: Petición al backend del arqueo esperado.
 
 ### 2. `OrderContext.jsx`
-Maneja el estado del POS y carrito de compras mediante un Reducer.
+Maneja el estado del POS y pedido en curso mediante un Reducer.
 **Retorna al usar `useOrder()`:**
 - `orderItems`: Array con los productos agregados.
 - `activeClient`: Información del cliente seleccionado.
-- `subtotal`, `discount`, `iva`, `totalToPay`: Valores financieros del carrito calculados en vivo.
-- `totalItemsCount`: Cantidad de ítems en carrito.
-- `addItemToOrder`, `updateItemQuantity`, `removeItemFromOrder`: Acciones del carrito.
+- `subtotal`, `discount`, `iva`, `totalToPay`: Valores financieros del pedido calculados en vivo.
+- `totalItemsCount`: Cantidad de ítems en el pedido.
+- `addItemToOrder`, `updateItemQuantity`, `removeItemFromOrder`: Acciones del pedido.
 - `setClientToOrder`, `removeClientFromOrder`: Acciones del cliente.
 - `resetPOSPanel`: Acción para limpiar la terminal completa post-venta.
 
@@ -58,7 +58,7 @@ Maneja el estado del POS y carrito de compras mediante un Reducer.
 
 ## Patrón de Estado Complejo (Reducer)
 
-En lugar de un `useFormReducer`, el proyecto utiliza el patrón `useReducer` directamente para gestionar el carrito en `orderReducer.js`.
+En lugar de un `useFormReducer`, el proyecto utiliza el patrón `useReducer` directamente para gestionar el pedido en curso en `orderReducer.js`.
 
 **Ejemplo de uso (Interno en OrderContext):**
 ```jsx
@@ -67,7 +67,7 @@ import { orderReducer, orderInitialState, ORDER_ACTIONS } from "./orderReducer";
 // Inicialización
 const [state, dispatch] = useReducer(orderReducer, orderInitialState);
 
-// Despacho de eventos (ej: Agregar al carrito)
+// Despacho de eventos (ej: agregar al pedido)
 dispatch({ 
     type: ORDER_ACTIONS.ADD, 
     payload: { ...product, quantity } 

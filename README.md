@@ -5,9 +5,13 @@ Punto de venta para Cafecito Feliz. El repositorio contiene dos paquetes Node se
 ## Estructura
 
 - `cafecito-api/`: API REST con Express 5, Mongoose, JWT, validaciones con `express-validator` y pruebas Jest/Supertest.
-- `cafecito-app/`: frontend React para apertura/cierre de turno, catálogo, carrito, cliente activo y checkout.
-- `SPECIFICATIONS.md`: especificación técnica y funcional derivada del código actual.
-- `POSSIBLE_IMPROVEMENTS.md`: mejoras candidatas detectadas durante el análisis.
+- `cafecito-app/`: frontend React para apertura/cierre de turno, catálogo, pedido POS, cliente activo y checkout de caja.
+- `docs/INDEX.md`: índice maestro de documentación vigente.
+- `docs/PRODUCT_SPEC.md`: especificación funcional y técnica vigente del POS.
+- `docs/BACKLOG.md`: backlog priorizado y pendiente accionable.
+- `docs/GOVERNANCE.md`: reglas de gobernanza documental y multiagente.
+- `docs/SPECIFICATIONS.md`: especificación técnica derivada del código actual; usar `docs/PRODUCT_SPEC.md` como fuente principal.
+- `docs/POSSIBLE_IMPROVEMENTS.md`: mejoras candidatas históricas detectadas durante análisis previos.
 
 ## Comandos
 
@@ -29,6 +33,8 @@ cd cafecito-app
 npm install
 npm start
 npm run build
+npm test -- --watchAll=false
+npm run cypress:run
 ```
 
 ## Variables de entorno
@@ -48,4 +54,8 @@ cd cafecito-api
 npm test
 ```
 
-Resultado observado: 7 suites y 40 tests pasando.
+Resultado observado: 17 suites y 123 tests pasando.
+
+Frontend verificado con `npm test -- --watchAll=false`: 1 suite y 1 test pasando.
+
+Cypress está configurado en `cafecito-app/` con smoke POS mockeado en `cypress/e2e/pos-smoke.cy.js`.

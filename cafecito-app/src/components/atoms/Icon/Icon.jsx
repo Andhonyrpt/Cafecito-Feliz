@@ -534,7 +534,7 @@ const Icon = ({ name, size = 20, className = "" }) => {
       </svg>
     ),
 
-    // Iconos adicionales útiles para el ecommerce
+    // Iconos adicionales utiles para el flujo POS
     arrowLeft: (
       <svg
         width={size}

@@ -8,7 +8,7 @@ Este backlog sale de la auditoria documental, el codigo actual y las pruebas eje
 
 | ID | Epica | Prioridad | Tipo |
 | --- | --- | --- | --- |
-| E1 | Normalizacion documental | Critico | Documentacion |
+| E1 | Normalizacion documental | Alto | Documentacion |
 | E2 | Alineacion frontend/backend POS | Critico | Alineacion frontend/backend |
 | E3 | Integridad de ordenes e inventario | Critico | Bug / Deuda tecnica |
 | E4 | Caja confiable | Alto | Alineacion frontend/backend |
@@ -23,7 +23,6 @@ Este backlog sale de la auditoria documental, el codigo actual y las pruebas eje
 
 | Item | Clasificacion | Evidencia |
 | --- | --- | --- |
-| Consolidar spec vigente del producto | Documentacion | Docs actuales contradicen codigo y pruebas |
 | Definir backend como fuente de verdad de totales | Alineacion frontend/backend | `OrderContext` calcula totales y backend recalcula en preview/create |
 | Corregir integridad de creacion de orden | Deuda tecnica | Stock, orden y cliente se actualizan sin transaccion |
 | Reemplazar `Order.countDocuments() + 1` para `orderNumber` | Bug | Riesgo de duplicados por concurrencia |
@@ -32,9 +31,9 @@ Este backlog sale de la auditoria documental, el codigo actual y las pruebas eje
 
 | Item | Clasificacion | Evidencia |
 | --- | --- | --- |
-| Actualizar README y cifras de tests | Documentacion | API actual: 17 suites/123 tests; README dice 7/40 |
-| Archivar o reescribir `cafecito-api/AGENTS.testing.md` | Documentacion | Habla de Vitest, pero el backend usa Jest |
-| Archivar o reescribir `cafecito-app/AGENTS.testing.md` | Documentacion | Cypress fue inicializado, pero la guia describe flujos/selectores no confirmados |
+| Consolidar o archivar `docs/SPECIFICATIONS.md` | Documentacion | `docs/PRODUCT_SPEC.md` es la fuente principal, pero `docs/SPECIFICATIONS.md` sigue existiendo como derivado historico |
+| Consolidar resumen canonico de `docs/qa/` | Documentacion | Los `QA_BACKEND_*` ya estan en `docs/qa/`; falta decidir cuanto queda como canon vs evidencia historica |
+| Mantener `cafecito-app/AGENTS.testing.md` alineado al POS | Documentacion | Cypress ya tiene smoke POS; la guia debe seguir el flujo real |
 | Corregir `GET /api/orders/client/:clientId` | Bug | Suite genero `StrictPopulateError` por populate invalido |
 | Corregir `getOrdersByClient` en frontend | Bug | Servicio usa ruta ambigua tipo `orders/:clientId` |
 | Hidratar caja activa desde backend | Alineacion frontend/backend | `openedAt` e `initialCash` dependen de localStorage |
@@ -46,10 +45,12 @@ Este backlog sale de la auditoria documental, el codigo actual y las pruebas eje
 
 | Item | Clasificacion | Evidencia |
 | --- | --- | --- |
-| Crear tests frontend de `OrderContext` | Deuda tecnica | Frontend solo tiene 1 test |
+| Crear tests frontend de `OrderContext` | Deuda tecnica | Frontend tiene cobertura unitaria minima |
 | Crear tests frontend de `SessionContext` | Deuda tecnica | Flujo caja/login es critico |
 | Crear test de checkout preview-confirm | Deuda tecnica | Flujo POS depende de preview antes de create |
-| Formalizar Cypress o removerlo | Deuda tecnica | Cypress fue inicializado con `npx cypress open`, pero falta script, alcance y casos POS utiles |
+| Agregar E2E POS contra backend real | Deuda tecnica | Existe smoke Cypress mockeado; falta validar persistencia real |
+| Agregar E2E de cierre de caja | Deuda tecnica | Flujo caja requiere cobertura end-to-end |
+| Agregar E2E de barista completando orden | Deuda tecnica | Vista barista existe y falta cobertura E2E |
 | Normalizar paths de servicios frontend | Refactor | Hay rutas con y sin slash inicial |
 | Reemplazar `alert()` por estados UI | Refactor | UX/error handling inconsistente |
 | Revisar cache de productos ante cambios externos | Bug potencial | Cache dura 5 minutos y se limpia solo en algunos flujos |
@@ -71,10 +72,11 @@ Como desarrollador nuevo quiero una spec consolidada para continuar el desarroll
 
 Aceptacion:
 - Existe spec vigente.
-- Docs obsoletas estan marcadas o archivadas.
+- Existe indice maestro y gobernanza documental.
+- Docs obsoletas estan marcadas, actualizadas o archivadas.
 - README apunta a docs finales.
 
-Prioridad: Critico. Estado actual: Inconsistente.
+Prioridad: Alto. Estado actual: Parcial; `docs/INDEX.md` y `docs/GOVERNANCE.md` ya existen.
 
 ### US-002 - Total final desde backend
 

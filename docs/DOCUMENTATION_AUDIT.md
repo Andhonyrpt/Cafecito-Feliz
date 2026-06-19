@@ -10,45 +10,49 @@ Este documento separa documentacion vigente, recuperable, obsoleta y redundante.
 | --- | --- | --- |
 | `README.md` | Util, con cifras de tests obsoletas | Actualizar |
 | `cafecito-app/README.md` | Vigente y breve | Conservar |
-| `SPECIFICATIONS.md` | Parcialmente vigente | Actualizar o reemplazar por `docs/PRODUCT_SPEC.md` |
-| `POSSIBLE_IMPROVEMENTS.md` | Util como fuente de backlog | Consolidar en `docs/BACKLOG.md` |
+| `docs/SPECIFICATIONS.md` | Parcialmente vigente como referencia derivada | Consolidar o reemplazar por `docs/PRODUCT_SPEC.md` |
+| `docs/POSSIBLE_IMPROVEMENTS.md` | Util como fuente historica de backlog | Consolidar en `docs/BACKLOG.md` |
 | `AGENTS.md` | Guia operativa vigente | Conservar |
 | `cafecito-api/AGENTS.md` | Guia backend util | Conservar |
 | `cafecito-app/AGENTS.md` | Guia frontend util | Conservar |
-| `cafecito-api/AGENTS.testing.md` | Incorrecto: habla de Vitest, pero el API usa Jest | Archivar o reescribir |
-| `cafecito-app/AGENTS.testing.md` | Desactualizado: Cypress ya fue inicializado, pero la guia describe flujos/selectores no confirmados | Archivar o reescribir |
-| `QA_BACKEND_TEST_PLAN.md` | Plan QA backend util | Conservar |
-| `QA_BACKEND_PROGRESS.md` | Bitacora QA util | Conservar |
-| `QA_BACKEND_PERFORMANCE_*` | Util, pero local-only | Consolidar resumen y dejar evidencia |
+| `cafecito-api/AGENTS.testing.md` | Actualizado para Jest/Supertest/MongoMemoryServer | Conservar |
+| `cafecito-app/AGENTS.testing.md` | Actualizado para POS y smoke Cypress inicial | Conservar |
+| `docs/INDEX.md` | Indice maestro agregado | Conservar |
+| `docs/GOVERNANCE.md` | Gobernanza documental y multiagente agregada | Conservar |
+| `.agents/` | Capa multiagente operativa | Conservar alineada al SSDLC |
+| `docs/qa/QA_BACKEND_TEST_PLAN.md` | Plan QA backend util | Conservar como detalle historico |
+| `docs/qa/QA_BACKEND_PROGRESS.md` | Bitacora QA util | Conservar como detalle historico |
+| `docs/qa/QA_BACKEND_PERFORMANCE_*` | Util, pero local-only | Conservar evidencia y resumir en `docs/QA_STRATEGY.md` |
 | `cafecito-api/SECURITY_*` | Vigente y valioso | Conservar |
 | `docs/skills/*.md` | Material generico, no spec del producto | Archivar como referencia generica |
 
 ## Documentacion Vigente
 
 - `cafecito-app/README.md`: comandos, stack y flujo principal del frontend.
-- `QA_BACKEND_TEST_PLAN.md`: estrategia de pruebas backend.
-- `QA_BACKEND_PROGRESS.md`: evidencia historica del avance de QA.
-- `QA_BACKEND_PERFORMANCE_EVIDENCE.md`: resultados locales de performance.
+- `docs/qa/QA_BACKEND_TEST_PLAN.md`: estrategia detallada de pruebas backend.
+- `docs/qa/QA_BACKEND_PROGRESS.md`: evidencia historica del avance de QA.
+- `docs/qa/QA_BACKEND_PERFORMANCE_EVIDENCE.md`: resultados locales de performance.
 - `cafecito-api/SECURITY_TEST_PLAN.md`, `SECURITY_TEST_MATRIX.md`, `SECURITY_PROGRESS.md`: estado y pendientes de seguridad.
 - `AGENTS.md`: reglas operativas del repositorio.
 
 ## Documentacion Desactualizada Pero Recuperable
 
-- `README.md`: conserva estructura y comandos, pero reporta `7 suites y 40 tests`; la verificacion real actual dio API `17 suites / 123 tests` y frontend `1 suite / 1 test`.
-- `SPECIFICATIONS.md`: buena base, pero auth, seguridad y pruebas quedaron atrasadas frente al codigo actual.
-- `POSSIBLE_IMPROVEMENTS.md`: contiene deuda valida, pero algunas entradas ya cambiaron por trabajo de QA/seguridad.
+- `README.md`: actualizado con referencias a docs canonicos y estado de pruebas verificado.
+- `docs/SPECIFICATIONS.md`: buena base derivada del codigo; debe quedar subordinado a `docs/PRODUCT_SPEC.md` y consolidarse para evitar doble fuente.
+- `docs/POSSIBLE_IMPROVEMENTS.md`: contiene deuda valida, pero algunas entradas ya cambiaron por trabajo de QA/seguridad.
 
 ## Documentacion Obsoleta o Contradictoria
 
-- `cafecito-api/AGENTS.testing.md`: contradice `package.json` y `jest.config.js`; no se debe usar para escribir tests actuales.
-- `cafecito-app/AGENTS.testing.md`: describe una suite Cypress con flujos/selectores no confirmados. Cypress fue inicializado con `npx cypress open`, pero aun falta definir scripts, alcance y casos reales del POS.
-- `SPECIFICATIONS.md`: cifras de tests obsoletas y varios puntos de auth/seguridad no reflejan remediaciones recientes.
+- `cafecito-api/AGENTS.testing.md`: actualizado para Jest; no usar versiones anteriores que mencionen Vitest.
+- `cafecito-app/AGENTS.testing.md`: actualizado para POS. Cypress ya tiene scripts y smoke mockeado; falta ampliar cobertura a backend real, cierre de caja y barista.
+- Cualquier documento que describa registro publico, envio, dashboard, checkout por pasos o e-commerce debe corregirse o archivarse si no corresponde al POS real.
+- `docs/SPECIFICATIONS.md`: ya no debe crecer como fuente paralela; si contiene detalles utiles, moverlos a `docs/PRODUCT_SPEC.md`, `docs/contracts/` o `docs/runbooks/`.
 - `docs/skills/SSDLC_SystemPrompt.md`: contiene instrucciones genericas como `git checkout develop && git pull`; no deben tratarse como reglas de este repo.
 
 ## Riesgos de Mantener Documentacion Incorrecta
 
-- Crear tests nuevos con Vitest en un backend Jest.
-- Asumir que Cypress ya tiene una suite E2E util y alineada al POS solo porque existen archivos generados.
+- Reintroducir guias de Vitest en un backend Jest.
+- Asumir que el smoke Cypress mockeado cubre persistencia real o todos los flujos críticos del POS.
 - Implementar contra contratos viejos de auth o caja.
 - Perder tiempo buscando pantallas o flujos no implementados.
 - Ocultar bugs reales por confiar en specs antiguas.
@@ -61,4 +65,10 @@ Este documento separa documentacion vigente, recuperable, obsoleta y redundante.
 - `docs/KNOWN_ISSUES.md`: bugs y deuda confirmada.
 - `docs/QA_STRATEGY.md`: estrategia y estado de pruebas.
 - `docs/SECURITY_STATUS.md`: seguridad aplicada y pendientes.
-- Futuros documentos sugeridos: `docs/API_MAP.md`, `docs/DATA_MODEL.md`, `docs/BUSINESS_RULES.md`, `docs/DECISIONS.md`.
+- `docs/INDEX.md`: entrada documental canonica.
+- `docs/GOVERNANCE.md`: reglas de mantenimiento, archivado y precedencia.
+- `docs/adrs/`: decisiones arquitectonicas.
+- `docs/contracts/`: contratos API/datos.
+- `docs/runbooks/`: procedimientos operativos.
+- `docs/threat-models/`: modelos STRIDE.
+- `docs/archive/`: documentos historicos o deprecados.

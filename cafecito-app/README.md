@@ -17,13 +17,15 @@ npm install
 npm start
 npm run build
 npm test -- --watchAll=false
+npm run cypress:open
+npm run cypress:run
 ```
 
 ## Configuración
 
 - `REACT_APP_API_URL`: base URL de la API usada por `src/services/http.js`.
 - La sesión usa `localStorage` para `authToken`, `refreshToken`, `openedAt` e `initialCash`.
-- El carrito usa `localStorage` para `order` y `active_client`.
+- El pedido POS en curso usa `localStorage` para `order` y `active_client`.
 - El catálogo cachea productos por página/categoría en `sessionStorage` durante 5 minutos.
 
 ## Flujo principal
@@ -33,6 +35,10 @@ npm test -- --watchAll=false
 `Home` carga categorías y productos desde la API. El usuario agrega productos al pedido, selecciona cliente opcional, define método de pago y tipo de orden desde `OrderPanel`.
 
 El checkout primero llama `previewOrder()` para calcular totales en backend y después `createOrder()` al confirmar el pago.
+
+## E2E
+
+Cypress tiene un smoke POS mockeado en `cypress/e2e/pos-smoke.cy.js`. Valida apertura de caja, carga de catálogo, agregado de producto, preview y creación de orden desde UI con API mockeada. No reemplaza pruebas contra backend real.
 
 ## Servicios
 
