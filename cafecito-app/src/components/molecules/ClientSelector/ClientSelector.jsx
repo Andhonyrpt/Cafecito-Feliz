@@ -59,7 +59,7 @@ export default function ClientSelector({
     return (
         <div className='client-selector'>
             <div className='client-title'>
-                <h3>Cliente</h3>
+                <h2>Cliente</h2>
                 {!activeClient && (
                     <Button
                         variant="primary"
@@ -75,10 +75,12 @@ export default function ClientSelector({
                 <div className='client-search-container-relative'>
                     <div className='client-search-container'>
                         <input
+                            id='client-search'
                             type='text'
                             value={searchTerm}
                             onChange={handleSearchChange}
                             placeholder='Buscar por nombre o email '
+                            aria-label='Buscar cliente por nombre o email'
                         />
                         <Icon name="search" size={16} />
                         {error && <span className="search-error-msg">{error}</span>}
@@ -113,7 +115,7 @@ export default function ClientSelector({
                     </div>
 
                     <div className='client-details'>
-                        <h4>{activeClient.displayName}</h4>
+                        <p className='client-name'>{activeClient.displayName}</p>
                         <p>{activeClient.email}</p>
                     </div>
 
@@ -123,6 +125,7 @@ export default function ClientSelector({
                             setSearchTerm('');
                         }}
                         className='remove-client-btn'
+                        aria-label='Quitar cliente del pedido'
                     >
                         <Icon name="x" size={14} />
                     </button>

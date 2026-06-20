@@ -225,7 +225,7 @@ export default function Home() {
                                     width="30"
                                     height="32"
                                 />
-                                <h2>{category.name}</h2>
+                                <span className="category-name">{category.name}</span>
                             </div>
                         </button>
                     ))}
@@ -254,6 +254,8 @@ export default function Home() {
                                     size="sm"
                                     className={`view-btn ${viewLayout === "grid" ? "active" : ""}`}
                                     onClick={() => setViewLayout("grid")}
+                                    aria-label="Cambiar a vista de cuadrícula"
+                                    aria-pressed={viewLayout === "grid"}
                                 >
                                     <Icon name="grid" size={18} />
                                 </Button>
@@ -263,6 +265,8 @@ export default function Home() {
                                     size="sm"
                                     className={`view-btn ${viewLayout === "list" ? "active" : ""}`}
                                     onClick={() => setViewLayout("list")}
+                                    aria-label="Cambiar a vista de lista"
+                                    aria-pressed={viewLayout === "list"}
                                 >
                                     <Icon name="list" size={18} />
                                 </Button>
@@ -286,6 +290,7 @@ export default function Home() {
                                     size="sm"
                                     disabled={!paginationInfo.hasPrev}
                                     onClick={() => setCurrentPage((prev) => prev - 1)}
+                                    aria-label="Página anterior"
                                 >
                                     <Icon name="chevronLeft" size={12} />
                                 </Button>
@@ -299,6 +304,7 @@ export default function Home() {
                                     size="sm"
                                     disabled={!paginationInfo.hasNext}
                                     onClick={() => setCurrentPage((prev) => prev + 1)}
+                                    aria-label="Página siguiente"
                                 >
                                     <Icon name="chevronRight" size={12} />
 

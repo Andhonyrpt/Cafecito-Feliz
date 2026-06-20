@@ -28,8 +28,10 @@
     align-items: center;
 }
 
-.category-menu__info h2 {
+.category-name {
     margin-left: 10px;
+    font-size: 1.5em;
+    font-weight: 700;
 }
 
 .category-img {
