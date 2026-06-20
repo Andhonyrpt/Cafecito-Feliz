@@ -1,14 +1,50 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 import Client from "../models/client.js";
+import CashSession from "../models/cashSession.js";
 import { calculateOrderFinancials } from "../utils/orderHelper.js";
+
+async function findAvailableBaristaForOrder() {
+    const activeBaristaSessions = await CashSession.find({ status: 'open' })
+        .populate('user', 'role isActive displayName')
+        .sort({ openedAt: 1 });
+
+    const activeBaristas = activeBaristaSessions
+        .filter((session) => session.user?.role === 'barista' && session.user?.isActive)
+        .map((session) => session.user);
+
+    if (activeBaristas.length === 0) return null;
+
+    const workload = await Promise.all(activeBaristas.map(async (barista) => {
+        const pendingCount = await Order.countDocuments({
+            status: 'pendiente',
+            assignedBarista: barista._id
+        });
+
+        return { barista, pendingCount };
+    }));
+
+    workload.sort((a, b) => {
+        if (a.pendingCount !== b.pendingCount) return a.pendingCount - b.pendingCount;
+        return String(a.barista._id).localeCompare(String(b.barista._id));
+    });
+
+    return workload[0].barista;
+}
 
 async function getOrders(req, res, next) {
     try {
 
-        const pendingOrders = await Order.find({ status: 'pendiente' })
+        const filters = { status: 'pendiente' };
+
+        if (req.user?.role === 'barista') {
+            filters.assignedBarista = req.user.userId;
+        }
+
+        const pendingOrders = await Order.find(filters)
             .populate('client', 'displayName') // Trae solo el nombre del cliente, ignorando emails
             .populate('products.productId')
+            .populate('assignedBarista', 'displayName employeeId')
             .sort({ createdAt: 1 })// Las más antiguas primero para respetar la fila
 
 
@@ -180,6 +216,8 @@ async function createOrder(req, res, next) {
             const totalOrdersCount = await Order.countDocuments();
             const nextOrderNumber = totalOrdersCount + 1;
 
+            const assignedBarista = await findAvailableBaristaForOrder();
+
             const newOrder = await Order.create({
                 user: userId,
                 client: client || null,
@@ -191,7 +229,9 @@ async function createOrder(req, res, next) {
                 paymentMethod,
                 orderType,
                 orderNumber: nextOrderNumber,
-                status: 'pendiente'
+                status: 'pendiente',
+                assignedBarista: assignedBarista?._id || null,
+                assignedAt: assignedBarista ? new Date() : null
             });
 
             if (client) {
@@ -203,6 +243,7 @@ async function createOrder(req, res, next) {
 
             await newOrder.populate('user', 'displayName employeeId role');
             await newOrder.populate('products.productId');
+            await newOrder.populate('assignedBarista', 'displayName employeeId');
 
             if (client) await newOrder.populate('client');
 
@@ -236,6 +277,14 @@ async function updateOrderStatus(req, res, next) {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        if (status !== 'completado') {
+            return res.status(400).json({ message: 'Las órdenes solo pueden marcarse como completadas.' });
+        }
+
+        if (req.user?.role === 'barista' && String(order.assignedBarista) !== req.user.userId) {
+            return res.status(403).json({ message: 'Esta orden no está asignada a este barista.' });
+        }
+
         // Guard: Máquina de estados. No permitir cambios desde estados terminales
         if (order.status === 'completado') {
             return res.status(400).json({
@@ -243,9 +292,14 @@ async function updateOrderStatus(req, res, next) {
             });
         }
 
-        const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { returnDocument: 'after' })
+        const updatedOrder = await Order.findByIdAndUpdate(
+            orderId,
+            { status, completedAt: new Date() },
+            { returnDocument: 'after' }
+        )
             .populate("client", "displayName")
-            .populate("products.productId");
+            .populate("products.productId")
+            .populate('assignedBarista', 'displayName employeeId');
 
         return res.status(200).json(updatedOrder);
 

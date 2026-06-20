@@ -68,6 +68,19 @@ const orderSchema = new mongoose.Schema({
         enum: ['pendiente', 'completado'],
         default: 'pendiente' // Toda orden nueva arranca en la cola de preparación
     },
+    assignedBarista: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
+    assignedAt: {
+        type: Date,
+        default: null
+    },
+    completedAt: {
+        type: Date,
+        default: null
+    },
     orderNumber: {
         type: Number,
         required: true,

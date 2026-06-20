@@ -1,6 +1,20 @@
 import Order from "../models/order.js";
 import CashSession from "../models/cashSession.js";
 
+async function assignUnassignedPendingOrdersToBarista(baristaId) {
+    const pendingOrders = await Order.find({
+        status: 'pendiente',
+        assignedBarista: null
+    }).sort({ createdAt: 1 });
+
+    if (pendingOrders.length === 0) return;
+
+    await Order.updateMany(
+        { _id: { $in: pendingOrders.map((order) => order._id) }, assignedBarista: null },
+        { $set: { assignedBarista: baristaId, assignedAt: new Date() } }
+    );
+}
+
 async function getTurnoTotal(req, res, next) {
     try {
         const { userId } = req.user;
@@ -37,9 +51,6 @@ async function getTurnoTotal(req, res, next) {
 async function openCashSession(req, res, next) {
     try {
 
-        console.log("=== DATOS DEL USUARIO EN REQ.USER ===", req.user);
-        console.log("=== DATOS DEL CUERPO REQ.BODY ===", req.body);
-
         const { userId, role } = req.user
         const { initialCash, timestamp } = req.body;
 
@@ -48,7 +59,24 @@ async function openCashSession(req, res, next) {
         }
 
         if (role !== 'vendedor') {
-            return res.status(200).json({ message: 'Acceso autorizado sin apertura de caja.' });
+            const session = await CashSession.findOneAndUpdate(
+                { user: userId, status: 'open' },
+                {
+                    $setOnInsert: {
+                        user: userId,
+                        initialCash: 0,
+                        openedAt: timestamp ? new Date(timestamp) : new Date(),
+                        status: 'open'
+                    }
+                },
+                { upsert: true, returnDocument: 'after' }
+            );
+
+            if (role === 'barista') {
+                await assignUnassignedPendingOrdersToBarista(userId);
+            }
+
+            return res.status(200).json({ message: 'Sesión abierta correctamente.', session });
         }
 
         if (initialCash === undefined || initialCash === null) {
@@ -82,7 +110,18 @@ async function closeCashSession(req, res, next) {
         }
 
         if (role !== 'vendedor') {
-            return res.status(200).json({ message: "Sesión finalizada de manera limpia." });
+            const updatedSession = await CashSession.findOneAndUpdate(
+                { user: userId, status: 'open' },
+                {
+                    $set: {
+                        closedAt: timestamp ? new Date(timestamp) : new Date(),
+                        status: 'closed'
+                    }
+                },
+                { returnDocument: 'after' }
+            );
+
+            return res.status(200).json({ message: "Sesión finalizada de manera limpia.", session: updatedSession });
         }
 
         const activeSession = await CashSession.findOne({ user: userId, status: 'open' });
