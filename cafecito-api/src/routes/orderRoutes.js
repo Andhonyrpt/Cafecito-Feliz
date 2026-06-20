@@ -3,6 +3,7 @@ import {
     getOrders,
     getOrderById,
     getOrdersByClient,
+    getMyShiftOrders,
     createOrder,
     updateOrderStatus,
     previewOrder
@@ -21,6 +22,8 @@ import { body } from "express-validator";
 const router = express.Router();
 
 router.get('/orders', authMiddleware, getOrders);
+
+router.get('/orders/my-shift', authMiddleware, getMyShiftOrders);
 
 router.get('/orders/:orderId', authMiddleware, [
     mongoIdValidation('orderId', 'Order ID')

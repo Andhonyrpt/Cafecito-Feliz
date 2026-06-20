@@ -4,7 +4,9 @@ import App from './components/templates/App/App';
 jest.mock('react-router-dom', () => ({
   BrowserRouter: ({ children }) => <div>{children}</div>,
   Routes: ({ children }) => <div>{children}</div>,
-  Route: ({ element }) => element,
+  Route: ({ path, element }) => (path === '/' ? element : null),
+  Navigate: () => null,
+  useNavigate: () => jest.fn(),
 }), { virtual: true });
 
 jest.mock('./services/categoryService', () => ({

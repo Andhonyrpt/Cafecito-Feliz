@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../atoms/Icon';
 import { useSession } from '../../../context/SessionContext';
 import './Header.css';
@@ -6,6 +7,7 @@ import './Header.css';
 export default function Header() {
 
     const [time, setTime] = useState(new Date());
+    const navigate = useNavigate();
 
     // Simulación de autenticación 
     const { currentUser, setIsModalOpen, setSessionMode, calculateExpectedTotals } = useSession();
@@ -46,6 +48,23 @@ export default function Header() {
         setIsModalOpen(true);    // Despliega el modal encima de la app
     };
 
+    const handleUserPanel = () => {
+        if (!isAuth) {
+            setSessionMode('open');
+            setIsModalOpen(true);
+            return;
+        }
+
+        if (currentUser.role === 'vendedor') {
+            navigate('/seller/orders');
+            return;
+        }
+
+        if (currentUser.role === 'barista') {
+            navigate('/');
+        }
+    };
+
     return (
         <header className='header'>
             <div className='header-left' />
@@ -66,6 +85,7 @@ export default function Header() {
                     className={`user-profile-button ${!isAuth ? 'not-authenticated' : ''}`}
                     type='button'
                     aria-label={isAuth ? `Usuario ${currentUser.displayName}` : 'Abrir inicio de sesión'}
+                    onClick={handleUserPanel}
                 >
                     <div className='user-avatar'>
                         {isAuth ? (

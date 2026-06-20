@@ -36,6 +36,17 @@ export const getPendingOrders = async () => {
     }
 }
 
+export const getMyShiftOrders = async () => {
+    try {
+        const response = await http.get('/orders/my-shift');
+
+        return response.data;
+    } catch (error) {
+        console.error("Error obteniendo las ventas del turno", error);
+        throw error.response?.data || error;
+    }
+};
+
 // Si en algún momento necesitas ver el historial de ventas del día para el corte de caja:
 export const getOrderById = async (orderId) => {
     try {
