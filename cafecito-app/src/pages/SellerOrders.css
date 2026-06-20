@@ -1,0 +1,111 @@
+.seller-orders,
+.seller-orders-state {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 24px 0 40px;
+}
+
+.seller-orders__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.seller-orders__eyebrow {
+    margin: 0 0 4px;
+    color: var(--primary-dark);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.seller-orders__header h1 {
+    margin: 0;
+    color: var(--text);
+}
+
+.seller-orders__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.seller-orders__error {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    color: var(--danger);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--r4);
+}
+
+.seller-orders__kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.seller-orders__kpis article,
+.seller-order-card,
+.seller-orders__empty {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r4);
+    box-shadow: var(--elev-1);
+}
+
+.seller-orders__kpis article {
+    display: grid;
+    gap: 6px;
+    padding: 16px;
+}
+
+.seller-orders__kpis span,
+.seller-order-card__number,
+.seller-order-card p {
+    color: var(--text-light);
+}
+
+.seller-orders__kpis strong {
+    color: var(--text);
+    font-size: 1.3rem;
+}
+
+.seller-orders__list {
+    display: grid;
+    gap: 12px;
+}
+
+.seller-order-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+}
+
+.seller-order-card h2,
+.seller-order-card p {
+    margin: 4px 0 0;
+}
+
+.seller-orders__empty {
+    padding: 32px;
+    text-align: center;
+    color: var(--text-light);
+}
+
+@media (max-width: 700px) {
+    .seller-orders__header,
+    .seller-order-card {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .seller-orders__actions {
+        flex-direction: column;
+    }
+}

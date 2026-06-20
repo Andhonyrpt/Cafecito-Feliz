@@ -22,6 +22,11 @@ describe('Orders Module Tests', () => {
         });
         empToken = seller.token;
 
+        await api()
+            .post('/api/total-cash/open')
+            .set(authHeader(empToken))
+            .send({ initialCash: 100 });
+
         const barista = await createBaristaWithToken({
             displayName: 'Order Barista',
             employeeId: 'EMP-061'
@@ -117,6 +122,20 @@ describe('Orders Module Tests', () => {
             expect(res.status).toBe(200);
             expect(res.body.orders.length).toBeGreaterThan(0);
             expect(res.body.orders.every((order) => order.assignedBarista._id === baristaId)).toBe(true);
+        });
+    });
+
+    describe('GET /api/orders/my-shift', () => {
+        it('should list seller shift orders and summary', async () => {
+            const res = await api()
+                .get('/api/orders/my-shift')
+                .set(authHeader(empToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('summary');
+            expect(res.body.summary.orderCount).toBeGreaterThan(0);
+            expect(res.body.summary.totalSales).toBeGreaterThan(0);
+            expect(res.body.orders.length).toBeGreaterThan(0);
         });
     });
 

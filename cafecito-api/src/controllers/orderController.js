@@ -109,6 +109,64 @@ async function getOrdersByClient(req, res, next) {
     }
 };
 
+async function getMyShiftOrders(req, res, next) {
+    try {
+        const { userId, role } = req.user;
+
+        if (role !== 'vendedor') {
+            return res.status(403).json({ message: 'Solo los vendedores pueden consultar ventas de su turno.' });
+        }
+
+        const activeSession = await CashSession.findOne({ user: userId, status: 'open' });
+
+        if (!activeSession) {
+            return res.status(404).json({ message: 'No hay una sesión de caja abierta para este vendedor.' });
+        }
+
+        const orders = await Order.find({
+            user: userId,
+            createdAt: { $gte: activeSession.openedAt }
+        })
+            .populate('client', 'displayName')
+            .populate('user', 'displayName employeeId role')
+            .populate('products.productId')
+            .sort({ createdAt: -1 });
+
+        const summary = orders.reduce((acc, order) => {
+            const total = order.totalPrice || 0;
+
+            acc.totalSales += total;
+            acc.orderCount += 1;
+
+            if (order.paymentMethod === 'efectivo') {
+                acc.cashSales += total;
+            }
+
+            if (order.paymentMethod === 'tarjeta') {
+                acc.cardSales += total;
+            }
+
+            return acc;
+        }, {
+            totalSales: 0,
+            cashSales: 0,
+            cardSales: 0,
+            orderCount: 0,
+            averageTicket: 0
+        });
+
+        summary.averageTicket = summary.orderCount > 0 ? summary.totalSales / summary.orderCount : 0;
+
+        res.status(200).json({
+            session: activeSession,
+            summary,
+            orders
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 async function createOrder(req, res, next) {
     try {
         const {
@@ -365,6 +423,7 @@ export {
     getOrders,
     getOrderById,
     getOrdersByClient,
+    getMyShiftOrders,
     createOrder,
     updateOrderStatus,
     previewOrder
