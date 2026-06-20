@@ -21,6 +21,7 @@ export default function ModifiersModal({ isOpen, onClose, product, onConfirm }) 
                     <button
                         className='close-btn'
                         onClick={onClose}
+                        aria-label='Cerrar modificadores'
                     >
                         &times;
                     </button>

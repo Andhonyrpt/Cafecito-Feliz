@@ -158,6 +158,7 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                         type='button'
                         className='session-modal-close-btn'
                         onClick={() => setIsModalOpen(false)}
+                        aria-label='Cerrar modal de sesión'
                     >
                         <Icon name='x' size={20} />
                     </button>
@@ -190,11 +191,12 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
                     {isOpening && (
                         <div className="session-input-group">
-                            <label>Número de Empleado</label>
+                            <label htmlFor="cash-session-employee-id">Número de Empleado</label>
                             <div className="session-input-wrapper">
                                 <Icon name="user" size={18} className="session-input-icon" />
                                 <input
                                     data-testid="cash-session-employee-id"
+                                    id="cash-session-employee-id"
                                     type="text"
                                     placeholder="Ej. EMP-01"
                                     value={employeeId}
@@ -206,11 +208,12 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
                     )}
 
                     <div className="session-input-group">
-                        <label >PIN de Empleado</label>
+                        <label htmlFor="cash-session-pin">PIN de Empleado</label>
                         <div className='session-input-wrapper'>
                             <Icon name="key" size={18} className='session-input-icon' />
                             <input
                                 data-testid="cash-session-pin"
+                                id="cash-session-pin"
                                 type="password"
                                 placeholder="••••"
                                 maxLength={6}
@@ -223,11 +226,12 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
                     {isOpening && isSeller && (
                         <div className='session-input-group'>
-                            <label>Fondo inicial en Caja</label>
+                            <label htmlFor="cash-session-initial-cash">Fondo inicial en Caja</label>
                             <div className='session-input-wrapper'>
                                 <span className='session-currency-prefix'>$</span>
                                 <input
                                     data-testid="cash-session-initial-cash"
+                                    id="cash-session-initial-cash"
                                     type="number"
                                     placeholder="0.00"
                                     min="0"
@@ -272,10 +276,11 @@ export default function CashSession({ isOpen, mode = 'open', onSessionSubmit, ex
 
                     {!isOpening && isSeller && isCashCorrect === false && (
                         <div className="session-input-group">
-                            <label>Detalla el motivo del descuadre obligatoriamente</label>
+                            <label htmlFor="session-discrepancy-reason">Detalla el motivo del descuadre obligatoriamente</label>
                             <div className="session-input-wrapper">
                                 <input
                                     className="session-discrepancy-input"
+                                    id="session-discrepancy-reason"
                                     type="text"
                                     placeholder="Ej. falta cambio de $50 / se dio cambio de más por error"
                                     value={discrepancyReason}

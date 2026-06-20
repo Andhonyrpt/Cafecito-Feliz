@@ -188,6 +188,9 @@ export default function OrderPanel({ onOrderSuccess }) {
                             type="button"
                             className="dropdown-btn"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            aria-expanded={isDropdownOpen}
+                            aria-haspopup="menu"
+                            aria-label="Seleccionar tipo de pedido"
                         >
                             <Icon name={orderType === 'local' ? 'shop' : 'bag'}
                                 size={16}
@@ -262,10 +265,11 @@ export default function OrderPanel({ onOrderSuccess }) {
                                     </div>
 
                                     <div className="item-quantity-controls">
-                                        <button
+                                     <button
                                             type="button"
                                             onClick={() => updateItemQuantity(currentItemId, item.quantity + 1, item.orderNotes, availableStock)}
                                             disabled={esMaximoStock}
+                                            aria-label={`Aumentar cantidad de ${p?.name}`}
                                         >
                                             <Icon name="chevronUp" size={15}></Icon>
                                         </button>
@@ -273,6 +277,7 @@ export default function OrderPanel({ onOrderSuccess }) {
                                             type="button"
                                             onClick={() => updateItemQuantity(currentItemId, item.quantity - 1, item.orderNotes)}
                                             disabled={esMinimoStock}
+                                            aria-label={`Disminuir cantidad de ${p?.name}`}
                                         >
                                             <Icon name="chevronDown" size={15}></Icon>
                                         </button>
@@ -298,6 +303,7 @@ export default function OrderPanel({ onOrderSuccess }) {
                                 <Button variant="ghost" className="danger" size="sm"
                                     onClick={() => removeItemFromOrder({ _id: currentItemId, orderNotes: item.orderNotes })}
                                     title="Eliminar articulo"
+                                    aria-label={`Eliminar ${p?.name} del pedido`}
                                 >
                                     <Icon name="trash" size={15} />
                                 </Button>

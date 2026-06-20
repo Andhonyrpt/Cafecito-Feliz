@@ -81,6 +81,7 @@ export default function CheckoutConfirmationModal({
                         onClick={onClose}
                         disabled={isSubmitting || terminalStatus === "procesando"}
                         className="close-x-btn"
+                        aria-label="Cerrar confirmación de cobro"
                     >
                         <Icon name='close' size={18} />
                     </button>
@@ -153,13 +154,14 @@ export default function CheckoutConfirmationModal({
                                 <h3>Manejo de Efectivo</h3>
 
                                 <div className="input-group-cash">
-                                    <label>¿Con cuánto paga el cliente?</label>
+                                    <label htmlFor="cash-received">¿Con cuánto paga el cliente?</label>
 
                                     <div className="cash-input-wrapper">
                                         <span>$</span>
 
                                         <input
                                             data-testid="cash-received-input"
+                                            id="cash-received"
                                             type="number"
                                             placeholder="0.00"
                                             value={montoRecibido}

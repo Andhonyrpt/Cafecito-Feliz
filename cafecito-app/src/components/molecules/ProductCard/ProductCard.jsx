@@ -32,6 +32,7 @@ const ProductCard = memo(({ product, orientation, priority = false, onAddProduct
                         onClick={() => onAddProduct(product)}
                         disabled={isButtonDisabled}
                         data-testid={`add-product-${product._id}`}
+                        aria-label={`Agregar ${name} al pedido`}
                     >
                         +
                     </Button>

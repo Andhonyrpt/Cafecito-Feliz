@@ -68,6 +68,7 @@ export default function CreateClientModal({ onClose, onClientCreated }) {
                     <button
                         className='close-btn'
                         onClick={onClose}
+                        aria-label='Cerrar nuevo cliente'
                     >
                         <Icon name='x' size={20} />
                     </button>
@@ -75,9 +76,10 @@ export default function CreateClientModal({ onClose, onClientCreated }) {
 
                 <form onSubmit={handleSubmit}>
                     <div className='form-group'>
-                        <label>Nombre</label>
+                        <label htmlFor='client-display-name'>Nombre</label>
 
                         <input
+                            id='client-display-name'
                             type="text"
                             required
                             placeholder='Ej. Juan Pérez'
@@ -87,9 +89,10 @@ export default function CreateClientModal({ onClose, onClientCreated }) {
                     </div>
 
                     <div className='form-group'>
-                        <label >Correo Electrónico</label>
+                        <label htmlFor='client-email'>Correo Electrónico</label>
 
                         <input
+                            id='client-email'
                             type="text"
                             required
                             placeholder='juan@ejemplo.com'

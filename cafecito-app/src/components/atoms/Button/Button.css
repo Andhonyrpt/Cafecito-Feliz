@@ -24,7 +24,7 @@
 /* Button Variants */
 .btn-primary {
     background: var(--success);
-    color: var(--text);
+    color: var(--card);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -33,7 +33,7 @@
 
 .btn-secondary {
     background: var(--button-secondary);
-    color: var(--primary);
+    color: var(--primary-dark);
     border: 1px solid var(--border);
 }
 

@@ -63,7 +63,10 @@ export default function Header() {
             <div className='header-right'>
                 {/* Desktop User Menu */}
                 <button
-                    className={`user-profile-button ${!isAuth ? 'not-authenticated' : ''}`}>
+                    className={`user-profile-button ${!isAuth ? 'not-authenticated' : ''}`}
+                    type='button'
+                    aria-label={isAuth ? `Usuario ${currentUser.displayName}` : 'Abrir inicio de sesión'}
+                >
                     <div className='user-avatar'>
                         {isAuth ? (
                             <img src={currentUser.avatar}
@@ -103,7 +106,7 @@ export default function Header() {
 
                 {isAuth && (
                     <div>
-                        <button className='logout-button' onClick={handleLogout}>
+                        <button className='logout-button' onClick={handleLogout} aria-label='Cerrar turno o sesión'>
                             <Icon name="logOut" size={24} />
                         </button>
                     </div>

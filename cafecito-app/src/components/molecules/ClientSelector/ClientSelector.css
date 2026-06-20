@@ -13,6 +13,11 @@
     margin-bottom: 12px;
 }
 
+.client-title h2 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
 .client-search-container-relative {
     position: relative;
     width: 100%;
@@ -129,7 +134,7 @@
     gap: 2px; /* Espaciado mínimo entre el nombre y el correo */
 }
 
-.client-details h4 {
+.client-name {
     margin: 0;
     font-size: 0.95rem;
     font-weight: 600;
