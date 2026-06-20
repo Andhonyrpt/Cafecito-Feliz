@@ -48,3 +48,18 @@ export const createAdminWithToken = async (overrides = {}) => {
         user: login.user
     };
 };
+
+export const createBaristaWithToken = async (overrides = {}) => {
+    const created = await createUserWithToken(overrides);
+    const User = mongoose.model('User');
+    await User.findOneAndUpdate({ employeeId: created.payload.employeeId }, { role: 'barista' });
+    const login = await loginUser({ employeeId: created.payload.employeeId, password: created.payload.password });
+
+    return {
+        ...created,
+        loginResponse: login.response,
+        token: login.token,
+        refreshToken: login.refreshToken,
+        user: login.user
+    };
+};

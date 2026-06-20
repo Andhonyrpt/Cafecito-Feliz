@@ -61,6 +61,22 @@
     box-shadow: var(--elev-1);
 }
 
+.pending-order-card--new {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(201, 106, 45, 0.18), var(--elev-2);
+    animation: new-order-pulse 1.2s ease-in-out 3;
+}
+
+@keyframes new-order-pulse {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
 .pending-order-card__top {
     display: flex;
     justify-content: space-between;
@@ -70,6 +86,18 @@
 .pending-order-card__number {
     color: var(--text-light);
     font-size: 0.85rem;
+}
+
+.pending-order-card__time {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-light);
+}
+
+.pending-order-card__client {
+    margin: 0;
+    color: var(--text-light);
+    font-weight: 600;
 }
 
 .pending-order-card h2 {
@@ -85,11 +113,6 @@
     border-radius: 999px;
     font-size: 0.8rem;
     font-weight: 700;
-}
-
-.pending-order-card__client {
-    margin: 0;
-    color: var(--text-light);
 }
 
 .pending-order-card__items {

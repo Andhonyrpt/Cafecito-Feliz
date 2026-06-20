@@ -1,4 +1,4 @@
-import { createAdminWithToken, createUserWithToken } from './helpers/auth.js';
+import { createAdminWithToken, createBaristaWithToken, createUserWithToken } from './helpers/auth.js';
 import { makeCategoryPayload, makeClientPayload, makeOrderPayload, makeProductPayload } from './helpers/factories.js';
 import { api, authHeader } from './helpers/http.js';
 
@@ -8,6 +8,8 @@ describe('Orders Module Tests', () => {
     let clientId = '';
     let orderId = '';
     let categoryId = '';
+    let baristaToken = '';
+    let baristaId = '';
 
     beforeAll(async () => {
         const admin = await createAdminWithToken({
@@ -19,6 +21,18 @@ describe('Orders Module Tests', () => {
             employeeId: 'EMP-060'
         });
         empToken = seller.token;
+
+        const barista = await createBaristaWithToken({
+            displayName: 'Order Barista',
+            employeeId: 'EMP-061'
+        });
+        baristaToken = barista.token;
+        baristaId = barista.user.id;
+
+        await api()
+            .post('/api/total-cash/open')
+            .set(authHeader(baristaToken))
+            .send({ initialCash: 0 });
 
         const resCat = await api()
             .post('/api/categories')
@@ -69,6 +83,7 @@ describe('Orders Module Tests', () => {
                 }));
             expect(res.status).toBe(201);
             expect(res.body).toHaveProperty('totalPrice', 46.4);
+            expect(res.body.assignedBarista._id).toBe(baristaId);
             orderId = res.body._id;
         });
 
@@ -92,6 +107,16 @@ describe('Orders Module Tests', () => {
                 .set(authHeader(empToken));
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('orders');
+        });
+
+        it('should list only orders assigned to the active barista', async () => {
+            const res = await api()
+                .get('/api/orders')
+                .set(authHeader(baristaToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body.orders.length).toBeGreaterThan(0);
+            expect(res.body.orders.every((order) => order.assignedBarista._id === baristaId)).toBe(true);
         });
     });
 
