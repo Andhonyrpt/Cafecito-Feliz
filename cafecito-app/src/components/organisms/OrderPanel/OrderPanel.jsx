@@ -11,6 +11,7 @@ import './OrderPanel.css';
 
 const CreateClientModal = lazy(() => import('../OrderModals/CreateClientModal.jsx'));
 const CheckoutConfirmationModal = lazy(() => import("../OrderModals/CheckoutConfirmationModal.jsx"));
+const SaleCompletedModal = lazy(() => import("../OrderModals/SaleCompletedModal.jsx"));
 
 function ModalFallback() {
     return <div className="modal-loading" role="status">Preparando...</div>;
@@ -43,6 +44,7 @@ export default function OrderPanel({ onOrderSuccess }) {
     const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
     const [previewData, setPreviewData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [completedOrder, setCompletedOrder] = useState(null);
 
     const dropdownRef = useRef(null);
 
@@ -146,9 +148,7 @@ export default function OrderPanel({ onOrderSuccess }) {
                 total: previewData?.total || totalToPay
             };
 
-            await createOrder(orderPayload);
-
-            alert('Cobro realizado con éxito');
+            const createdOrder = await createOrder(orderPayload);
 
             clearProductsCache();
 
@@ -158,6 +158,7 @@ export default function OrderPanel({ onOrderSuccess }) {
 
             setIsCheckoutModalOpen(false);
             setPreviewData(null);
+            setCompletedOrder(createdOrder);
             removeClientFromOrder();
             resetPOSPanel();
             setPaymentMethod('efectivo');
@@ -391,6 +392,15 @@ export default function OrderPanel({ onOrderSuccess }) {
                         activeClient={activeClient}
                         orderItems={orderItems}
                         paymentMethod={paymentMethod}
+                    />
+                </Suspense>
+            )}
+
+            {completedOrder && (
+                <Suspense fallback={<ModalFallback />}>
+                    <SaleCompletedModal
+                        order={completedOrder}
+                        onClose={() => setCompletedOrder(null)}
                     />
                 </Suspense>
             )}

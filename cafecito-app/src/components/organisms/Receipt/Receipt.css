@@ -1,0 +1,96 @@
+.receipt-print-root {
+    display: none;
+}
+
+.receipt {
+    width: 80mm;
+    padding: 10px;
+    color: #111;
+    background: #fff;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.receipt__header {
+    text-align: center;
+}
+
+.receipt__header h1 {
+    margin: 0;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.receipt__header p,
+.receipt__footer p {
+    margin: 2px 0;
+}
+
+.receipt__meta,
+.receipt__totals {
+    display: grid;
+    gap: 4px;
+}
+
+.receipt__meta div,
+.receipt__totals div,
+.receipt__item-main {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.receipt__divider {
+    border-top: 1px dashed #111;
+    margin: 10px 0;
+}
+
+.receipt__items {
+    display: grid;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.receipt__item small {
+    display: block;
+    margin-top: 2px;
+}
+
+.receipt__total {
+    padding-top: 6px;
+    border-top: 1px solid #111;
+    font-size: 14px;
+}
+
+.receipt__footer {
+    margin-top: 12px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+@media print {
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    .receipt-print-root,
+    .receipt-print-root * {
+        visibility: visible !important;
+    }
+
+    .receipt-print-root {
+        display: block !important;
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 80mm;
+        background: #fff;
+    }
+}
