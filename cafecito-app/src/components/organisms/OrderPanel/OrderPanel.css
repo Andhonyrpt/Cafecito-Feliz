@@ -247,3 +247,39 @@
     gap: 10px;
     margin-top: 15px;
 }
+
+.modal-loading {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    color: var(--text-light);
+    background: rgba(45, 34, 28, 0.18);
+}
+
+@media (max-width: 760px) {
+    .order-view {
+        padding: 0;
+    }
+
+    .order-view-info {
+        padding: 12px;
+    }
+
+    .order-view-header {
+        flex-wrap: wrap;
+    }
+
+    .order-item {
+        grid-template-columns: auto 1fr auto;
+    }
+
+    .order-item-image {
+        display: none;
+    }
+
+    .payment-grid {
+        grid-template-columns: 1fr;
+    }
+}

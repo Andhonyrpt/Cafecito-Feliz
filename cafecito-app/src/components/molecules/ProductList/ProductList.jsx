@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useOrder } from "../../../context/OrderContext";
 import ProductCard from "../ProductCard/ProductCard";
 import "./ProductList.css";
@@ -10,13 +11,20 @@ export default function ProductList({
 
     const { orderItems } = useOrder();
 
-    const renderProductCard = (product, index, orientation) => {
-        // 2. Sumamos de forma global cuánto hay de ESTE producto en el carrito actual
-        const totalEnCarrito = orderItems
-            .filter((item) => (item.product?._id || item._id) === product._id)
-            .reduce((sum, item) => sum + item.quantity, 0);
+    const quantityByProductId = useMemo(() => {
+        return orderItems.reduce((quantities, item) => {
+            const productId = item.product?._id || item._id;
 
-        // 3. Evaluamos el booleano limpio contra el stock que viene de MongoDB
+            if (productId) {
+                quantities[productId] = (quantities[productId] || 0) + item.quantity;
+            }
+
+            return quantities;
+        }, {});
+    }, [orderItems]);
+
+    const renderProductCard = (product, index, orientation) => {
+        const totalEnCarrito = quantityByProductId[product._id] || 0;
         const esMaximoStock = totalEnCarrito >= (product.stock || 0);
 
         return (
@@ -25,8 +33,8 @@ export default function ProductList({
                 product={product}
                 orientation={orientation}
                 className="list-item"
-                priority={index < 2}
-                onAdd={() => onAddProduct(product)}
+                priority={index < 4}
+                onAddProduct={onAddProduct}
                 isButtonDisabled={esMaximoStock}
             />
         );

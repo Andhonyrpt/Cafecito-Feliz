@@ -51,7 +51,13 @@ export default function Header() {
             <div className='header-left' />
 
             <div className='header-center'>
-                <img src="/img/logo/logo-cafecito-1.png" alt="Logo Cafecito Feliz" className="header-logo" />
+                <img
+                    src="/img/logo/logo-cafecito-1.png"
+                    alt="Logo Cafecito Feliz"
+                    className="header-logo"
+                    width="150"
+                    height="44"
+                />
             </div>
 
             <div className='header-right'>
@@ -63,6 +69,10 @@ export default function Header() {
                             <img src={currentUser.avatar}
                                 alt={currentUser.displayName}
                                 className='user-avatar-img'
+                                loading='lazy'
+                                decoding='async'
+                                width='42'
+                                height='42'
                             />
                         ) : (
                             <Icon name="user" size={18} className={!isAuth ? "logged-out-icon" : ""} />

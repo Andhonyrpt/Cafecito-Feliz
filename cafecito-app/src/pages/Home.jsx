@@ -1,17 +1,66 @@
-import { useState, useEffect } from "react";
+import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { fetchProducts } from "../services/productService";
 import { fetchCategories } from "../services/categoryService";
-import DynamicIcon from "../components/atoms/DynamicIcon/DynamicIcon";
 import ProductList from "../components/molecules/ProductList/ProductList";
 import Button from "../components/atoms/Button/Button";
 import OrderPanel from "../components/organisms/OrderPanel/OrderPanel";
-import CashSession from "../components/organisms/CashSession/CashSession";
-import PendingOrders from "../components/organisms/PendingOrders/PendingOrders";
 import { useSession } from "../context/SessionContext";
 import { useOrder } from "../context/OrderContext";
-import ModifiersModal from "../components/organisms/OrderModals/ModifiersModal";
 import './Home.css';
 import Icon from "../components/atoms/Icon";
+
+const CashSession = lazy(() => import("../components/organisms/CashSession/CashSession"));
+const PendingOrders = lazy(() => import("../components/organisms/PendingOrders/PendingOrders"));
+const ModifiersModal = lazy(() => import("../components/organisms/OrderModals/ModifiersModal"));
+
+function InlineFallback({ children = "Cargando..." }) {
+    return <div className="inline-fallback" role="status">{children}</div>;
+}
+
+const warmedImageOrigins = new Set();
+const preloadedImages = new Set();
+
+function warmImageOrigin(imageUrl) {
+    if (!imageUrl) return;
+
+    try {
+        const { origin } = new URL(imageUrl, window.location.origin);
+
+        if (warmedImageOrigins.has(origin)) return;
+
+        warmedImageOrigins.add(origin);
+
+        const preconnect = document.createElement("link");
+        preconnect.rel = "preconnect";
+        preconnect.href = origin;
+
+        const dnsPrefetch = document.createElement("link");
+        dnsPrefetch.rel = "dns-prefetch";
+        dnsPrefetch.href = origin;
+
+        document.head.append(preconnect, dnsPrefetch);
+    } catch (error) {
+        // Invalid image URLs should not block product rendering.
+    }
+}
+
+function preloadCatalogImages(products) {
+    products.slice(0, 4).forEach((product) => {
+        const imageUrl = product?.imageUrl;
+
+        if (!imageUrl || preloadedImages.has(imageUrl)) return;
+
+        preloadedImages.add(imageUrl);
+        warmImageOrigin(imageUrl);
+
+        const preload = document.createElement("link");
+        preload.rel = "preload";
+        preload.as = "image";
+        preload.href = imageUrl;
+        preload.fetchPriority = "high";
+        document.head.appendChild(preload);
+    });
+}
 
 export default function Home() {
 
@@ -24,13 +73,21 @@ export default function Home() {
     const [isModifiersOpen, setIsModifiersOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [isProductsLoading, setIsProductsLoading] = useState(false);
 
 
     const { currentUser, isModalOpen, sessionMode, handleSessionSubmit, expectedCash } = useSession();
     const { addItemToOrder } = useOrder();
+    const canLoadCatalog = currentUser?.role === 'vendedor';
 
     useEffect(() => {
         let isMounted = true;
+
+        if (!canLoadCatalog) {
+            setCategories([]);
+            setActiveCategoryId(null);
+            return undefined;
+        }
 
         const loadCategories = async () => {
             try {
@@ -57,19 +114,31 @@ export default function Home() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [canLoadCatalog]);
 
     const productsPerPage = viewLayout === "grid" ? 12 : 4;
 
     useEffect(() => {
         let isMounted = true;
 
+        if (!canLoadCatalog) {
+            setProducts([]);
+            setPaginationInfo({});
+            setIsProductsLoading(false);
+            return undefined;
+        }
+
         const loadProducts = async () => {
+            setIsProductsLoading(true);
+
             try {
                 const productsData = await fetchProducts(currentPage, productsPerPage, activeCategoryId) || {};
 
                 if (isMounted) {
-                    setProducts(productsData?.products || []);
+                    const loadedProducts = productsData?.products || [];
+
+                    preloadCatalogImages(loadedProducts);
+                    setProducts(loadedProducts);
 
                     setPaginationInfo(productsData?.pagination || {});
                 }
@@ -77,6 +146,10 @@ export default function Home() {
             } catch (error) {
                 if (isMounted) {
                     setProducts([]);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsProductsLoading(false);
                 }
             }
         };
@@ -89,33 +162,48 @@ export default function Home() {
             isMounted = false;
         };
 
-    }, [currentPage, activeCategoryId, viewLayout, productsPerPage, refreshTrigger]);
+    }, [currentPage, activeCategoryId, viewLayout, productsPerPage, refreshTrigger, canLoadCatalog]);
 
-    const activeCategory = categories.find((cat) => cat._id === activeCategoryId);
+    const activeCategory = useMemo(
+        () => categories.find((cat) => cat._id === activeCategoryId),
+        [categories, activeCategoryId]
+    );
 
-    const handleCategory = (categoryId) => {
-        setActiveCategoryId(categoryId);
-        setCurrentPage(1);
-    };
+    const handleCategory = useCallback((categoryId) => {
+        startTransition(() => {
+            setActiveCategoryId(categoryId);
+            setCurrentPage(1);
+        });
+    }, []);
 
-    const handleOpenModifiers = (product) => {
+    const handleOpenModifiers = useCallback((product) => {
         setSelectedProduct(product);
         setIsModifiersOpen(true);
-    };
+    }, []);
 
     // Esta función se ejecuta cuando le dan "Agregar a la orden" dentro del modal:
-    const handleConfirmAddOrder = (product, note) => {
+    const handleConfirmAddOrder = useCallback((product, note) => {
         const productWithNotes = {
             ...product,
             orderNotes: note
         };
 
         addItemToOrder(productWithNotes);
-    };
+    }, [addItemToOrder]);
+
+    const handleOrderSuccess = useCallback(() => {
+        setTimeout(() => {
+            setRefreshTrigger(prev => prev + 1);
+        }, 300);
+    }, []);
 
     const renderRoleContent = () => {
         if (currentUser?.role === 'barista') {
-            return <PendingOrders />;
+            return (
+                <Suspense fallback={<InlineFallback>Cargando órdenes...</InlineFallback>}>
+                    <PendingOrders />
+                </Suspense>
+            );
         }
 
         return (
@@ -132,6 +220,10 @@ export default function Home() {
                                     src={category.imageUrl}
                                     alt={category.name}
                                     className="category-img"
+                                    loading="lazy"
+                                    decoding="async"
+                                    width="30"
+                                    height="32"
                                 />
                                 <h2>{category.name}</h2>
                             </div>
@@ -143,11 +235,15 @@ export default function Home() {
                     <div className="products-section__header">
                         <div className="products-section__header--left">
                             <h1 className="products-section__header--title">{activeCategory ? activeCategory.name : ""}</h1>
-                            <img
-                                src={activeCategory?.imageUrl}
-                                alt={activeCategory?.name}
-                                className="category-img"
-                            />
+                                <img
+                                    src={activeCategory?.imageUrl}
+                                    alt={activeCategory?.name}
+                                    className="category-img"
+                                    loading="eager"
+                                    decoding="async"
+                                    width="30"
+                                    height="32"
+                                />
                         </div>
 
                         <div className="products-section__header--right">
@@ -159,7 +255,7 @@ export default function Home() {
                                     className={`view-btn ${viewLayout === "grid" ? "active" : ""}`}
                                     onClick={() => setViewLayout("grid")}
                                 >
-                                    <DynamicIcon name="LayoutGrid" size={18} />
+                                    <Icon name="grid" size={18} />
                                 </Button>
 
                                 <Button
@@ -168,7 +264,7 @@ export default function Home() {
                                     className={`view-btn ${viewLayout === "list" ? "active" : ""}`}
                                     onClick={() => setViewLayout("list")}
                                 >
-                                    <DynamicIcon name="List" size={18} />
+                                    <Icon name="list" size={18} />
                                 </Button>
                             </div>
                         </div>
@@ -180,6 +276,8 @@ export default function Home() {
                             layout={viewLayout}
                             onAddProduct={handleOpenModifiers}
                         />
+
+                        {isProductsLoading && <InlineFallback>Actualizando productos...</InlineFallback>}
 
                         {paginationInfo?.totalPages > 1 && (
                             <div className="pagination-controls">
@@ -212,20 +310,20 @@ export default function Home() {
 
                 <div className="checkout-container">
                     <OrderPanel
-                        onOrderSuccess={() => {
-                            setTimeout(() => {
-                                setRefreshTrigger(prev => prev + 1);
-                            }, 300);
-                        }}
+                        onOrderSuccess={handleOrderSuccess}
                     />
                 </div>
 
-                <ModifiersModal
-                    isOpen={isModifiersOpen}
-                    onClose={() => setIsModifiersOpen(false)}
-                    product={selectedProduct}
-                    onConfirm={handleConfirmAddOrder}
-                />
+                {isModifiersOpen && (
+                    <Suspense fallback={null}>
+                        <ModifiersModal
+                            isOpen={isModifiersOpen}
+                            onClose={() => setIsModifiersOpen(false)}
+                            product={selectedProduct}
+                            onConfirm={handleConfirmAddOrder}
+                        />
+                    </Suspense>
+                )}
             </>
         );
     };
@@ -233,12 +331,16 @@ export default function Home() {
 
     return (
         <div className="home-container">
-            <CashSession
-                isOpen={isModalOpen}
-                mode={sessionMode}
-                onSessionSubmit={handleSessionSubmit}
-                expectedCash={expectedCash}
-            />
+            {isModalOpen && (
+                <Suspense fallback={<InlineFallback>Cargando sesión...</InlineFallback>}>
+                    <CashSession
+                        isOpen={isModalOpen}
+                        mode={sessionMode}
+                        onSessionSubmit={handleSessionSubmit}
+                        expectedCash={expectedCash}
+                    />
+                </Suspense>
+            )}
             {renderRoleContent()}
         </div>
     )

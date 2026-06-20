@@ -30,6 +30,10 @@ export default function ModifiersModal({ isOpen, onClose, product, onConfirm }) 
                     <img src={product.imageUrl}
                         alt={product.name}
                         className='modal-product-img'
+                        width='180'
+                        height='120'
+                        loading='eager'
+                        decoding='async'
                     />
 
                     <div className='modifiers-form-group'>

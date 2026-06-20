@@ -144,3 +144,36 @@
     color: var(--button-danger);
     cursor: pointer;
 }
+
+@media (max-width: 760px) {
+    .header {
+        height: auto;
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .header-left {
+        display: none;
+    }
+
+    .header-logo {
+        width: 112px;
+    }
+
+    .header-right {
+        gap: 10px;
+    }
+
+    .user-profile-button {
+        padding: 4px;
+    }
+
+    .user-text,
+    .clock-date {
+        display: none;
+    }
+
+    .clock-container {
+        padding-left: 10px;
+    }
+}

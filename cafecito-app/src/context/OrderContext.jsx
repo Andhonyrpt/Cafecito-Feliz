@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useReducer, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import storageService from "../services/storageService";
 import { orderReducer, orderInitialState, ORDER_ACTIONS } from "./orderReducer";
 
@@ -13,10 +13,10 @@ export function OrderProvider({ children }) {
     const [state, dispatch] = useReducer(orderReducer, orderInitialState);
     const [activeClient, setActiveClient] = useState(null);
 
-    const subtotal = state.items.reduce((sum, i) => {
+    const subtotal = useMemo(() => state.items.reduce((sum, i) => {
         const price = i.product?.price || i.price || 0;
         return sum + (price * (i.quantity || 0));
-    }, 0);
+    }, 0), [state.items]);
 
     let discountPercentage = 0;
 
@@ -32,7 +32,10 @@ export function OrderProvider({ children }) {
     const subtotalDescuento = subtotal - discount;
     const iva = subtotalDescuento * 0.16;
     const totalToPay = subtotalDescuento + iva;
-    const totalItemsCount = state.items.reduce((sum, i) => sum + (i.quantity || 0), 0);
+    const totalItemsCount = useMemo(
+        () => state.items.reduce((sum, i) => sum + (i.quantity || 0), 0),
+        [state.items]
+    );
 
     useEffect(() => {
         storageService.set(STORAGE_KEYS.ORDER, state.items);
@@ -55,27 +58,27 @@ export function OrderProvider({ children }) {
         initializeOrder();
     }, []);
 
-    const addItemToOrder = (product, quantity = 1) => {
+    const addItemToOrder = useCallback((product, quantity = 1) => {
         dispatch({ type: ORDER_ACTIONS.ADD, payload: { ...product, quantity } });
-    };
+    }, []);
 
-    const updateItemQuantity = (_id, quantity, orderNotes = "", stock) => {
+    const updateItemQuantity = useCallback((_id, quantity, orderNotes = "", stock) => {
         dispatch({ type: ORDER_ACTIONS.SET_QTY, payload: { _id, quantity, orderNotes, stock } });
-    };
+    }, []);
 
-    const removeItemFromOrder = (payloadData) => {
+    const removeItemFromOrder = useCallback((payloadData) => {
         dispatch({ type: ORDER_ACTIONS.REMOVE, payload: payloadData });
-    };
+    }, []);
 
-    const setClientToOrder = (client) => {
+    const setClientToOrder = useCallback((client) => {
         setActiveClient(client);
         storageService.set(STORAGE_KEYS.CLIENT, client);
-    };
+    }, []);
 
-    const removeClientFromOrder = () => {
+    const removeClientFromOrder = useCallback(() => {
         setActiveClient(null);
         storageService.remove(STORAGE_KEYS.CLIENT);
-    };
+    }, []);
 
     const resetPOSPanel = useCallback(() => {
         dispatch({ type: ORDER_ACTIONS.CLEAR });
@@ -84,7 +87,7 @@ export function OrderProvider({ children }) {
         storageService.remove(STORAGE_KEYS.CLIENT);
     }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         orderItems: state.items,
         activeClient,
         subtotal,
@@ -98,7 +101,21 @@ export function OrderProvider({ children }) {
         removeItemFromOrder,
         removeClientFromOrder,
         resetPOSPanel
-    };
+    }), [
+        state.items,
+        activeClient,
+        subtotal,
+        discount,
+        iva,
+        totalToPay,
+        totalItemsCount,
+        addItemToOrder,
+        updateItemQuantity,
+        setClientToOrder,
+        removeItemFromOrder,
+        removeClientFromOrder,
+        resetPOSPanel
+    ]);
 
     return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
 }
