@@ -78,7 +78,7 @@ export default function Home() {
 
     const { currentUser, isModalOpen, sessionMode, handleSessionSubmit, expectedCash } = useSession();
     const { addItemToOrder } = useOrder();
-    const canLoadCatalog = currentUser?.role === 'vendedor';
+    const canLoadCatalog = !!currentUser && currentUser.role !== 'barista';
 
     useEffect(() => {
         let isMounted = true;
