@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { lazy, Suspense, useState, useEffect, useRef } from "react";
 import { useOrder } from "../../../context/OrderContext";
 import { useSession } from "../../../context/SessionContext.jsx";
 import { clearProductsCache } from "../../../services/productService.js";
@@ -7,9 +7,14 @@ import { getUserProfile } from "../../../services/userService.js";
 import Button from "../../atoms/Button/Button.jsx";
 import Icon from "../../atoms/Icon";
 import ClientSelector from "../../molecules/ClientSelector/ClientSelector";
-import CreateClientModal from '../OrderModals/CreateClientModal.jsx';
-import CheckoutConfirmationModal from "../OrderModals/CheckoutConfirmationModal.jsx";
 import './OrderPanel.css';
+
+const CreateClientModal = lazy(() => import('../OrderModals/CreateClientModal.jsx'));
+const CheckoutConfirmationModal = lazy(() => import("../OrderModals/CheckoutConfirmationModal.jsx"));
+
+function ModalFallback() {
+    return <div className="modal-loading" role="status">Preparando...</div>;
+}
 
 export default function OrderPanel({ onOrderSuccess }) {
 
@@ -275,7 +280,14 @@ export default function OrderPanel({ onOrderSuccess }) {
                                 </div>
 
                                 <div className="order-item-image">
-                                    <img src={p?.imageUrl} alt={p?.name} />
+                                    <img
+                                        src={p?.imageUrl}
+                                        alt={p?.name}
+                                        loading="lazy"
+                                        decoding="async"
+                                        width="55"
+                                        height="55"
+                                    />
                                 </div>
 
                                 <div className="order-item-info">
@@ -349,28 +361,32 @@ export default function OrderPanel({ onOrderSuccess }) {
             </div>
 
             {isClientModalOpen && (
-                <CreateClientModal
-                    onClose={() => setIsClientModalOpen(false)}
-                    onClientCreated={(newClient) => {
-                        setClientToOrder(newClient); // Lo asigna directo a la orden al crearse
-                        setIsClientModalOpen(false); // Cierra el modal
-                    }}
-                />
+                <Suspense fallback={<ModalFallback />}>
+                    <CreateClientModal
+                        onClose={() => setIsClientModalOpen(false)}
+                        onClientCreated={(newClient) => {
+                            setClientToOrder(newClient); // Lo asigna directo a la orden al crearse
+                            setIsClientModalOpen(false); // Cierra el modal
+                        }}
+                    />
+                </Suspense>
             )}
 
             {isCheckoutModalOpen && (
-                <CheckoutConfirmationModal
-                    onClose={() => {
-                        setIsCheckoutModalOpen(false);
-                        setPreviewData(null);
-                    }}
-                    onConfirm={handleConfirmPayment}
-                    previewData={previewData}
-                    orderType={orderType}
-                    activeClient={activeClient}
-                    orderItems={orderItems}
-                    paymentMethod={paymentMethod}
-                />
+                <Suspense fallback={<ModalFallback />}>
+                    <CheckoutConfirmationModal
+                        onClose={() => {
+                            setIsCheckoutModalOpen(false);
+                            setPreviewData(null);
+                        }}
+                        onConfirm={handleConfirmPayment}
+                        previewData={previewData}
+                        orderType={orderType}
+                        activeClient={activeClient}
+                        orderItems={orderItems}
+                        paymentMethod={paymentMethod}
+                    />
+                </Suspense>
             )}
         </div>
     );

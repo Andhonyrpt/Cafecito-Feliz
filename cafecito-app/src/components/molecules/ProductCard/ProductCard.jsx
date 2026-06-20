@@ -2,7 +2,7 @@ import { memo } from "react";
 import Button from "../../atoms/Button/Button";
 import './ProductCard.css';
 
-const ProductCard = memo(({ product, orientation, priority = false, onAdd, isButtonDisabled }) => {
+const ProductCard = memo(({ product, orientation, priority = false, onAddProduct, isButtonDisabled }) => {
     const { name, price, imageUrl } = product;
 
     const cardClass = `product-card product-card--${orientation}`;
@@ -12,6 +12,11 @@ const ProductCard = memo(({ product, orientation, priority = false, onAdd, isBut
             <img src={imageUrl}
                 alt={name}
                 className="product-card-image"
+                loading={priority ? "eager" : "lazy"}
+                decoding="async"
+                fetchPriority={priority ? "high" : "auto"}
+                width="180"
+                height="120"
             />
             <div className="product-card-content">
                 <h3 className="product-card-title">
@@ -24,7 +29,7 @@ const ProductCard = memo(({ product, orientation, priority = false, onAdd, isBut
                     </h3>
 
                     <Button variant="secondary" size="sm"
-                        onClick={onAdd}
+                        onClick={() => onAddProduct(product)}
                         disabled={isButtonDisabled}
                         data-testid={`add-product-${product._id}`}
                     >
