@@ -1,15 +1,78 @@
-import { createAdminWithToken, createUserWithToken } from './helpers/auth.js';
+import { createAdminWithToken, createBaristaWithToken, createUserWithToken } from './helpers/auth.js';
 import { api, authHeader } from './helpers/http.js';
 
 describe('Cash Module Tests', () => {
     let empToken = '';
+    let adminToken = '';
 
     beforeAll(async () => {
+        const admin = await createAdminWithToken({
+            displayName: 'Admin Cash',
+            employeeId: 'EMP-070'
+        });
+        adminToken = admin.token;
+
         const employee = await createUserWithToken({
             displayName: 'Emp Cash',
             employeeId: 'EMP-07'
         });
         empToken = employee.token;
+    });
+
+    describe('GET /api/total-cash/admin/sessions', () => {
+        it('should list cash sessions if admin', async () => {
+            const res = await api()
+                .get('/api/total-cash/admin/sessions')
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('sessions');
+            expect(res.body).toHaveProperty('summary');
+            expect(res.body).toHaveProperty('pagination');
+            expect(Array.isArray(res.body.sessions)).toBe(true);
+        });
+
+        it('should filter sessions by status if admin', async () => {
+            const res = await api()
+                .get('/api/total-cash/admin/sessions?status=open')
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body.sessions.every((session) => session.status === 'open')).toBe(true);
+        });
+
+        it('should not include barista operational sessions in cash sessions', async () => {
+            const barista = await createBaristaWithToken({
+                displayName: 'Barista Shift Metrics',
+                employeeId: 'EMP-074'
+            });
+
+            const opened = await api()
+                .post('/api/total-cash/open')
+                .set(authHeader(barista.token))
+                .send({ initialCash: 0 });
+
+            expect(opened.status).toBe(200);
+            expect(opened.body).toHaveProperty('session', null);
+            expect(opened.body).toHaveProperty('baristaSession');
+
+            const res = await api()
+                .get('/api/total-cash/admin/sessions')
+                .set(authHeader(adminToken));
+
+            const session = res.body.sessions.find((session) => session.user?.employeeId === 'EMP-074');
+
+            expect(res.status).toBe(200);
+            expect(session).toBeUndefined();
+        });
+
+        it('should fail if seller tries to list cash sessions', async () => {
+            const res = await api()
+                .get('/api/total-cash/admin/sessions')
+                .set(authHeader(empToken));
+
+            expect(res.status).toBe(403);
+        });
     });
 
     describe('POST /api/total-cash/open', () => {
@@ -48,11 +111,19 @@ describe('Cash Module Tests', () => {
     });
 
     describe('POST /api/total-cash/close', () => {
-        it('should close admin session without cash audit fields', async () => {
+        it('should close admin session without creating an operational cash shift', async () => {
             const admin = await createAdminWithToken({
                 displayName: 'Admin Cash Close',
                 employeeId: 'EMP-073'
             });
+
+            const opened = await api()
+                .post('/api/total-cash/open')
+                .set(authHeader(admin.token))
+                .send({ initialCash: 0 });
+
+            expect(opened.status).toBe(200);
+            expect(opened.body).toHaveProperty('session', null);
 
             const res = await api()
                 .post('/api/total-cash/close')
@@ -64,7 +135,8 @@ describe('Cash Module Tests', () => {
                 });
 
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('message', 'Sesión finalizada de manera limpia.');
+            expect(res.body).toHaveProperty('message', 'Sesión admin finalizada sin caja.');
+            expect(res.body).toHaveProperty('session', null);
         });
 
         it('should close cash session', async () => {

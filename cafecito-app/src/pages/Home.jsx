@@ -9,7 +9,6 @@ import { useOrder } from "../context/OrderContext";
 import './Home.css';
 import Icon from "../components/atoms/Icon";
 
-const CashSession = lazy(() => import("../components/organisms/CashSession/CashSession"));
 const PendingOrders = lazy(() => import("../components/organisms/PendingOrders/PendingOrders"));
 const ModifiersModal = lazy(() => import("../components/organisms/OrderModals/ModifiersModal"));
 
@@ -76,7 +75,7 @@ export default function Home() {
     const [isProductsLoading, setIsProductsLoading] = useState(false);
 
 
-    const { currentUser, isModalOpen, sessionMode, handleSessionSubmit, expectedCash } = useSession();
+    const { currentUser } = useSession();
     const { addItemToOrder } = useOrder();
     const canLoadCatalog = !!currentUser && currentUser.role !== 'barista';
 
@@ -337,16 +336,6 @@ export default function Home() {
 
     return (
         <div className="home-container">
-            {isModalOpen && (
-                <Suspense fallback={<InlineFallback>Cargando sesión...</InlineFallback>}>
-                    <CashSession
-                        isOpen={isModalOpen}
-                        mode={sessionMode}
-                        onSessionSubmit={handleSessionSubmit}
-                        expectedCash={expectedCash}
-                    />
-                </Suspense>
-            )}
             {renderRoleContent()}
         </div>
     )

@@ -4,7 +4,7 @@ import { useSession } from '../context/SessionContext';
 const getDefaultRouteByRole = (role) => {
     if (role === 'barista') return '/';
     if (role === 'vendedor') return '/';
-    if (role === 'admin') return '/';
+    if (role === 'admin') return '/admin';
 
     return '/';
 };

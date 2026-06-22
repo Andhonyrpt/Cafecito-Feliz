@@ -2,10 +2,12 @@ import Order from "../models/order.js";
 import Product from "../models/product.js";
 import Client from "../models/client.js";
 import CashSession from "../models/cashSession.js";
+import BaristaSession from "../models/baristaSession.js";
+import User from "../models/user.js";
 import { calculateOrderFinancials } from "../utils/orderHelper.js";
 
 async function findAvailableBaristaForOrder() {
-    const activeBaristaSessions = await CashSession.find({ status: 'open' })
+    const activeBaristaSessions = await BaristaSession.find({ status: 'open' })
         .populate('user', 'role isActive displayName')
         .sort({ openedAt: 1 });
 
@@ -161,6 +163,199 @@ async function getMyShiftOrders(req, res, next) {
             session: activeSession,
             summary,
             orders
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+function getSalesRangeStart(range, now = new Date()) {
+    const start = new Date(now);
+
+    if (range === 'day') {
+        start.setHours(0, 0, 0, 0);
+        return start;
+    }
+
+    if (range === 'week') {
+        start.setHours(0, 0, 0, 0);
+        const day = start.getDay();
+        const diff = day === 0 ? 6 : day - 1;
+        start.setDate(start.getDate() - diff);
+        return start;
+    }
+
+    if (range === 'month') {
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+        return start;
+    }
+
+    if (range === 'year') {
+        start.setMonth(0, 1);
+        start.setHours(0, 0, 0, 0);
+        return start;
+    }
+
+    start.setHours(0, 0, 0, 0);
+    return start;
+}
+
+function getSalesSeriesLabel(date, range) {
+    if (range === 'day') {
+        return new Intl.DateTimeFormat('es-MX', { hour: '2-digit', hour12: false }).format(date);
+    }
+
+    if (range === 'year') {
+        return new Intl.DateTimeFormat('es-MX', { month: 'short' }).format(date);
+    }
+
+    return new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short' }).format(date);
+}
+
+async function getAdminSalesSummary(req, res, next) {
+    try {
+        const range = req.query.range || 'day';
+        const now = new Date();
+        const startDate = getSalesRangeStart(range, now);
+
+        const orders = await Order.find({
+            createdAt: { $gte: startDate, $lte: now }
+        })
+            .populate('products.productId', 'name')
+            .sort({ createdAt: 1 });
+
+        const summary = orders.reduce((acc, order) => {
+            const total = order.totalPrice || 0;
+
+            acc.totalSales += total;
+            acc.orderCount += 1;
+
+            if (order.paymentMethod === 'efectivo') acc.cashSales += total;
+            if (order.paymentMethod === 'tarjeta') acc.cardSales += total;
+
+            const label = getSalesSeriesLabel(order.createdAt, range);
+            const currentPoint = acc.seriesMap.get(label) || { label, total: 0, orderCount: 0 };
+            currentPoint.total += total;
+            currentPoint.orderCount += 1;
+            acc.seriesMap.set(label, currentPoint);
+
+            order.products?.forEach((item) => {
+                const product = item.productId;
+                const productId = String(product?._id || item.productId);
+                const productName = product?.name || 'Producto';
+                const currentProduct = acc.productsMap.get(productId) || {
+                    productId,
+                    name: productName,
+                    quantitySold: 0,
+                    totalRevenue: 0
+                };
+
+                currentProduct.quantitySold += item.quantity || 0;
+                currentProduct.totalRevenue += (item.price || 0) * (item.quantity || 0);
+                acc.productsMap.set(productId, currentProduct);
+            });
+
+            return acc;
+        }, {
+            totalSales: 0,
+            cashSales: 0,
+            cardSales: 0,
+            orderCount: 0,
+            averageTicket: 0,
+            seriesMap: new Map(),
+            productsMap: new Map()
+        });
+
+        summary.averageTicket = summary.orderCount > 0 ? summary.totalSales / summary.orderCount : 0;
+
+        const salesSeries = Array.from(summary.seriesMap.values());
+        const topProducts = Array.from(summary.productsMap.values())
+            .sort((a, b) => b.quantitySold - a.quantitySold)
+            .slice(0, 5);
+
+        delete summary.seriesMap;
+        delete summary.productsMap;
+
+        res.status(200).json({
+            range,
+            startDate,
+            endDate: now,
+            summary,
+            salesSeries,
+            topProducts
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+async function getAdminOrders(req, res, next) {
+    try {
+        const {
+            range = 'day',
+            from,
+            to,
+            sellerEmployeeId,
+            baristaEmployeeId,
+            paymentMethod,
+            status,
+            page = 1,
+            limit = 10
+        } = req.query;
+        const now = new Date();
+        const filter = {};
+
+        if (from || to) {
+            filter.createdAt = {};
+            if (from) filter.createdAt.$gte = new Date(from);
+            if (to) {
+                const toDate = new Date(to);
+                if (String(to).length === 10) toDate.setHours(23, 59, 59, 999);
+                filter.createdAt.$lte = toDate;
+            }
+        } else {
+            filter.createdAt = { $gte: getSalesRangeStart(range, now), $lte: now };
+        }
+
+        if (paymentMethod) filter.paymentMethod = paymentMethod;
+        if (status) filter.status = status;
+
+        if (sellerEmployeeId) {
+            const seller = await User.findOne({ employeeId: sellerEmployeeId, role: 'vendedor' });
+            filter.user = seller?._id || null;
+        }
+
+        if (baristaEmployeeId) {
+            const barista = await User.findOne({ employeeId: baristaEmployeeId, role: 'barista' });
+            filter.assignedBarista = barista?._id || null;
+        }
+
+        const pageNum = parseInt(page, 10) || 1;
+        const limitNum = Math.min(parseInt(limit, 10) || 10, 1000);
+        const skip = (pageNum - 1) * limitNum;
+
+        const orders = await Order.find(filter)
+            .populate('client', 'displayName')
+            .populate('user', 'displayName employeeId role')
+            .populate('assignedBarista', 'displayName employeeId role')
+            .populate('products.productId', 'name')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNum);
+
+        const total = await Order.countDocuments(filter);
+
+        res.status(200).json({
+            orders,
+            pagination: {
+                total,
+                totalPages: Math.ceil(total / limitNum) || 1,
+                currentPage: pageNum,
+                perPage: limitNum,
+                hasNext: pageNum < Math.ceil(total / limitNum),
+                hasPrev: pageNum > 1
+            }
         });
     } catch (error) {
         next(error);
@@ -424,6 +619,8 @@ export {
     getOrderById,
     getOrdersByClient,
     getMyShiftOrders,
+    getAdminSalesSummary,
+    getAdminOrders,
     createOrder,
     updateOrderStatus,
     previewOrder

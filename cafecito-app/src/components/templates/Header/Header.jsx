@@ -60,6 +60,11 @@ export default function Header() {
             return;
         }
 
+        if (currentUser.role === 'admin') {
+            navigate('/admin');
+            return;
+        }
+
         if (currentUser.role === 'barista') {
             navigate('/');
         }

@@ -46,3 +46,20 @@ export const clearProductsCache = () => {
         }
     });
 };
+
+export const createProduct = async (productData) => {
+    const res = await http.post('/products', productData);
+    clearProductsCache();
+    return res.data;
+};
+
+export const updateProduct = async (productId, productData) => {
+    const res = await http.put(`/products/${productId}`, productData);
+    clearProductsCache();
+    return res.data;
+};
+
+export const deleteProduct = async (productId) => {
+    await http.delete(`/products/${productId}`);
+    clearProductsCache();
+};

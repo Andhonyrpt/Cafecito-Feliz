@@ -1,4 +1,5 @@
 import { http } from "./http";
+import { clearProductsCache } from "./productService";
 
 const CATEGORIES_CACHE_KEY = "categories_all";
 const CATEGORIES_TTL = 10 * 60 * 1000;
@@ -36,4 +37,24 @@ export const fetchCategories = async () => {
 
 export const clearCategoriesCache = () => {
     sessionStorage.removeItem(CATEGORIES_CACHE_KEY);
+};
+
+export const createCategory = async (categoryData) => {
+    const response = await http.post('/categories', categoryData);
+    clearCategoriesCache();
+    clearProductsCache();
+    return response.data;
+};
+
+export const updateCategory = async (categoryId, categoryData) => {
+    const response = await http.put(`/categories/${categoryId}`, categoryData);
+    clearCategoriesCache();
+    clearProductsCache();
+    return response.data;
+};
+
+export const deleteCategory = async (categoryId) => {
+    await http.delete(`/categories/${categoryId}`);
+    clearCategoriesCache();
+    clearProductsCache();
 };

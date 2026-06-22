@@ -34,6 +34,6 @@ export const createUser = async (userData) => {
 };
 
 export const toggleUserStatus = async (userId) => {
-    const res = await http.patch(`toggle-status/${userId}`);
+    const res = await http.patch(`/toggle-status/${userId}`);
     return res.data;
 }

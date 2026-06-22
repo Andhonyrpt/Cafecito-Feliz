@@ -73,11 +73,55 @@ describe('Users Module Tests', () => {
         });
     });
 
+    describe('POST /api/users', () => {
+        it('should create seller and barista employees if admin', async () => {
+            const sellerPayload = makeUserPayload({
+                displayName: 'New Seller',
+                employeeId: 'EMP-2101',
+                role: 'vendedor'
+            });
+            const baristaPayload = makeUserPayload({
+                displayName: 'New Barista',
+                employeeId: 'EMP-2102',
+                role: 'barista'
+            });
+
+            const sellerRes = await api()
+                .post('/api/users')
+                .set(authHeader(adminToken))
+                .send(sellerPayload);
+            const baristaRes = await api()
+                .post('/api/users')
+                .set(authHeader(adminToken))
+                .send(baristaPayload);
+
+            expect(sellerRes.status).toBe(201);
+            expect(sellerRes.body.user).toMatchObject({ role: 'vendedor', employeeId: sellerPayload.employeeId });
+            expect(sellerRes.body.user).not.toHaveProperty('hashPassword');
+            expect(baristaRes.status).toBe(201);
+            expect(baristaRes.body.user).toMatchObject({ role: 'barista', employeeId: baristaPayload.employeeId });
+        });
+
+        it('should not create admin employees through users endpoint', async () => {
+            const payload = makeUserPayload({
+                employeeId: 'EMP-2103',
+                role: 'admin'
+            });
+
+            const res = await api()
+                .post('/api/users')
+                .set(authHeader(adminToken))
+                .send(payload);
+
+            expect(res.status).toBe(422);
+        });
+    });
+
     describe('PUT /api/users/:userId', () => {
         it('should update user if admin', async () => {
             const updatePayload = makeUserPayload({
                 displayName: 'Updated User',
-                employeeId: normalUserPayload.employeeId,
+                employeeId: 'EMP-2104',
                 role: 'vendedor',
                 isActive: true,
                 avatar: 'http://example.com/new.jpg'
@@ -90,6 +134,17 @@ describe('Users Module Tests', () => {
             
             expect(res.status).toBe(200);
             expect(res.body.user).toHaveProperty('displayName', updatePayload.displayName);
+            expect(res.body.user).toHaveProperty('employeeId', updatePayload.employeeId);
+            expect(res.body.user).not.toHaveProperty('hashPassword');
+        });
+
+        it('should not update an employee to admin', async () => {
+            const res = await api()
+                .put(`/api/users/${testUserId}`)
+                .set(authHeader(adminToken))
+                .send({ role: 'admin' });
+
+            expect(res.status).toBe(422);
         });
     });
 

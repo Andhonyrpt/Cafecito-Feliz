@@ -139,7 +139,26 @@ export const roleValidation = () =>
     body("role")
         .optional()
         .isIn(["admin", "vendedor", "barista"])
-        .withMessage("Role must be admin, customer, or guest");
+        .withMessage("Role must be admin, vendedor, or barista");
+
+export const employeeRoleValidation = (required = true) => {
+    const validator = body("role")
+        .isIn(["vendedor", "barista"])
+        .withMessage("El rol debe ser vendedor o barista");
+
+    return required ? validator.notEmpty().withMessage("El rol es obligatorio") : validator.optional();
+};
+
+export const optionalPinValidation = () =>
+    body('password')
+        .optional({ checkFalsy: true })
+        .isString()
+        .withMessage('El PIN debe ser una cadena de texto.')
+        .trim()
+        .isNumeric()
+        .withMessage('El PIN solo debe contener números.')
+        .isLength({ min: 5 })
+        .withMessage('El PIN debe tener al menos 5 dígitos.');
 
 // Validación de sort field
 export const sortFieldValidation = (allowedFields = []) =>
@@ -289,4 +308,32 @@ export const cashCloseValidation = () => [
         .optional({ checkFalsy: true })
         .trim()
         .isLength({ max: 250 }).withMessage("El motivo del descuadre no puede exceder los 250 caracteres.")
+];
+
+export const cashSessionsAdminQueryValidation = () => [
+    query("status")
+        .optional()
+        .isIn(["open", "closed"])
+        .withMessage("Status must be open or closed"),
+    query("role")
+        .optional()
+        .isIn(["vendedor"])
+        .withMessage("Role must be vendedor"),
+    query("employeeId")
+        .optional()
+        .isString()
+        .withMessage("Employee ID must be a string")
+        .trim()
+        .toUpperCase()
+        .matches(/^EMP-\d+$/)
+        .withMessage("El ID de empleado debe tener el formato correcto (Ej: EMP-01)"),
+    query("from")
+        .optional()
+        .isISO8601()
+        .withMessage("From must be a valid ISO8601 date"),
+    query("to")
+        .optional()
+        .isISO8601()
+        .withMessage("To must be a valid ISO8601 date"),
+    ...paginationValidation()
 ];
