@@ -13,8 +13,8 @@ import validate from '../middlewares/validation.js';
 import {
     bodyMongoIdValidation,
     generalNameValidation,
+    imageUrlValidation,
     mongoIdValidation,
-    urlValidation
 } from '../middlewares/validators.js';
 
 const router = express.Router();
@@ -29,14 +29,14 @@ router.get('/categories/:categoryId', [
 
 router.post('/categories', authMiddleware, isAdmin, [
     generalNameValidation('name', true, 100),
-    urlValidation('imageUrl'),
+    imageUrlValidation('imageUrl', true),
     bodyMongoIdValidation('parentCategory', 'Parent category ID', true)
 ], validate, createCategory);
 
 router.put('/categories/:categoryId', authMiddleware, isAdmin, [
     mongoIdValidation('categoryId', 'Category ID'),
     generalNameValidation('name', false, 100),
-    urlValidation('imageUrl'),
+    imageUrlValidation('imageUrl', false),
     bodyMongoIdValidation('parentCategory', 'Parent category ID', true)
 ], validate, updateCategory);
 

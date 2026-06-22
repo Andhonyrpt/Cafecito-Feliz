@@ -145,11 +145,12 @@
     cursor: pointer;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
     .header {
         height: auto;
         padding: 10px 12px;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .header-left {

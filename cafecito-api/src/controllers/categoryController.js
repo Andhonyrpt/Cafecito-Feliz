@@ -1,4 +1,5 @@
 import Category from "../models/category.js";
+import Product from "../models/product.js";
 
 async function getCategories(req, res, next) {
     try {
@@ -114,6 +115,14 @@ async function updateCategory(req, res, next) {
 async function deleteCategory(req, res, next) {
     try {
         const { categoryId } = req.params;
+
+        const relatedProductsCount = await Product.countDocuments({ parentCategory: categoryId });
+
+        if (relatedProductsCount > 0) {
+            return res.status(400).json({
+                message: "No se puede eliminar la categoría porque tiene productos asociados."
+            });
+        }
 
         const deletedCategory = await Category.findByIdAndDelete(categoryId);
 

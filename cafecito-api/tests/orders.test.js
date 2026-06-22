@@ -10,12 +10,14 @@ describe('Orders Module Tests', () => {
     let categoryId = '';
     let baristaToken = '';
     let baristaId = '';
+    let adminToken = '';
 
     beforeAll(async () => {
         const admin = await createAdminWithToken({
             displayName: 'Emp Order',
             employeeId: 'EMP-06'
         });
+        adminToken = admin.token;
         const seller = await createUserWithToken({
             displayName: 'Order Seller',
             employeeId: 'EMP-060'
@@ -136,6 +138,53 @@ describe('Orders Module Tests', () => {
             expect(res.body.summary.orderCount).toBeGreaterThan(0);
             expect(res.body.summary.totalSales).toBeGreaterThan(0);
             expect(res.body.orders.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('GET /api/orders/admin/sales-summary', () => {
+        it('should return sales summary for admins', async () => {
+            const res = await api()
+                .get('/api/orders/admin/sales-summary?range=day')
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('summary');
+            expect(res.body.summary.orderCount).toBeGreaterThan(0);
+            expect(res.body.summary.totalSales).toBeGreaterThan(0);
+            expect(res.body).toHaveProperty('salesSeries');
+            expect(res.body).toHaveProperty('topProducts');
+        });
+
+        it('should reject non-admin users', async () => {
+            const res = await api()
+                .get('/api/orders/admin/sales-summary?range=day')
+                .set(authHeader(empToken));
+
+            expect(res.status).toBe(403);
+        });
+    });
+
+    describe('GET /api/orders/admin/list', () => {
+        it('should list filtered admin orders', async () => {
+            const res = await api()
+                .get('/api/orders/admin/list?range=day&paymentMethod=efectivo&limit=5')
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('orders');
+            expect(res.body).toHaveProperty('pagination');
+            expect(res.body.orders.length).toBeGreaterThan(0);
+            expect(res.body.orders[0]).toHaveProperty('user');
+            expect(res.body.orders[0]).toHaveProperty('assignedBarista');
+            expect(res.body.orders.every((order) => order.paymentMethod === 'efectivo')).toBe(true);
+        });
+
+        it('should reject non-admin users from admin orders list', async () => {
+            const res = await api()
+                .get('/api/orders/admin/list?range=day')
+                .set(authHeader(empToken));
+
+            expect(res.status).toBe(403);
         });
     });
 

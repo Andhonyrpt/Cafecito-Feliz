@@ -25,7 +25,9 @@ import {
     paginationValidation,
     queryRoleValidation,
     queryIsActiveValidation,
-    pinValidation
+    pinValidation,
+    employeeRoleValidation,
+    optionalPinValidation
 } from '../middlewares/validators.js';
 
 const router = express.Router();
@@ -54,14 +56,15 @@ router.post('/users', authMiddleware, isAdmin, [
     employeeIdValidation(),
     pinValidation(),
     urlValidation('avatar'),
-    roleValidation(),
+    employeeRoleValidation(true),
     booleanValidation('isActive')
 ], validate, createUser);
 
 router.put('/users/:userId', authMiddleware, isAdmin, [
     mongoIdValidation('userId', 'User ID'),
     ...profileValidations,
-    roleValidation(),
+    employeeRoleValidation(false),
+    optionalPinValidation(),
     booleanValidation('isActive')
 ], validate, updateUser);
 

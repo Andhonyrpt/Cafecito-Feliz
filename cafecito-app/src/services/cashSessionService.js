@@ -32,3 +32,13 @@ export const closeCashSession = async (closingData) => {
         throw error;
     }
 }
+
+export const getAdminCashSessions = async (params = {}) => {
+    try {
+        const response = await http.get('/total-cash/admin/sessions', { params });
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener turnos admin:", error);
+        throw error.response?.data || error;
+    }
+};

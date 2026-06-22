@@ -83,12 +83,14 @@ async function getUserById(req, res, next) {
 async function updateUser(req, res, next) {
     try {
         const { userId } = req.params;
-        const { displayName, role, avatar, isActive } = req.body;
+        const { displayName, employeeId, role, avatar, isActive, password } = req.body;
 
         if (
             !displayName && !role &&
+            !employeeId &&
             avatar === undefined &&
-            isActive === undefined
+            isActive === undefined &&
+            !password
         ) {
             return res.status(400).json({
                 message: 'At least one field must be provided to update'
@@ -102,9 +104,11 @@ async function updateUser(req, res, next) {
         }
 
         if (displayName) user.displayName = displayName;
+        if (employeeId) user.employeeId = employeeId;
         if (role) user.role = role;
         if (avatar !== undefined) user.avatar = avatar;
         if (isActive !== undefined) user.isActive = isActive;
+        if (password) user.hashPassword = await bcrypt.hash(password, 10);
 
         await user.save();
 

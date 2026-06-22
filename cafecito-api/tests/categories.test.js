@@ -1,5 +1,5 @@
 import { createAdminWithToken } from './helpers/auth.js';
-import { makeCategoryPayload } from './helpers/factories.js';
+import { makeCategoryPayload, makeProductPayload } from './helpers/factories.js';
 import { api, authHeader } from './helpers/http.js';
 
 describe('Categories Module Tests', () => {
@@ -58,19 +58,45 @@ describe('Categories Module Tests', () => {
 
     describe('PUT /api/categories/:categoryId', () => {
         it('should update category if admin', async () => {
-            const updatePayload = makeCategoryPayload({ name: 'Bebidas Calientes' });
+            const updatePayload = makeCategoryPayload({
+                name: 'Bebidas Calientes',
+                imageUrl: '/img/categories/Cafes.png'
+            });
 
             const res = await api()
                 .put(`/api/categories/${categoryId}`)
                 .set(authHeader(adminToken))
-                .send({ name: updatePayload.name });
+                .send({ name: updatePayload.name, imageUrl: updatePayload.imageUrl });
             
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('name', updatePayload.name);
+            expect(res.body).toHaveProperty('imageUrl', updatePayload.imageUrl);
         });
     });
 
     describe('DELETE /api/categories/:categoryId', () => {
+        it('should not delete category with associated products', async () => {
+            const categoryWithProduct = await api()
+                .post('/api/categories')
+                .set(authHeader(adminToken))
+                .send(makeCategoryPayload({ name: 'Categoria con producto' }));
+
+            await api()
+                .post('/api/products')
+                .set(authHeader(adminToken))
+                .send(makeProductPayload(categoryWithProduct.body._id, {
+                    name: 'Producto asociado',
+                    imageUrl: 'http://example.com/producto-asociado.jpg'
+                }));
+
+            const res = await api()
+                .delete(`/api/categories/${categoryWithProduct.body._id}`)
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(400);
+            expect(res.body.message).toMatch(/productos asociados/i);
+        });
+
         it('should delete category if admin', async () => {
             const res = await api()
                 .delete(`/api/categories/${categoryId}`)

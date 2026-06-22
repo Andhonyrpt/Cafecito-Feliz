@@ -270,7 +270,7 @@
     background: rgba(45, 34, 28, 0.18);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
     .order-view {
         padding: 0;
     }

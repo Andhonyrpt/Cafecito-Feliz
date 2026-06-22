@@ -16,7 +16,7 @@
 
 .list-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
     justify-items: stretch;
 }
@@ -45,29 +45,18 @@
     /* border-color: var(--accent); */
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1024px) {
     .list-container {
         max-width: none;
     }
-
-    .list-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
     .list-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
     }
 
     .list-vertical {
         gap: 12px;
-    }
-}
-
-@media (max-width: 420px) {
-    .list-grid {
-        grid-template-columns: 1fr;
     }
 }

@@ -21,5 +21,5 @@ jest.mock('./services/productService', () => ({
 test('renders POS session entry point', async () => {
   render(<App />);
 
-  expect(await screen.findByText(/apertura de turno/i)).toBeInTheDocument();
+  expect(await screen.findByText(/inicia sesión/i)).toBeInTheDocument();
 });
