@@ -15,7 +15,7 @@ Este documento separa documentacion vigente, recuperable, obsoleta y redundante.
 | `AGENTS.md` | Guia operativa vigente | Conservar |
 | `cafecito-api/AGENTS.md` | Guia backend util | Conservar |
 | `cafecito-app/AGENTS.md` | Guia frontend util | Conservar |
-| `cafecito-api/AGENTS.testing.md` | Actualizado para Jest/Supertest/MongoMemoryServer | Conservar |
+| `cafecito-api/AGENTS.testing.md` | Actualizado para Jest/Supertest/MongoMemoryReplSet | Conservar |
 | `cafecito-app/AGENTS.testing.md` | Actualizado para POS y smoke Cypress inicial | Conservar |
 | `docs/INDEX.md` | Indice maestro agregado | Conservar |
 | `docs/GOVERNANCE.md` | Gobernanza documental y multiagente agregada | Conservar |

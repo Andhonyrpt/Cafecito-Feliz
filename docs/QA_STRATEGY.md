@@ -1,20 +1,22 @@
-# QA Strategy
+﻿# QA Strategy
 
-Ultima revision: 2026-06-18.
+Ultima revision: 2026-06-22.
 
 ## Estado Actual Verificado
 
 | Paquete | Comando | Resultado observado |
 | --- | --- | --- |
-| API | `npm test` desde `cafecito-api/` | 17 suites passed, 123 tests passed |
-| Frontend | `npm test -- --watchAll=false` desde `cafecito-app/` | 1 suite passed, 1 test passed |
+| API | `npm run test:coverage` desde `cafecito-api/` | 17 suites passed, 158 tests passed; coverage thresholds verdes, branch coverage global 66.39% |
+| Frontend unit/component | `npm test -- --watchAll=false` desde `cafecito-app/` | 5 suites passed, 9 tests passed |
+| Frontend E2E mockeado | `npm run cypress:run` desde `cafecito-app/` | 4 specs passed, 4 tests passed |
+| Frontend E2E real local | `npm run seed:e2e`, API/frontend vivos, `npm run cypress:run:real` | 2 specs passed, 2 tests passed contra backend/Mongo local; hay un spec nuevo de stock insuficiente agregado, pendiente de revalidar tras reiniciar la API con la nueva cadena Mongo |
 
 ## Backend
 
 Stack de pruebas:
 - Jest 30.
 - Supertest.
-- MongoMemoryServer.
+- MongoMemoryReplSet, porque la creación de órdenes usa transacciones MongoDB.
 - `jest.config.js` con `testEnvironment: node`, setup en `tests/setup/setup.js` y thresholds de coverage.
 
 Comandos:
@@ -39,28 +41,30 @@ Cobertura funcional actual:
 Riesgos QA backend:
 - Algunos tests documentan comportamiento actual de duplicados como error handler actual; no necesariamente comportamiento ideal.
 - `logs/error.log` puede modificarse durante tests por side effects del error handler.
-- Hay warnings Mongoose por `{ new: true }` deprecado.
 - Hay logs debug en controladores de caja.
+- El runtime local con Mongo viva debe reiniciarse después de cambios de conexión para revalidar E2E reales de órdenes.
 
 ## Frontend
 
 Stack de pruebas:
 - Create React App / Jest.
 - `src/App.test.js`.
-- Cypress con smoke POS inicial en `cypress/e2e/pos-smoke.cy.js`.
+- `src/components/molecules/ClientSelector/ClientSelector.test.jsx`.
+- `src/components/organisms/OrderPanel/OrderPanel.test.jsx`.
+- `src/context/OrderContext.test.jsx`.
+- `src/context/SessionContext.test.jsx`.
+- Cypress con specs POS mockeados en `cypress/e2e/` y specs backend-real en `cypress/e2e-real/`.
 
 Comando no interactivo:
 - `npm test -- --watchAll=false`
 - `npm run cypress:open`
 - `npm run cypress:run`
+- `npm run cypress:run:real`
 - `npm run e2e`
 
 Gaps frontend:
-- Sin tests para `OrderContext`.
-- Sin tests para `SessionContext`.
 - Sin tests para servicios HTTP/token refresh.
-- Sin test unit/integration de checkout preview-create.
-- Cypress ya tiene un smoke POS mockeado; falta ampliar a backend real, cierre de caja, barista y cliente.
+- Cypress real de stock insuficiente ya tiene spec, pero falta revalidar el runtime local tras reiniciar la API.
 - Los E2E no deben usar flujos de e-commerce como registro, envio, dashboard o checkout por pasos; deben cubrir el POS real.
 
 ## Performance
@@ -77,8 +81,8 @@ Estado:
 ## Estrategia Recomendada
 
 1. Mantener API suite completa como gate antes de cambios backend relevantes.
-2. Agregar tests frontend unit/integration para contexts y checkout.
-3. Ampliar Cypress desde el smoke POS actual hacia casos E2E con backend real y flujos críticos restantes.
+2. Agregar tests frontend unit/integration para servicios HTTP/token refresh.
+3. Revalidar Cypress backend-real tras reiniciar la API local con la nueva configuración Mongo.
 4. Separar tests que documentan bugs de tests de comportamiento esperado.
 5. Evitar que tests modifiquen logs versionados.
 6. Ejecutar performance local despues de cambios en auth, catalogo u ordenes.
@@ -90,5 +94,5 @@ Estado:
 | Backend auth/security | `npm test -- tests/auth.test.js tests/authorization.test.js tests/ethical-hacking.test.js` |
 | Backend ordenes | `npm test -- tests/orders.test.js tests/regression/pos-flow.test.js` |
 | Backend caja | `npm test -- tests/cash.test.js tests/regression/pos-flow.test.js` |
-| Frontend POS | `npm test -- --watchAll=false`, `npm run cypress:run` cuando el frontend esté levantado, y futuros tests de contexts/checkout |
+| Frontend POS | `npm test -- --watchAll=false`, `npm run cypress:run` cuando el frontend esté levantado, y tests de contexts/checkout |
 | Release local | API `npm test`, frontend `npm test -- --watchAll=false`, build frontend si aplica |

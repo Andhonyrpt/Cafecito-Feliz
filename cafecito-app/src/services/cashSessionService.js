@@ -33,6 +33,16 @@ export const closeCashSession = async (closingData) => {
     }
 }
 
+export const getActiveSession = async () => {
+    try {
+        const response = await http.get('/total-cash/active');
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener sesión activa:", error);
+        throw error;
+    }
+};
+
 export const getAdminCashSessions = async (params = {}) => {
     try {
         const response = await http.get('/total-cash/admin/sessions', { params });

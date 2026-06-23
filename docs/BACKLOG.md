@@ -1,6 +1,6 @@
-# Backlog Estructurado
+﻿# Backlog Estructurado
 
-Ultima revision: 2026-06-18.
+Ultima revision: 2026-06-22.
 
 Este backlog sale de la auditoria documental, el codigo actual y las pruebas ejecutadas. No incluye funcionalidades inventadas.
 
@@ -24,8 +24,6 @@ Este backlog sale de la auditoria documental, el codigo actual y las pruebas eje
 | Item | Clasificacion | Evidencia |
 | --- | --- | --- |
 | Definir backend como fuente de verdad de totales | Alineacion frontend/backend | `OrderContext` calcula totales y backend recalcula en preview/create |
-| Corregir integridad de creacion de orden | Deuda tecnica | Stock, orden y cliente se actualizan sin transaccion |
-| Reemplazar `Order.countDocuments() + 1` para `orderNumber` | Bug | Riesgo de duplicados por concurrencia |
 
 ### Alto
 
@@ -34,10 +32,8 @@ Este backlog sale de la auditoria documental, el codigo actual y las pruebas eje
 | Consolidar o archivar `docs/SPECIFICATIONS.md` | Documentacion | `docs/PRODUCT_SPEC.md` es la fuente principal, pero `docs/SPECIFICATIONS.md` sigue existiendo como derivado historico |
 | Consolidar resumen canonico de `docs/qa/` | Documentacion | Los `QA_BACKEND_*` ya estan en `docs/qa/`; falta decidir cuanto queda como canon vs evidencia historica |
 | Mantener `cafecito-app/AGENTS.testing.md` alineado al POS | Documentacion | Cypress ya tiene smoke POS; la guia debe seguir el flujo real |
-| Corregir `GET /api/orders/client/:clientId` | Bug | Suite genero `StrictPopulateError` por populate invalido |
-| Corregir `getOrdersByClient` en frontend | Bug | Servicio usa ruta ambigua tipo `orders/:clientId` |
-| Hidratar caja activa desde backend | Alineacion frontend/backend | `openedAt` e `initialCash` dependen de localStorage |
-| Prevenir multiples cajas abiertas por usuario si aplica | Bug | No se evidencio control de una sesion activa por vendedor |
+| Hidratar caja activa desde backend | Alineacion frontend/backend | Implementado en `SessionContext`; mantener regresion y uso consistente |
+| Prevenir multiples cajas abiertas por usuario si aplica | Bug | No se evidencio bloqueo | 
 | Decidir e implementar revocacion de refresh token | Seguridad | Logout responde exito, pero no invalida refresh token persistente |
 | Validar PIN en cierre de caja server-side o documentar decision | Seguridad | Frontend valida PIN antes de close; backend debe ser fuente si es regla critica |
 
@@ -45,12 +41,8 @@ Este backlog sale de la auditoria documental, el codigo actual y las pruebas eje
 
 | Item | Clasificacion | Evidencia |
 | --- | --- | --- |
-| Crear tests frontend de `OrderContext` | Deuda tecnica | Frontend tiene cobertura unitaria minima |
-| Crear tests frontend de `SessionContext` | Deuda tecnica | Flujo caja/login es critico |
-| Crear test de checkout preview-confirm | Deuda tecnica | Flujo POS depende de preview antes de create |
-| Agregar E2E POS contra backend real | Deuda tecnica | Existe smoke Cypress mockeado; falta validar persistencia real |
-| Agregar E2E de cierre de caja | Deuda tecnica | Flujo caja requiere cobertura end-to-end |
-| Agregar E2E de barista completando orden | Deuda tecnica | Vista barista existe y falta cobertura E2E |
+| Revalidar spec real de stock insuficiente tras reiniciar API local | Deuda tecnica | El spec `pos-real-stock-insufficient.cy.js` ya existe, pero la API viva usada por Cypress seguia sin el ajuste nuevo de conexion Mongo |
+| Crear tests frontend de servicios HTTP/token refresh | Deuda tecnica | Flujo de refresh aun sin cobertura dedicada |
 | Normalizar paths de servicios frontend | Refactor | Hay rutas con y sin slash inicial |
 | Reemplazar `alert()` por estados UI | Refactor | UX/error handling inconsistente |
 | Revisar cache de productos ante cambios externos | Bug potencial | Cache dura 5 minutos y se limpia solo en algunos flujos |
@@ -98,7 +90,7 @@ Aceptacion:
 - Frontend usa `/orders/client/:clientId`.
 - Hay test de regresion.
 
-Prioridad: Alto. Estado actual: Inconsistente.
+Prioridad: Alto. Estado actual: Corregido en API y servicio frontend; mantener test de regresion.
 
 ### US-004 - Caja confiable
 
@@ -109,7 +101,7 @@ Aceptacion:
 - No hay doble apertura si la regla lo prohibe.
 - Frontend no depende solo de localStorage.
 
-Prioridad: Alto. Estado actual: Parcial.
+Prioridad: Alto. Estado actual: Parcial; `SessionContext` ya hidrata sesion activa desde backend.
 
 ### US-005 - Ordenes consistentes
 
@@ -120,7 +112,7 @@ Aceptacion:
 - Fallos no dejan actualizaciones parciales.
 - `orderNumber` no se duplica.
 
-Prioridad: Critico. Estado actual: Parcial.
+Prioridad: Critico. Estado actual: Parcial; creacion de orden ya usa transaccion y `orderNumber` atomico.
 
 ### US-006 - Logout seguro
 

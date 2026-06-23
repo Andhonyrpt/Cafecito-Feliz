@@ -7,6 +7,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed": "node scripts/seed.js",
+    "seed:e2e": "node scripts/seed-e2e.js",
     "seed:production": "cross-env SEED_ENV_FILE=.env.production NODE_ENV=production SEED_CONFIRM_PRODUCTION=true node scripts/seed.js",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
     "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",

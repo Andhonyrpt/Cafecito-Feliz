@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { createAdminWithToken, createBaristaWithToken, createUserWithToken } from './helpers/auth.js';
 import { makeCategoryPayload, makeClientPayload, makeOrderPayload, makeProductPayload } from './helpers/factories.js';
 import { api, authHeader } from './helpers/http.js';
@@ -76,6 +77,47 @@ describe('Orders Module Tests', () => {
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('total', 46.4);
         });
+
+        it('should reject preview for baristas', async () => {
+            const res = await api()
+                .post('/api/orders/preview')
+                .set(authHeader(baristaToken))
+                .send({
+                    products: [{ productId, quantity: 1 }]
+                });
+
+            expect(res.status).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Solo los vendedores pueden simular ventas.');
+        });
+
+        it('should apply loyalty discounts by purchase count', async () => {
+            const Client = mongoose.model('Client');
+
+            const discountCases = [
+                { purchases: 1, expectedDiscount: 1 },
+                { purchases: 5, expectedDiscount: 2 },
+                { purchases: 10, expectedDiscount: 3 }
+            ];
+
+            for (const discountCase of discountCases) {
+                const client = await Client.create({
+                    displayName: `Discount Client ${discountCase.purchases}`,
+                    email: `discount-${discountCase.purchases}@example.com`,
+                    totalPurchaseCount: discountCase.purchases
+                });
+
+                const res = await api()
+                    .post('/api/orders/preview')
+                    .set(authHeader(empToken))
+                    .send({
+                        client: client._id,
+                        products: [{ productId, quantity: 1 }]
+                    });
+
+                expect(res.status).toBe(200);
+                expect(res.body).toHaveProperty('discount', discountCase.expectedDiscount);
+            }
+        });
     });
 
     describe('POST /api/orders', () => {
@@ -94,6 +136,41 @@ describe('Orders Module Tests', () => {
             orderId = res.body._id;
         });
 
+        it('should assign sequential order numbers and update related records atomically', async () => {
+            const Product = mongoose.model('Product');
+            const Client = mongoose.model('Client');
+            const stockBefore = (await Product.findById(productId)).stock;
+
+            const first = await api()
+                .post('/api/orders')
+                .set(authHeader(empToken))
+                .send(makeOrderPayload({
+                    client: clientId,
+                    productId,
+                    quantity: 1
+                }));
+            const second = await api()
+                .post('/api/orders')
+                .set(authHeader(empToken))
+                .send(makeOrderPayload({
+                    client: clientId,
+                    productId,
+                    quantity: 1
+                }));
+
+            expect(first.status).toBe(201);
+            expect(second.status).toBe(201);
+            expect(second.body.orderNumber).toBe(first.body.orderNumber + 1);
+
+            const productAfter = await Product.findById(productId);
+            const clientAfter = await Client.findById(clientId);
+
+            expect(productAfter.stock).toBe(stockBefore - 2);
+            expect(clientAfter.purchaseHistory.map(String)).toEqual(
+                expect.arrayContaining([first.body._id, second.body._id])
+            );
+        });
+
         it('should fail if products array is empty', async () => {
             const res = await api()
                 .post('/api/orders')
@@ -104,6 +181,20 @@ describe('Orders Module Tests', () => {
                     productId
                 }));
             expect(res.status).toBe(422);
+        });
+
+        it('should reject order creation for baristas', async () => {
+            const res = await api()
+                .post('/api/orders')
+                .set(authHeader(baristaToken))
+                .send(makeOrderPayload({
+                    client: clientId,
+                    productId,
+                    quantity: 1
+                }));
+
+            expect(res.status).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Solo los vendedores pueden registrar ventas.');
         });
     });
 
@@ -139,6 +230,27 @@ describe('Orders Module Tests', () => {
             expect(res.body.summary.totalSales).toBeGreaterThan(0);
             expect(res.body.orders.length).toBeGreaterThan(0);
         });
+
+        it('should reject shift orders for non-sellers', async () => {
+            const res = await api()
+                .get('/api/orders/my-shift')
+                .set(authHeader(baristaToken));
+
+            expect(res.status).toBe(403);
+        });
+
+        it('should return 404 when seller has no open cash session', async () => {
+            const seller = await createUserWithToken({
+                displayName: 'Order Seller Without Shift',
+                employeeId: 'EMP-062'
+            });
+
+            const res = await api()
+                .get('/api/orders/my-shift')
+                .set(authHeader(seller.token));
+
+            expect(res.status).toBe(404);
+        });
     });
 
     describe('GET /api/orders/admin/sales-summary', () => {
@@ -153,6 +265,18 @@ describe('Orders Module Tests', () => {
             expect(res.body.summary.totalSales).toBeGreaterThan(0);
             expect(res.body).toHaveProperty('salesSeries');
             expect(res.body).toHaveProperty('topProducts');
+        });
+
+        it('should return sales summaries for week, month, and year ranges', async () => {
+            for (const range of ['week', 'month', 'year']) {
+                const res = await api()
+                    .get(`/api/orders/admin/sales-summary?range=${range}`)
+                    .set(authHeader(adminToken));
+
+                expect(res.status).toBe(200);
+                expect(res.body).toHaveProperty('range', range);
+                expect(res.body).toHaveProperty('summary');
+            }
         });
 
         it('should reject non-admin users', async () => {
@@ -179,6 +303,28 @@ describe('Orders Module Tests', () => {
             expect(res.body.orders.every((order) => order.paymentMethod === 'efectivo')).toBe(true);
         });
 
+        it('should list admin orders with explicit dates and employee filters', async () => {
+            const from = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+            const to = new Date().toISOString().slice(0, 10);
+
+            const res = await api()
+                .get(`/api/orders/admin/list?from=${from}&to=${to}&sellerEmployeeId=EMP-060&baristaEmployeeId=EMP-061&status=pendiente&page=1&limit=10`)
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('orders');
+            expect(res.body).toHaveProperty('pagination');
+        });
+
+        it('should return an empty list for missing employee filters', async () => {
+            const res = await api()
+                .get('/api/orders/admin/list?sellerEmployeeId=EMP-999&baristaEmployeeId=EMP-998')
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(200);
+            expect(res.body.orders).toHaveLength(0);
+        });
+
         it('should reject non-admin users from admin orders list', async () => {
             const res = await api()
                 .get('/api/orders/admin/list?range=day')
@@ -196,6 +342,49 @@ describe('Orders Module Tests', () => {
                 .send({ status: 'completado' });
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('status', 'completado');
+        });
+
+        it('should reject non-completed status changes that pass route validation', async () => {
+            const order = await api()
+                .post('/api/orders')
+                .set(authHeader(empToken))
+                .send(makeOrderPayload({
+                    client: clientId,
+                    productId,
+                    quantity: 1
+                }));
+
+            const res = await api()
+                .patch(`/api/orders/${order.body._id}/status`)
+                .set(authHeader(empToken))
+                .send({ status: 'pendiente' });
+
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty('message', 'Las órdenes solo pueden marcarse como completadas.');
+        });
+
+        it('should reject a barista completing an order assigned to another barista', async () => {
+            const anotherBarista = await createBaristaWithToken({
+                displayName: 'Other Order Barista',
+                employeeId: 'EMP-063'
+            });
+
+            const order = await api()
+                .post('/api/orders')
+                .set(authHeader(empToken))
+                .send(makeOrderPayload({
+                    client: clientId,
+                    productId,
+                    quantity: 1
+                }));
+
+            const res = await api()
+                .patch(`/api/orders/${order.body._id}/status`)
+                .set(authHeader(anotherBarista.token))
+                .send({ status: 'completado' });
+
+            expect(res.status).toBe(403);
+            expect(res.body).toHaveProperty('message', 'Esta orden no está asignada a este barista.');
         });
     });
 });

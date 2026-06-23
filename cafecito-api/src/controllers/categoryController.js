@@ -98,7 +98,7 @@ async function updateCategory(req, res, next) {
         const updatedCategory = await Category.findByIdAndUpdate(
             categoryId,
             updateData,
-            { new: true }
+            { returnDocument: 'after' }
         ).populate('parentCategory');
 
         if (!updatedCategory) {
@@ -152,7 +152,7 @@ async function searchCategories(req, res, next) {
 
         if (q) {
             filters.$or = [
-                { name: { regex: q, $options: 'i' } }
+                { name: { $regex: q, $options: 'i' } }
             ];
         }
 
@@ -180,7 +180,7 @@ async function searchCategories(req, res, next) {
         const pageInt = parseInt(page) || 1;
         const skip = (pageInt - 1) * limitInt;
 
-        const categories = await Category.countDocuments(filters)
+        const categories = await Category.find(filters)
             .populate('parentCategory')
             .sort(sortOptions)
             .skip(skip)

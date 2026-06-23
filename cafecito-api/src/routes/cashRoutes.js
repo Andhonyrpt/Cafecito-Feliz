@@ -2,6 +2,7 @@ import express from 'express';
 import {
     getTurnoTotal,
     getAdminCashSessions,
+    getActiveSession,
     openCashSession,
     closeCashSession
 } from '../controllers/cashSessionController.js';
@@ -25,6 +26,8 @@ const validateSellerCashClose = async (req, res, next) => {
     await Promise.all(cashCloseValidation().map((validation) => validation.run(req)));
     next();
 };
+
+router.get('/total-cash/active', authMiddleware, getActiveSession);
 
 router.get('/total-cash/orders', authMiddleware, [
     cashOpenedAtValidation()

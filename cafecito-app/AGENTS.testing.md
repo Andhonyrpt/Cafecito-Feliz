@@ -6,9 +6,10 @@ Este frontend es un POS de cafetería, no un e-commerce multipágina. No documen
 
 - Tests unitarios/componentes: Create React App/Jest.
 - Comando no interactivo: `npm test -- --watchAll=false` desde `cafecito-app/`.
-- Test actual confirmado: `src/App.test.js`.
-- Cypress está instalado y fue inicializado con `npx cypress open`, por lo que pueden existir `cypress.config.js` y carpeta `cypress/`.
-- Cypress ya tiene scripts y un smoke POS mockeado en `cypress/e2e/pos-smoke.cy.js`; todavía falta ampliar cobertura a backend real, cierre de caja, barista y cliente.
+- Tests actuales confirmados: `src/App.test.js`, `src/components/molecules/ClientSelector/ClientSelector.test.jsx` y `src/context/OrderContext.test.jsx`.
+- Cypress está configurado con `cypress.config.js`, `baseUrl: http://localhost:3000` y scripts `cypress:open`, `cypress:run`, `cypress:run:real`, `e2e`.
+- Cypress tiene specs mockeados en `cypress/e2e/` para smoke POS, creación/selección de cliente, cierre de caja y flujo barista.
+- Cypress backend-real vive en `cypress/e2e-real/` y requiere antes `npm run seed:e2e` en `cafecito-api/`, API viva en `http://localhost:3001` y frontend vivo en `http://localhost:3000`.
 
 ## Alcance correcto del POS
 
@@ -35,5 +36,5 @@ Los tests deben centrarse en los flujos reales:
 
 - Usar servicios/mocks alineados con `src/services/http.js`.
 - El flujo real trabaja con órdenes mediante `/orders/preview` y `/orders`.
-- Si se agregan E2E Cypress contra backend real, documentar datos semilla requeridos y limpieza.
+- Los E2E Cypress contra backend real usan datos reservados `E2E` y no deben depender de datos operativos no controlados.
 - Preferir selectores estables solo para elementos que existen en el POS real.

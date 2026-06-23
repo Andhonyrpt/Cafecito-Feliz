@@ -2,6 +2,21 @@
 
 Este documento contiene las reglas de arquitectura y patrones establecidos en `cafecito-api` para asegurar consistencia en futuros desarrollos.
 
+## Comandos
+
+Ejecutar siempre desde `cafecito-api/`; este repo no es un workspace npm.
+- `npm install`
+- `npm run dev`
+- `npm start`
+- `npm test`
+- `npm test -- tests/auth.test.js`
+- `npm run test:watch`
+- `npm run test:coverage`
+- `npm run seed`
+- `npm run seed:e2e`
+- `npm run seed:production` usa `SEED_ENV_FILE=.env.production`, `NODE_ENV=production` y `SEED_CONFIRM_PRODUCTION=true` desde el script.
+- `npm run seed:e2e` prepara datos locales reservados para Cypress real (`EMP-9001`, `EMP-9002`, `E2E Cafes`, `E2E Americano`, `e2e.cliente@e2e.local`) y limpia solo órdenes/sesiones asociadas a esos datos.
+
 ## Estructura de Directorios (`src/`)
 
 ```
@@ -26,6 +41,7 @@ src/
 
 ### Sesiones de Caja (`/api/total-cash`)
 - `GET  /orders` (Requiere: Auth, Validaciones)
+- `GET  /admin/sessions` (Requiere: Auth, Admin, Validaciones)
 - `POST /open` (Requiere: Auth, Validaciones)
 - `POST /close` (Requiere: Auth, Validaciones)
 
@@ -46,6 +62,9 @@ src/
 
 ### Órdenes (`/api/orders`)
 - `GET  /` (Requiere: Auth)
+- `GET  /my-shift` (Requiere: Auth)
+- `GET  /admin/sales-summary` (Requiere: Auth, Admin, Validaciones)
+- `GET  /admin/list` (Requiere: Auth, Admin, Validaciones)
 - `GET  /:orderId` (Requiere: Auth, Validaciones)
 - `GET  /client/:clientId` (Requiere: Auth, Validaciones)
 - `POST /` (Requiere: Auth, Validaciones)
@@ -105,14 +124,19 @@ src/
    - `status`: String ('pendiente', 'completado')
    - `orderNumber`: Number (Unique)
 
-5. **Product**
+5. **Counter**
+   - `name`: String (Unique)
+   - `seq`: Number
+   - Uso actual: secuencia atomica de `orderNumber`.
+
+6. **Product**
    - `name`: String (Unique)
    - `price`: Number
    - `stock`: Number
    - `imageUrl`: String
    - `parentCategory`: ObjectId (Ref: Category)
 
-6. **User**
+7. **User**
    - `displayName`: String
    - `employeeId`: String (Unique)
    - `hashPassword`: String
@@ -126,6 +150,7 @@ src/
 
 Se debe utilizar `express-validator` reusando los siguientes métodos:
 - `employeeIdValidation`
+- `employeeIdParamValidation`
 - `passwordValidation`
 - `fullPasswordValidation`
 - `passwordLoginValidation`
@@ -139,6 +164,8 @@ Se debe utilizar `express-validator` reusando los siguientes métodos:
 - `queryMongoIdValidation`
 - `booleanValidation`
 - `roleValidation`
+- `employeeRoleValidation`
+- `optionalPinValidation`
 - `sortFieldValidation`
 - `orderValidation`
 - `queryRoleValidation`
@@ -156,6 +183,27 @@ Se debe utilizar `express-validator` reusando los siguientes métodos:
 - `cashInitialValidation`
 - `cashOpenedAtValidation`
 - `cashCloseValidation`
+- `cashSessionsAdminQueryValidation`
+
+## Testing
+
+- Jest usa `node --experimental-vm-modules` y `NODE_ENV=test` desde los scripts de `package.json`.
+- `tests/setup/setup.js` crea `MongoMemoryReplSet` y conecta Mongoose; no levantar ni depender de MongoDB real para `npm test`.
+- `jest.config.js` busca `tests/**/*.test.js`, limpia/restaura mocks y exige cobertura global: statements/lines/functions 80%, branches 65%.
+- Los tests de integración importan `app` desde `server.js`; `server.js` solo hace `listen` cuando `NODE_ENV !== "test"`.
+- Si una prueba genera `logs/error.log`, limpiar ese artefacto antes de cerrar la tarea.
+
+## Integridad de Ordenes
+
+- `createOrder()` usa una transaccion MongoDB para descontar stock, crear la orden y actualizar el cliente como una sola unidad.
+- `orderNumber` se obtiene desde el modelo `Counter` con `findOneAndUpdate(..., $inc)` dentro de la misma transaccion.
+- La base MongoDB local/desplegada debe soportar transacciones; usar replica set cuando se ejecute fuera de tests.
+
+## Seguridad y Middlewares
+
+- `authRoutes.js` aplica rate limits locales a login, refresh, verify-pin y check-role desde `src/middlewares/rateLimit.js`.
+- `server.js` aplica `helmet()`, `express.json({ limit: '100kb' })` y CORS con `process.env.CORS_ORIGIN?.split(',')`.
+- Las variables requeridas están en `.env.example`: `PORT`, `NODE_ENV`, `MONGODB_URI`, `MONGODB_DB`, `JWT_SECRET`, `REFRESH_TOKEN_SECRET`, `CORS_ORIGIN`.
 
 ## Patrones de Código
 

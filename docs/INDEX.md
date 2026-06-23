@@ -35,9 +35,10 @@ Este índice es la puerta de entrada documental para Cafecito Feliz. El producto
 ## Estado actual de E2E
 
 - Cypress está configurado en `cafecito-app`.
-- Smoke POS: `cafecito-app/cypress/e2e/pos-smoke.cy.js`.
+- Specs POS mockeados: `pos-smoke`, `pos-client-flow`, `pos-cash-close`, `pos-barista-flow` bajo `cafecito-app/cypress/e2e/`.
+- Specs POS reales locales: `pos-real-flow`, `pos-real-cash-close` bajo `cafecito-app/cypress/e2e-real/`.
 - Plan: `docs/test-plans/e2e-pos.md`.
-- El smoke usa API mockeada; no reemplaza pruebas contra backend real.
+- Los specs en `cypress/e2e/` usan API mockeada con `cy.intercept`; el spec en `cypress/e2e-real/` requiere seed `E2E`, API y frontend vivos.
 
 ## Reglas rápidas
 

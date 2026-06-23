@@ -6,13 +6,38 @@ Este documento contiene las reglas de arquitectura y patrones establecidos en `c
 
 ```
 src/
-├── components/   # Componentes modulares de UI (App, Order, List, ProductCard, common)
+├── components/   # UI en atoms/molecules/organisms/templates
 ├── context/      # Estados globales usando Context API y Reducers
 ├── data/         # Archivos JSON mock (products, categories, etc.)
-├── layout/       # Componentes de envoltura principal (Header, Layout principal)
-├── pages/        # Vistas completas de la aplicación (únicamente Home.jsx)
+├── pages/        # Home, SellerOrders, ProtectedRoute y vistas Admin
 └── services/     # Llamadas a la API y configuración HTTP (Axios)
 ```
+
+La estructura real de componentes usa carpetas tipo atomic design: `components/atoms`, `components/molecules`, `components/organisms` y `components/templates`.
+
+## Comandos
+
+Ejecutar siempre desde `cafecito-app/`; este repo no es un workspace npm.
+- `npm install`
+- `npm start`
+- `npm run build`
+- `npm test -- --watchAll=false`
+- `npm test -- App.test.js --watchAll=false`
+- `npm run cypress:open`
+- `npm run cypress:run`
+- `npm run cypress:run:real`
+- `npm run e2e`
+
+## Rutas Reales
+
+`src/components/templates/App/App.jsx` define las rutas actuales:
+- `/` renderiza `Home` para el POS principal.
+- `/seller/orders` renderiza `SellerOrders` dentro de `ProtectedRoute` para rol `vendedor`.
+- `/admin` renderiza `AdminDashboard` dentro de `ProtectedRoute` para rol `admin`.
+- Hijas de `/admin`: índice `AdminHome`, `sales`, `products`, `categories`, `employees`, `shifts`.
+- `*` redirige a `/`.
+
+No documentar ni implementar rutas de e-commerce como shipping, payment, confirm o order-success salvo petición explícita.
 
 ## Contextos Disponibles
 
@@ -40,6 +65,8 @@ Maneja el estado del POS y pedido en curso mediante un Reducer.
 - `resetPOSPanel`: Acción para limpiar la terminal completa post-venta.
 
 ## Componentes `common/` (UI Base)
+
+Estos componentes viven actualmente bajo `src/components/atoms/`, no en una carpeta `common/`.
 
 1. **`Button.jsx`**
    - **Props:** `children`, `onClick`, `type` (default "button"), `disabled` (boolean), `variant` ("primary", "secondary", "third", "danger", "outline"), `size` ("xsm", "sm", "base", "md", "lg"), `className`.
@@ -101,12 +128,26 @@ export const createClient = async (clientData) => {
 
 **Mecanismos internos de `http.js`**:
 - Agrega en cada petición el token del `localStorage.getItem('authToken')`.
+- Usa `REACT_APP_API_URL` como `baseURL` y `timeout: 8000`.
 - Intercepta errores `401`/`403`. Si el token expiró y no es una ruta de auth/refresh, llama automáticamente a `refresh()` de `auth.js` para rotar tokens, retoma la solicitud anterior, y avisa al UI de cerrar sesión si la rotación falla.
+
+## Servicios y Caché
+
+- `productService.js` cachea listas en `sessionStorage` por 5 minutos con claves `products_page_*`; conservar o llamar `clearProductsCache()` cuando una acción cambie stock/productos.
+- El servicio de órdenes está nombrado `src/services/orderSevice.js` (typo existente). Si se renombra, actualizar imports en todo el repo en el mismo cambio.
+- `storageService` antepone el prefijo literal `cafecito` a claves lógicas como `order` y `active_client`; usar el servicio/contextos en vez de escribir esas claves manualmente.
+
+## Testing
+
+- Tests CRA/Jest actuales: `src/App.test.js`, `src/components/molecules/ClientSelector/ClientSelector.test.jsx` y `src/context/OrderContext.test.jsx`.
+- Cypress usa `baseUrl: http://localhost:3000` y specs `cypress/e2e/**/*.cy.{js,jsx,ts,tsx}`.
+- Los E2E actuales (`pos-smoke`, `pos-client-flow`, `pos-cash-close`, `pos-barista-flow`) mockean API con `cy.intercept`; no cuentan como cobertura contra backend real.
+- El E2E real vive en `cypress/e2e-real/pos-real-flow.cy.js`; requiere `npm run seed:e2e` en `cafecito-api/` y API/frontend vivos antes de `npm run cypress:run:real`.
 
 ## Restricciones Arquitectónicas (Qué NO hacer)
 
 1. **NO crear nuevos contextos**: Si hace falta guardar estado, evaluar si corresponde al POS (`OrderContext`) o al turno (`SessionContext`).
 2. **NO usar fetch o axios directo**: Cualquier request al API debe importarse desde un servicio en `src/services/` el cual consume el módulo local `http.js`.
-3. **NO agregar React Router sin consultar**: El proyecto está deliberadamente construido como un layout SPA plano alrededor de `<Home />`.
+3. **NO agregar rutas de e-commerce sin consultar**: El router existe para POS, vendedor y admin; no crear flujos de tienda online que no existan en el producto.
 4. **NO modificar DOM manualmente**: Mantener las props para interactuar entre modales y vistas en lugar de forzar llamadas a variables globales.
 5. **NO inventar Hooks**: Se descubrió que no existe `useFormReducer`, sino un `orderReducer`. Limítate a usar lo que existe en `src/context/`.
