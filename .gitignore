@@ -5,3 +5,13 @@
 !.env.example
 .env
 .env.production
+
+# generated test artifacts
+coverage/
+**/coverage/
+logs/*.log
+**/logs/*.log
+cypress/screenshots/
+**/cypress/screenshots/
+cypress/videos/
+**/cypress/videos/

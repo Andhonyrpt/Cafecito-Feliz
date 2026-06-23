@@ -281,8 +281,8 @@ describe('Coverage extra integration paths', () => {
             const byClient = await request(app)
                 .get(`/api/orders/client/${clientId}`)
                 .set('Authorization', `Bearer ${empToken}`);
-            expect(byClient.status).toBe(500);
-            expect(byClient.body).toHaveProperty('status', 'error');
+            expect(byClient.status).toBe(200);
+            expect(byClient.body).toHaveProperty('orders');
 
             const previewMissing = await request(app)
                 .post('/api/orders/preview')

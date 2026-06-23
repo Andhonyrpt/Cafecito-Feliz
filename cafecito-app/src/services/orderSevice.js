@@ -72,7 +72,7 @@ export const updateOrderStatus = async (orderId) => {
 
 export const getOrdersByClient = async (clientId, page = 1, limit = 10) => {
     try {
-        const response = await http.get(`orders/${clientId}`, {
+        const response = await http.get(`/orders/client/${clientId}`, {
             params: { page, limit }
         });
         return response.data;

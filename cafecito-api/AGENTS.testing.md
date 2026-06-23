@@ -1,6 +1,6 @@
 # Guía de Testing - Cafecito API
 
-Esta API usa Jest, Supertest y MongoMemoryServer. No usar Vitest en este paquete.
+Esta API usa Jest, Supertest y MongoMemoryReplSet. No usar Vitest en este paquete.
 
 ## Comandos
 
@@ -18,9 +18,10 @@ npm run test:coverage
 - Runner: Jest con `node --experimental-vm-modules`.
 - Config: `jest.config.js`.
 - Setup: `tests/setup/setup.js`.
-- Base de datos: `mongodb-memory-server`.
+- Base de datos: `mongodb-memory-server` con `MongoMemoryReplSet` para soportar transacciones.
 - Entorno: `NODE_ENV=test` vía `cross-env`.
 - Imports del backend: ESM con extensión `.js`.
+- `npm run test:coverage` debe cumplir thresholds globales: statements/lines/functions 80% y branches 65%.
 
 ## Patrones de pruebas
 

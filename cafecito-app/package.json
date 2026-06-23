@@ -20,8 +20,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
-    "e2e": "cypress run",
+    "cypress:run": "cypress run --spec \"cypress/e2e/**/*.cy.{js,jsx,ts,tsx}\"",
+    "cypress:run:real": "cypress run --spec \"cypress/e2e-real/**/*.cy.{js,jsx,ts,tsx}\" --env REAL_E2E=true",
+    "e2e": "cypress run --spec \"cypress/e2e/**/*.cy.{js,jsx,ts,tsx}\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

@@ -576,7 +576,19 @@ async function previewOrder(req, res, next) {
         const priceChecks = await Promise.all(products.map(async (item) => {
             const product = await Product.findById(item.productId);
 
-            if (!product) return null;
+            if (!product) {
+                return { error: 'Product not found', productId: item.productId };
+            }
+
+            if (product.stock < item.quantity) {
+                return {
+                    error: 'Stock insuficiente',
+                    productId: item.productId,
+                    productName: product.name,
+                    available: product.stock,
+                    requested: item.quantity
+                };
+            }
 
             return {
                 price: product.price,
@@ -584,8 +596,12 @@ async function previewOrder(req, res, next) {
             };
         }));
 
-        if (priceChecks.some((p) => p === null)) {
-            return res.status(404).json({ message: "One or more products not found" });
+        const errors = priceChecks.filter((check) => check.error);
+        if (errors.length > 0) {
+            return res.status(400).json({
+                message: 'No se puede completar la venta por falta de inventario.',
+                errors
+            });
         }
 
         let discountPercentage = 0;

@@ -18,13 +18,13 @@ Estas mejoras salen del análisis del código actual. No están implementadas en
 ## Backend
 
 - Remover imports no usados en rutas y controladores para reducir ruido (`passwordValidation`, `priceValidation`, etc. donde no aplican).
-- Cambiar usos de `{ new: true }` en Mongoose a `{ returnDocument: 'after' }` para eliminar warnings.
 - Remover logs de depuración en `openCashSession()` o protegerlos por entorno.
 - Usar `next(error)` en `previewOrder()` en vez de responder manualmente `500` con stack.
 - Agregar manejo de errores de duplicados Mongo (`E11000`) para usuarios, productos, categorías y clientes.
 - Agregar invalidación o almacenamiento de refresh tokens si se requiere logout real.
 - Definir si los administradores deben abrir/cerrar caja o solo tener acceso administrativo, y documentarlo como regla de negocio.
 - Normalizar idioma de nombres de campos y mensajes (`cashSales`, `totalPrice`, `openedAt`, mensajes en español/inglés).
+- Verificar que entornos locales/desplegados ejecuten MongoDB como replica set para soportar transacciones de órdenes.
 
 ## Frontend
 
@@ -41,17 +41,17 @@ Estas mejoras salen del análisis del código actual. No están implementadas en
 - Separar tests que documentan comportamiento actual defectuoso de tests de comportamiento esperado.
 - Usar factories/helpers para crear usuarios, categorías, productos, clientes y tokens.
 - Aislar datos por test con `beforeEach` o fixtures explícitos; actualmente algunos tests dependen del orden dentro del archivo.
-- Agregar pruebas frontend para `OrderContext`, `SessionContext`, servicios HTTP y flujo de checkout.
-- Ampliar Cypress desde el smoke POS mockeado hacia flujos con backend real, cierre de caja y barista.
+- Agregar pruebas frontend para `SessionContext`, servicios HTTP y flujo de checkout.
+- Ampliar Cypress backend-real con casos negativos como stock insuficiente.
 
 ## Mejoras recomendadas por cobertura
 
 - Subir branch coverage del API: está por debajo del 80% aunque statements, lines y functions ya superan el umbral.
 - Cubrir ramas de error en `orderController.js`, especialmente rollback de stock, orden no encontrada, producto no encontrado y preview con cliente/descuento.
-- Cubrir ramas pendientes en `cashSessionController.js`: usuario inexistente, sesión no abierta, errores inesperados y cierre vendedor sin sesión activa.
-- Cubrir `categoryController.searchCategories()` con filtros, sort, order y paginación; hoy la cobertura se concentra en el flujo sin paginar.
+- Cubrir ramas pendientes en `cashSessionController.js`: errores inesperados y cierre vendedor sin sesión activa.
+- Seguir ampliando `categoryController.searchCategories()` si se agregan filtros nuevos o reglas de ordenamiento adicionales.
 - Agregar pruebas específicas para `globalerrorHandler.js` y ramas de escritura fallida en `errorHandler.js` si se quiere medir middlewares con más precisión.
-- Reducir ruido de consola durante cobertura (`dotenv`, logs de caja, warnings Mongoose) para que los reportes sean más legibles.
+- Reducir ruido de consola durante cobertura (`dotenv` y logs de caja) para que los reportes sean más legibles.
 
 ## Documentación
 

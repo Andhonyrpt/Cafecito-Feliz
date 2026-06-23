@@ -1,6 +1,6 @@
 # Product Spec
 
-Ultima revision: 2026-06-18.
+Ultima revision: 2026-06-22 (actualizada tras refactor de ordenes, sesion activa y tests).
 
 Este spec describe el estado actual confirmado del sistema y los gaps para continuar el desarrollo. No asume que el producto esta terminado.
 
@@ -16,15 +16,15 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 
 | Area | Estado |
 | --- | --- |
-| Backend API | Muy avanzado, con tests y seguridad basica |
+| Backend API | Muy avanzado, con tests y seguridad basica; transacciones MongoDB, contador atomico |
 | Frontend POS | Funcional en ruta unica `/` |
-| Caja | Implementada, pero con estado duplicado local/backend |
+| Caja | Implementada con hidratacion backend (`GET /api/total-cash/active`); fallback localStorage |
 | Catalogo | Implementado |
 | Clientes | Implementado |
-| Ordenes | Implementado, con deuda de integridad |
-| Barista | Implementado basico con polling |
+| Ordenes | Implementado con transacciones, contador atomico, asignacion barista por carga; tests de regresion |
+| Barista | Implementado basico con polling; sesion operativa separada |
 | Admin UI | No confirmado como pantalla actual |
-| E2E | Cypress configurado con smoke POS mockeado; falta backend real/cierre/barista |
+| E2E | Cypress mockeado para POS/cliente/caja/barista; Cypress real local para caja/venta POS + barista |
 
 ## Alcance Objetivo
 
@@ -63,7 +63,7 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 - Endpoints: `/categories`, `/categories/search`, `/products`, `/products/category/:categoryId`.
 - Modelos: `Category`, `Product`.
 - Reglas: productos tienen precio, stock y categoria; escrituras requieren admin.
-- Gaps: cache de productos puede quedar stale; busqueda de categorias tiene bugs probables.
+- Gaps: cache de productos puede quedar stale.
 
 ### Clientes
 
@@ -88,22 +88,22 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 ### Ordenes
 
 - Proposito: crear, listar y completar pedidos.
-- Estado actual: implementado con bugs/deuda.
-- Componentes: `PendingOrders`, `OrderPanel`.
-- Endpoints: `/orders`, `/orders/:orderId`, `/orders/client/:clientId`, `/orders/:orderId/status`.
-- Modelos: `Order`, `Product`, `Client`.
-- Reglas: solo vendedor previsualiza/crea; nuevas ordenes quedan `pendiente`; `completado` es terminal.
-- Gaps: `GET /orders/client/:clientId` falla por populate; `orderNumber` por conteo es race-prone; no hay transacciones.
+- Estado actual: implementado con transacciones MongoDB y contador atomico; tests de regresion cubren atomicidad y descuento stock.
+- Componentes: `PendingOrders`, `OrderPanel`, `OrderContext`, `orderService` (misspelled as `orderSevice.js`).
+- Endpoints: `/orders`, `/orders/:orderId`, `/orders/client/:clientId`, `/orders/:orderId/status`, `/orders/preview`, `/orders/my-shift`, `/orders/admin/list`, `/orders/admin/sales-summary`.
+- Modelos: `Order`, `Product`, `Client`, `Counter`, `BaristaSession`.
+- Reglas: solo vendedor previsualiza/crea; nuevas ordenes quedan `pendiente`; `completado` es terminal; crear orden descuenta stock, crea orden y actualiza cliente dentro de una transaccion MongoDB; `orderNumber` sale de un contador atomico (`Counter` con `findOneAndUpdate $inc`); asignacion automatica de barista por carga de trabajo; validacion stock con `findOneAndUpdate {stock: {$gte: qty}}`; error 400/404 si stock insuficiente o producto no existe.
+- Gaps: alineacion frontend/backend totales (frontend calcula estimado, backend es fuente final); cache productos stale tras orden; probar escenarios backend-real adicionales como stock insuficiente.
 
 ### Caja
 
 - Proposito: apertura/cierre de turno y arqueo.
-- Estado actual: implementado parcialmente.
+- Estado actual: implementado con endpoint de sesion activa.
 - Componentes: `CashSession`, `SessionContext`, `Header`.
-- Endpoints: `/total-cash/open`, `/total-cash/close`, `/total-cash/orders`.
-- Modelo: `CashSession`.
-- Reglas: ventas en efectivo desde `openedAt`; admin no crea sesion real.
-- Gaps: estado duplicado local/backend; posible multiple sesion abierta; validar PIN server-side si aplica.
+- Endpoints: `/total-cash/open`, `/total-cash/close`, `/total-cash/orders`, `/total-cash/active`, `/total-cash/admin/sessions`.
+- Modelo: `CashSession`, `BaristaSession`.
+- Reglas: ventas en efectivo desde `openedAt`; admin no crea sesion operativa; baristas tienen sesion operativa separada; `SessionContext` hidrata sesion activa desde backend (`GET /api/total-cash/active`) con fallback a localStorage.
+- Gaps: posible multiple sesion abierta; validar PIN server-side si aplica; admin no debe crear sesion real.
 
 ### Barista
 
@@ -124,8 +124,8 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 | Base de datos | MongoDB |
 | Estado global frontend | `SessionContext`, `OrderContext`, `orderReducer` |
 | Persistencia local | `localStorage` y `sessionStorage` |
-| Tests API | Jest, Supertest, MongoMemoryServer |
-| Tests frontend | CRA/Jest, solo `src/App.test.js` |
+| Tests API | Jest, Supertest, MongoMemoryReplSet |
+| Tests frontend | CRA/Jest (`App.test`, `ClientSelector.test`, `OrderContext.test`), Cypress mockeado POS y Cypress real local |
 
 ## Persistencia Local vs Remota
 
@@ -135,11 +135,11 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 | Categorias/productos | MongoDB |
 | Clientes | MongoDB |
 | Ordenes | MongoDB |
-| Caja | MongoDB + `localStorage` (`openedAt`, `initialCash`) |
+| Caja | MongoDB (fuente); `localStorage` (`openedAt`, `initialCash`) como fallback/hidratacion inicial |
 | Tokens | `localStorage` |
 | Carrito | `localStorage` via `storageService` |
 | Cliente activo | `localStorage` via `storageService` |
-| Cache productos | `sessionStorage` |
+| Cache productos | `sessionStorage` (5 min, keys `products_page_*`) |
 
 ## Reglas Funcionales Confirmadas
 
@@ -147,29 +147,31 @@ Permitir operar ventas de cafeteria desde caja, registrando pedidos, controlando
 - Usuarios inactivos no pueden login/refresh/acceder.
 - Rutas admin requieren `authMiddleware` + `isAdmin`.
 - Backend calcula precios, descuentos, IVA/tax y total.
-- Descuento por cliente depende de `totalPurchaseCount`.
-- Stock se descuenta al crear orden.
+- Descuento por cliente depende de `totalPurchaseCount` (1-4: 5%, 5-9: 10%, 10+: 15%).
+- Stock se descuenta al crear orden dentro de una transaccion junto con orden y cliente.
+- `orderNumber` se asigna con contador atomico `Counter` (`findOneAndUpdate $inc`).
 - Orden nueva inicia `pendiente`.
 - Orden `completado` no debe reabrirse.
 - Caja suma ventas en efectivo desde apertura.
 - Tarjeta es simulada, no integrada a terminal real.
+- `SessionContext` hidrata sesion de caja activa desde `GET /api/total-cash/active` (con fallback a localStorage).
+- Baristas tienen sesion operativa separada (`BaristaSession`); apertura de caja por barista asigna ordenes pendientes no asignadas.
 - No existen flujos de envio, dashboard multipagina ni checkout por pasos tipo tienda online en el alcance actual; el flujo real trabaja con pedidos POS y ordenes.
 
 ## Inconsistencias Principales
 
-- Totales duplicados frontend/backend.
-- Caja duplicada local/backend.
-- Stock cacheado en frontend frente a stock real backend.
+- Totales duplicados frontend/backend (frontend estima, backend es fuente final).
+- Caja: hidratacion desde backend implementada (`SessionContext` usa `GET /api/total-cash/active`), pero localStorage sigue como fallback; posible multiples sesiones abiertas.
+- Stock cacheado en frontend (`sessionStorage` 5 min) frente a stock real backend.
 - Logout no revoca refresh token.
-- Cypress configurado con scripts y smoke POS mockeado; falta ampliar a backend real, cierre de caja y barista.
-- Guias testing obsoletas.
+- Cypress configurado con specs mockeados para smoke POS, cliente, cierre de caja y barista; existen specs reales locales para cierre de caja y venta POS + barista.
+- Quedan gaps de testing unitario en contexts, HTTP/token refresh y checkout preview-create.
 
 ## Recomendacion de Cierre de Gaps
 
-1. Establecer backend como fuente de verdad para totales, stock, caja y ordenes.
-2. Corregir bugs de ordenes por cliente y servicios frontend relacionados.
-3. Normalizar caja para hidratar sesion desde backend.
-4. Reforzar integridad de ordenes con contador atomico y transacciones o estrategia equivalente.
-5. Decidir politica de refresh tokens y logout.
-6. Crear cobertura frontend para contexts y checkout.
-7. Limpiar documentacion obsoleta.
+1. Establecer backend como fuente de verdad para totales (checkout usa preview backend), stock, ordenes.
+2. Caja: hidratacion desde backend implementada; pendiente validar regla de multiples sesiones abiertas y PIN server-side.
+3. Decidir politica de refresh tokens y logout (revocacion).
+4. Crear cobertura frontend para contexts (SessionContext, OrderContext), HTTP/token refresh y checkout preview-create.
+5. Invalidar cache productos (`clearProductsCache`) tras cambios administrativos o crear orden.
+6. Limpiar documentacion obsoleta (`docs/SPECIFICATIONS.md`, consolidar `docs/qa/*`).

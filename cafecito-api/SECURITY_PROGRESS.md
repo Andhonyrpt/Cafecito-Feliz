@@ -8,7 +8,7 @@ Registro de progreso para las interacciones de seguridad sobre `cafecito-api`. M
 
 - No modificar `cafecito-api/AGENTS.md` ni `cafecito-app/AGENTS.md` salvo pedido explicito.
 - Ejecutar comandos de API desde `cafecito-api/`.
-- Preferir pruebas automatizadas con Jest/Supertest/MongoMemoryServer.
+- Preferir pruebas automatizadas con Jest/Supertest/MongoMemoryReplSet.
 - Documentar hallazgo, evidencia, estado y siguiente accion.
 - Marcar los riesgos bajos como opcionales salvo que el usuario los suba de prioridad.
 

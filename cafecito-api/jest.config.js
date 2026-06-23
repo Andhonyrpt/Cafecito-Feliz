@@ -11,6 +11,9 @@ export default {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  coveragePathIgnorePatterns: [
+    "<rootDir>/tests/helpers/"
+  ],
   coverageThreshold: {
     global: {
       statements: 80,

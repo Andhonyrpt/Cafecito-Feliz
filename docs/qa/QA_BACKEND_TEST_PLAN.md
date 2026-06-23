@@ -24,7 +24,7 @@ Definir un plan robusto y trazable para pruebas unitarias e integración del bac
 - No hay pruebas negativas exhaustivas de autorización para todos los endpoints protegidos.
 - No hay pruebas específicas de seguridad para JWT inválido, token expirado, payload manipulado o roles insuficientes en cada recurso.
 - No hay pruebas directas de middlewares globales (`errorHandler`, `globalerrorHandler`) salvo cobertura indirecta.
-- No hay pruebas de concurrencia o integridad transaccional para stock y creación de órdenes.
+- Hay cobertura de integridad para creación de órdenes con contador atómico y transacciones; falta ampliar escenarios concurrentes de carga si el producto lo requiere.
 - No hay pruebas documentadas para performance básica, paginación masiva o límites de datos.
 
 ## Estrategia de Pruebas

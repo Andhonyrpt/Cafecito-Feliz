@@ -48,6 +48,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--gap);
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .pending-order-card {

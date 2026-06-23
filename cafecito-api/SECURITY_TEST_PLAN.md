@@ -33,7 +33,7 @@ Evaluar riesgos de seguridad en `cafecito-api`, priorizar los hallazgos crítico
 - API Express/Mongoose ubicada en `cafecito-api/`.
 - Rutas de autenticación, usuarios, productos, categorías, clientes, órdenes y caja.
 - Middleware de autenticación/autorización, validadores, manejo global de errores y modelos Mongoose.
-- Pruebas locales con Jest, Supertest y MongoMemoryServer.
+- Pruebas locales con Jest, Supertest y MongoMemoryReplSet.
 - Revisión de dependencias de producción con `npm audit --omit=dev`.
 
 ## Fuera De Alcance

@@ -330,9 +330,30 @@ async function getAdminCashSessions(req, res, next) {
     }
 };
 
+async function getActiveSession(req, res, next) {
+    try {
+        const { userId, role } = req.user;
+
+        if (!userId) {
+            return res.status(401).json({ message: "User not found" });
+        }
+
+        if (role === 'barista') {
+            const session = await BaristaSession.findOne({ user: userId, status: 'open' });
+            return res.status(200).json({ session: null, baristaSession: session });
+        }
+
+        const session = await CashSession.findOne({ user: userId, status: 'open' });
+        res.status(200).json({ session });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export {
     getTurnoTotal,
     getAdminCashSessions,
+    getActiveSession,
     openCashSession,
     closeCashSession
 };

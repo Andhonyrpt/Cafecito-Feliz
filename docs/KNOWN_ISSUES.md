@@ -1,6 +1,6 @@
 # Known Issues
 
-Ultima revision: 2026-06-18.
+Ultima revision: 2026-06-22.
 
 Lista de bugs, inconsistencias y deuda confirmada o altamente probable. No incluye features deseadas sin evidencia.
 
@@ -8,16 +8,12 @@ Lista de bugs, inconsistencias y deuda confirmada o altamente probable. No inclu
 
 | Issue | Tipo | Evidencia | Riesgo | Siguiente accion |
 | --- | --- | --- | --- | --- |
-| `orderNumber` usa `Order.countDocuments() + 1` | Bug concurrencia | Exploracion de backend | Numeros duplicados bajo concurrencia | Reemplazar por contador atomico |
-| Creacion de orden no es transaccional | Deuda tecnica | Stock, orden y cliente se actualizan en pasos | Stock/cliente parcialmente actualizado ante fallo | Evaluar transacciones Mongo o compensacion robusta |
 | Totales duplicados frontend/backend | Alineacion | `OrderContext` calcula y backend recalcula | Monto visible distinto al cobrado | Definir backend como total final |
 
 ## Altos
 
 | Issue | Tipo | Evidencia | Riesgo | Siguiente accion |
 | --- | --- | --- | --- | --- |
-| `GET /api/orders/client/:clientId` falla por populate | Bug | Error real `StrictPopulateError` en logs de test | Historial por cliente roto | Corregir populate y agregar test |
-| Servicio frontend de ordenes por cliente usa ruta ambigua | Bug | `orderSevice.js` usa patrones `orders/:id` | Llama endpoint incorrecto | Usar `/orders/client/:clientId` |
 | Caja duplicada local/backend | Alineacion | `openedAt` e `initialCash` en localStorage y `CashSession` en DB | Cierre con datos stale | Hidratar desde backend |
 | Posibles multiples sesiones de caja abiertas | Bug | No se evidencio bloqueo | Arqueos inconsistentes | Agregar regla y test si aplica |
 | Logout no revoca refresh token | Seguridad | `logout` responde exito sin invalidacion persistente | Sesion reutilizable | Definir token store o `tokenVersion` |
@@ -32,8 +28,8 @@ Lista de bugs, inconsistencias y deuda confirmada o altamente probable. No inclu
 | `setLogoutCallback` no aparece registrado | Bug potencial | `http.js` lo soporta, no se evidencio uso | Refresh fallido no fuerza logout UI | Registrar callback o remover |
 | Paths de servicios inconsistentes | Refactor | Mezcla `/path` y `path` | Errores sutiles de URL | Normalizar estilo |
 | Frontend usa `alert()` | Deuda UX | Componentes de flujo POS | Mala experiencia/error handling | Estados de error y mensajes inline |
-| E2E solo cubre smoke POS mockeado | Deuda QA | Existe `cypress/e2e/pos-smoke.cy.js`, pero falta backend real, cierre de caja y barista | Cobertura incompleta | Agregar E2E progresivos |
-| Frontend con cobertura minima | Deuda QA | Solo `src/App.test.js` | Regresiones UI/context | Agregar tests criticos |
+| E2E real no cubre stock insuficiente | Deuda QA | Existen flujos reales de venta POS + barista y cierre de caja | Cobertura incompleta | Agregar escenario backend-real de stock insuficiente |
+| Frontend con cobertura minima | Deuda QA | Hay tests para App, ClientSelector y OrderContext | Regresiones UI/context | Agregar tests de SessionContext, HTTP/token refresh y checkout |
 
 ## Bajos
 

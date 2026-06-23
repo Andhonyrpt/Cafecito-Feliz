@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { createAdminWithToken } from './helpers/auth.js';
 import { makeCategoryPayload, makeProductPayload } from './helpers/factories.js';
 import { api, authHeader } from './helpers/http.js';
@@ -46,6 +47,15 @@ describe('Categories Module Tests', () => {
             expect(Array.isArray(res.body.categories)).toBe(true);
             expect(res.body.categories.length).toBeGreaterThan(0);
         });
+
+        it('should get paginated categories', async () => {
+            const res = await api().get('/api/categories?page=1&limit=5');
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('categories');
+            expect(res.body).toHaveProperty('pagination');
+            expect(res.body.pagination).toHaveProperty('currentPage', 1);
+        });
     });
 
     describe('GET /api/categories/:categoryId', () => {
@@ -53,6 +63,15 @@ describe('Categories Module Tests', () => {
             const res = await api().get(`/api/categories/${categoryId}`);
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('_id', categoryId);
+        });
+
+        it('should return 404 for missing category', async () => {
+            const missingId = new mongoose.Types.ObjectId().toString();
+
+            const res = await api().get(`/api/categories/${missingId}`);
+
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty('message', 'Category not found');
         });
     });
 
@@ -71,6 +90,58 @@ describe('Categories Module Tests', () => {
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('name', updatePayload.name);
             expect(res.body).toHaveProperty('imageUrl', updatePayload.imageUrl);
+        });
+
+        it('should update category parent when provided', async () => {
+            const parent = await api()
+                .post('/api/categories')
+                .set(authHeader(adminToken))
+                .send(makeCategoryPayload({ name: 'Categoria padre' }));
+
+            const child = await api()
+                .post('/api/categories')
+                .set(authHeader(adminToken))
+                .send(makeCategoryPayload({ name: 'Categoria hija' }));
+
+            const res = await api()
+                .put(`/api/categories/${child.body._id}`)
+                .set(authHeader(adminToken))
+                .send({ parentCategory: parent.body._id });
+
+            expect(res.status).toBe(200);
+            expect(res.body.parentCategory).toHaveProperty('_id', parent.body._id);
+        });
+
+        it('should reject empty category updates', async () => {
+            const res = await api()
+                .put(`/api/categories/${categoryId}`)
+                .set(authHeader(adminToken))
+                .send({});
+
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty('message', 'At least one field must be provided for update');
+        });
+
+        it('should return 404 when updating a missing category', async () => {
+            const missingId = new mongoose.Types.ObjectId().toString();
+
+            const res = await api()
+                .put(`/api/categories/${missingId}`)
+                .set(authHeader(adminToken))
+                .send({ name: 'No existe' });
+
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty('message', 'Category not found');
+        });
+    });
+
+    describe('GET /api/categories/search', () => {
+        it('should search and sort categories without pagination', async () => {
+            const res = await api().get('/api/categories/search?q=Bebidas&sort=name&order=asc');
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('categories');
+            expect(Array.isArray(res.body.categories)).toBe(true);
         });
     });
 
@@ -103,6 +174,17 @@ describe('Categories Module Tests', () => {
                 .set(authHeader(adminToken));
             
             expect(res.status).toBe(204);
+        });
+
+        it('should return 404 when deleting a missing category', async () => {
+            const missingId = new mongoose.Types.ObjectId().toString();
+
+            const res = await api()
+                .delete(`/api/categories/${missingId}`)
+                .set(authHeader(adminToken));
+
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty('message', 'Category not found');
         });
     });
 });

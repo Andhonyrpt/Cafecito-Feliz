@@ -2,7 +2,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { getUserProfile } from "../services/userService";
 import { login, verifyEmployeePin } from "../services/auth";
 import Loading from '../components/atoms/Loading/Loading';
-import { fetchTurnoTotals, createCashSession, closeCashSession } from "../services/cashSessionService";
+import { fetchTurnoTotals, createCashSession, closeCashSession, getActiveSession } from "../services/cashSessionService";
 
 const SessionContext = createContext();
 
@@ -21,15 +21,45 @@ export function SessionProvider({ children }) {
             if (token) {
                 try {
                     const user = await getUserProfile();
-                    const savedOpenedAt = localStorage.getItem('openedAt');
-                    const savedInitialCash = localStorage.getItem('initialCash');
+                    let openedAt = null;
+                    let initialCash = 0;
+
+                    if (user.role === 'vendedor') {
+                        try {
+                            const activeSessionData = await getActiveSession();
+                            if (activeSessionData && activeSessionData.session) {
+                                openedAt = activeSessionData.session.openedAt;
+                                initialCash = activeSessionData.session.initialCash;
+                            }
+                        } catch (err) {
+                            console.error("Error fetching active vendor session from backend, falling back to localStorage", err);
+                            openedAt = localStorage.getItem('openedAt') || null;
+                            initialCash = Number(localStorage.getItem('initialCash')) || 0;
+                        }
+                    } else if (user.role === 'barista') {
+                        try {
+                            const activeSessionData = await getActiveSession();
+                            if (activeSessionData && activeSessionData.baristaSession) {
+                                openedAt = activeSessionData.baristaSession.openedAt;
+                            }
+                        } catch (err) {
+                            console.error("Error fetching active barista session from backend, falling back to localStorage", err);
+                            openedAt = localStorage.getItem('openedAt') || null;
+                        }
+                    }
 
                     setCurrentUser({
                         ...user,
-                        initialCash: savedInitialCash ? Number(savedInitialCash) : 0,
-                        openedAt: savedOpenedAt || null
+                        initialCash,
+                        openedAt: openedAt || null
                     });
-                    setIsModalOpen(false);
+
+                    if (user.role === 'admin' || openedAt) {
+                        setIsModalOpen(false);
+                    } else {
+                        setSessionMode('open');
+                        setIsModalOpen(true);
+                    }
                 } catch (error) {
                     localStorage.removeItem('authToken');
                     setIsModalOpen(true);

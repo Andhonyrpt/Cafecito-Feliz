@@ -7,6 +7,12 @@
     padding: 0 16px 24px;
 }
 
+.home-container--barista {
+    grid-template-columns: 1fr;
+    max-width: 1200px;
+    margin: 15px auto 0 auto;
+}
+
 .inline-fallback {
     width: 100%;
     padding: 12px 16px;
