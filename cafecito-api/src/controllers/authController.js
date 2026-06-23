@@ -50,6 +50,17 @@ const generatePassword = async (password) => {
  *     responses:
  *       201:
  *         description: Usuario registrado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 displayName:
+ *                   type: string
+ *                 employeeId:
+ *                   type: string
+ *                 role:
+ *                   type: string
  */
 async function register(req, res, next) {
     try {
@@ -101,8 +112,32 @@ async function register(req, res, next) {
  *     responses:
  *       200:
  *         description: Login exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     displayName:
+ *                       type: string
+ *                     employeeId:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                     avatar:
+ *                       type: string
  *       400:
  *         description: Credenciales inválidas
+ *       403:
+ *         description: Usuario inactivo
  */
 async function login(req, res, next) {
     try {

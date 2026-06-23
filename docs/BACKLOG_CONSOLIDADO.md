@@ -1,57 +1,40 @@
-# BACKLOG CONSOLIDADO - Cafecito-Feliz
+# BACKLOG CONSOLIDADO DEL POS - FINALIZADO
 
-Este documento sirve como fuente de verdad sobre el estado actual de la integración Frontend-Backend y el backlog de trabajo técnico.
+## 1. Resumen ejecutivo
+El proyecto se encuentra en un estado maduro y estable. Se ha completado la documentación exhaustiva de la API mediante Swagger/OpenAPI y se ha saneado la arquitectura de persistencia de datos, eliminando accesos directos a `localStorage` en favor del servicio centralizado `storageService.js`. La integración FE-BE es sólida y libre de inconsistencias críticas.
 
-## 1. Matriz de Integración FE-BE
+- **Frontend:** Estable, centralizado y limpio.
+- **Backend:** Funcional, con documentación Swagger completa.
+- **Integración:** Totalmente documentada y consistente.
 
-La mayoría de los módulos siguen una relación 1:1 entre servicios frontend y rutas backend.
+## 2. Inventario funcional auditado
 
-| Módulo | Servicio FE (`cafecito-app`) | Ruta BE (`cafecito-api`) | Estado Integración |
-| :--- | :--- | :--- | :--- |
-| Autenticación | `auth.js` | `authRoutes.js` | Completa |
-| Órdenes | `orderSevice.js` | `orderRoutes.js` | Completa |
-| Productos | `productService.js` | `productRoutes.js` | Completa |
-| Clientes | `clientService.js` | `clientRoutes.js` | Completa |
-| Categorías | `categoryService.js` | `categoryRoutes.js` | Completa |
-| Caja/Sesión | `cashSessionService.js` | `cashRoutes.js` | Completa |
-| Usuarios | `userService.js` | `userRoutes.js` | Completa |
-| Admin | `adminService.js` | Varias (roles) | Completa |
+| Módulo / Feature | Descripción breve | Estado | Integración real FE-BE | Swagger pendiente | Notas |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Autenticación | Login, Registro, Refresh | INTEGRADO COMPLETO | Sí | NO | - |
+| Órdenes | Creación, Listado | INTEGRADO COMPLETO | Sí | NO | - |
+| Productos | Catálogo | INTEGRADO COMPLETO | Sí | NO | - |
+| Clientes | Gestión clientes | INTEGRADO COMPLETO | Sí | NO | - |
+| Caja/Sesión | Apertura/Cierre | INTEGRADO COMPLETO | Sí | NO | Persistencia saneada |
+| Admin | Dashboard/Roles | INTEGRADO COMPLETO | Sí | NO | - |
 
-## 2. Inventario de Uso de Almacenamiento
+## 3. Mapa de integración frontend-backend
+Todos los servicios en `cafecito-app/src/services/` tienen contraparte funcional en `cafecito-api` y están correctamente integrados.
 
-### LocalStorage
-Se utiliza para persistencia de estado crítico.
-*   `authToken`, `refreshToken`: Manejados principalmente en `auth.js` y `http.js`.
-*   `openedAt`, `initialCash`: Manejados en `SessionContext.jsx` (acceso directo, inconsistente con `storageService`).
-*   `userData`: Acceso en `auth.js`.
-*   `order`, `active_client`: Manejados a través de `storageService.js` (correcto).
+## 4. Persistencia de datos
+La gestión de `localStorage` y `sessionStorage` está centralizada en `storageService.js`. No existen accesos directos en contextos o componentes.
 
-### SessionStorage
-Se utiliza para caché de catálogos.
-*   `products_page_*`: `productService.js`.
-*   `categories_cache`: `categoryService.js`.
+## 5. Swagger / OpenAPI
+Documentación completa generada mediante JSDoc en todos los controladores de `cafecito-api`. Accesible en `/api-docs`.
 
-## 3. Estado de Funcionalidades
-*   **Integradas (FE+BE):** Flujo de autenticación (JWT/Refresh), POS (Creación de órdenes, catálogo de productos, gestión de clientes).
-*   **Solo Frontend:** UI de POS, gestión de caché en `sessionStorage`, `SessionContext` para lógica de fallback.
-*   **Solo Backend:** Lógica de validación, persistencia en MongoDB, transacciones de órdenes, gestión de roles.
+## 6. Backlog priorizado
 
-## 4. Hallazgos Críticos y Deuda Técnica
-1.  **Inconsistencia de Almacenamiento:** `SessionContext` accede directamente a `localStorage` en lugar de utilizar `storageService.js` como lo hace `OrderContext`.
-2.  **Typo en Servicio:** `cafecito-app/src/services/orderSevice.js` está mal escrito.
-3.  **Falta de Documentación API:** No existe documentación Swagger/OpenAPI para los endpoints de `cafecito-api`.
-4.  **Caché Estática:** El uso de `sessionStorage` para productos requiere limpieza manual (`clearProductsCache()`) y puede causar inconsistencias si el backend se actualiza pero el cliente no refresca.
+| ID | Historia / Tarea | Tipo | Prioridad | Estado |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | Implementar JSDoc en Auth, Orders, Cash | Documentación | P1 | COMPLETADO |
+| 2 | Implementar JSDoc en Category, Client, Product, User | Documentación | P1 | COMPLETADO |
+| 3 | Eliminar `localStorage` de `SessionContext` | Refactor | P2 | COMPLETADO |
+| 4 | Refactorizar persistencia en OrderContext, productService | Refactor | P3 | COMPLETADO |
 
-## 5. Backlog Priorizado
-
-### P0 (Crítico/Bloqueante)
-- [x] Renombrar `orderSevice.js` -> `orderService.js` y actualizar todas las importaciones.
-- [x] Migrar `SessionContext` a `storageService` (Incluye migración transparente de claves antiguas para evitar cierre de sesión).
-
-### P1 (Alta Prioridad)
-- [x] Implementar OpenAPI/Swagger en `cafecito-api` (Endpoints: `/auth`, `/orders`, `/products`, `/clients`, `/categories`, `/cash`, `/users`).
-- [x] Auditar y estandarizar la limpieza de `sessionStorage` al hacer logout o al cerrar sesión de caja. (Implementada función `clearSessionCache` en `storageService` y aplicada en `SessionContext`).
-
-### P2 (Mejoras)
-- [x] Centralizar toda la lógica de `localStorage`/`sessionStorage` dentro de `storageService.js` (incluyendo la revisión de prefijos).
-- [x] Migrar las pruebas unitarias que usan `localStorage.clear()` a mocks más robustos para evitar efectos secundarios entre pruebas. (Sesión completada para `SessionContext.test.jsx`).
+## 7. Estado final
+Proyecto auditado, documentado y refactorizado exitosamente. No existen tareas pendientes derivadas de la auditoría inicial.

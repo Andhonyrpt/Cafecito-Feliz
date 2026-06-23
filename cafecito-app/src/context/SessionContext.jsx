@@ -110,9 +110,7 @@ export function SessionProvider({ children }) {
 
                 const nowIsoString = new Date(data.timestamp).toISOString();
 
-                storageService.set('authToken', token);
-                storageService.set('openedAt', nowIsoString);
-                storageService.set('initialCash', data.amount);
+                storageService.saveSession(token, nowIsoString, Number(data.amount));
 
                 await createCashSession(Number(data.amount), nowIsoString);
 
@@ -142,11 +140,7 @@ export function SessionProvider({ children }) {
                     timestamp: data.timestamp
                 });
 
-                storageService.remove('authToken');
-                storageService.remove('openedAt');
-                storageService.remove('initialCash');
-
-                storageService.clearSessionCache();
+                storageService.clearSession();
 
                 setCurrentUser(null);
                 setSessionMode('open');

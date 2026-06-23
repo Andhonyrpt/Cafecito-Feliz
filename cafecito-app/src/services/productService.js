@@ -1,4 +1,5 @@
 import { http } from "./http";
+import storageService from "./storageService";
 
 export const fetchProducts = async (page, limit, category) => {
     let url = '/products';
@@ -13,38 +14,22 @@ export const fetchProducts = async (page, limit, category) => {
     }
 
     const cacheKey = `products_page_${page || 'all'}_limit_${limit || 'all'}_cat_${category || 'all'}`;
-    const cachedItem = sessionStorage.getItem(cacheKey);
+    const cachedData = storageService.getCache(cacheKey);
 
-    if (cachedItem) {
-        try {
-            const parsed = JSON.parse(cachedItem);
-            const isExpired = Date.now() - parsed.timestamp > 5 * 60 * 1000;
-
-            if (!isExpired) {
-                return parsed.data;
-            }
-        } catch (error) {
-            // Ignorar errores de parseo y forzar re-fetch
-        }
+    if (cachedData) {
+        return cachedData;
     }
 
     const res = await http.get(url);
     const result = res.data || { products: [], pagination: {} };
 
-    sessionStorage.setItem(cacheKey, JSON.stringify({
-        timestamp: Date.now(),
-        data: result
-    }));
+    storageService.setCache(cacheKey, result);
 
     return result;
 };
 
 export const clearProductsCache = () => {
-    Object.keys(sessionStorage).forEach((key) => {
-        if (key.startsWith("products_page_")) {
-            sessionStorage.removeItem(key);
-        }
-    });
+    storageService.clearSessionCache("products_page_");
 };
 
 export const createProduct = async (productData) => {

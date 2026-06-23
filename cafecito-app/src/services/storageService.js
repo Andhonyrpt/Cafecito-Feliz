@@ -66,10 +66,60 @@ const storageService = {
     },
 
     /**
-     * Limpia todo el almacenamiento de sesión específico de la aplicación.
+     * Guarda la sesión del usuario (token y datos de caja).
      */
-    clearSessionCache() {
+    saveSession(token, openedAt, initialCash) {
+        this.set('authToken', token);
+        this.set('openedAt', openedAt);
+        this.set('initialCash', initialCash);
+    },
+
+    /**
+     * Limpia la sesión del usuario y datos de caja.
+     */
+    clearSession() {
+        this.remove('authToken');
+        this.remove('openedAt');
+        this.remove('initialCash');
+        this.clearSessionCache();
+    },
+
+    /**
+     * Guarda un valor en sessionStorage con una marca de tiempo.
+     */
+    setCache(key, value) {
+        sessionStorage.setItem(key, JSON.stringify({
+            timestamp: Date.now(),
+            data: value
+        }));
+    },
+
+    /**
+     * Obtiene un valor de sessionStorage validando su tiempo de vida (TTL).
+     */
+    getCache(key, ttl = 5 * 60 * 1000) {
+        const cachedItem = sessionStorage.getItem(key);
+        if (!cachedItem) return null;
+
+        try {
+            const parsed = JSON.parse(cachedItem);
+            const isExpired = Date.now() - parsed.timestamp > ttl;
+
+            if (!isExpired) {
+                return parsed.data;
+            }
+        } catch (error) {
+            console.error(`Error reading cache: ${key}`, error);
+        }
+        return null;
+    },
+
+    /**
+     * Limpia todo el almacenamiento de sesión.
+     */
+    clearSessionCache(prefix = "") {
         Object.keys(sessionStorage)
+            .filter(key => key.startsWith(prefix))
             .forEach(key => sessionStorage.removeItem(key));
     },
 
