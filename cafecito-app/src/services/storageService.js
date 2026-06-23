@@ -43,6 +43,37 @@ const storageService = {
     },
 
     /**
+     * Intenta migrar una clave antigua sin prefijo a la nueva con prefijo.
+     * @param {string} oldKey 
+     * @param {string} newKey 
+     */
+    migrate(oldKey, newKey) {
+        const oldValue = localStorage.getItem(oldKey);
+        if (oldValue) {
+            try {
+                // Asumimos que el valor antiguo era un string JSON o valor directo
+                const parsedValue = JSON.parse(oldValue);
+                this.set(newKey, parsedValue);
+                localStorage.removeItem(oldKey);
+                console.log(`Migrated ${oldKey} to ${newKey}`);
+            } catch (e) {
+                // Si falla el parseo, guardamos como string directo
+                this.set(newKey, oldValue);
+                localStorage.removeItem(oldKey);
+                console.log(`Migrated ${oldKey} to ${newKey} (as string)`);
+            }
+        }
+    },
+
+    /**
+     * Limpia todo el almacenamiento de sesión específico de la aplicación.
+     */
+    clearSessionCache() {
+        Object.keys(sessionStorage)
+            .forEach(key => sessionStorage.removeItem(key));
+    },
+
+    /**
      * Elimina una clave.
      */
     remove(key) {

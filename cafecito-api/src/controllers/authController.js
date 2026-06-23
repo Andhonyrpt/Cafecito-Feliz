@@ -26,6 +26,31 @@ const generatePassword = async (password) => {
     return await bcrypt.hash(password, saltRounds);
 }
 
+/**
+ * @openapi
+ * /api/auth/register:
+ *   post:
+ *     summary: Registra un nuevo usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               displayName:
+ *                 type: string
+ *               employeeId:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               avatar:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Usuario registrado exitosamente
+ */
 async function register(req, res, next) {
     try {
         const { displayName, employeeId, password, avatar } = req.body;
@@ -56,6 +81,29 @@ async function register(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     summary: Inicia sesión de usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               employeeId:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ *       400:
+ *         description: Credenciales inválidas
+ */
 async function login(req, res, next) {
     try {
         const { employeeId, password } = req.body;
@@ -107,6 +155,20 @@ async function login(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresca el token de acceso
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Token refrescado exitosamente
+ *       401:
+ *         description: No se proporcionó token de refresco
+ *       403:
+ *         description: Token inválido o expirado
+ */
 async function refreshToken(req, res, next) {
     try {
         let token = req.body?.refreshToken;
@@ -149,10 +211,45 @@ async function refreshToken(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     summary: Cierra sesión de usuario
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada exitosamente
+ */
 async function logout(req, res, next) {
     res.status(200).json({ message: "Logged out successfully" });
 }
 
+/**
+ * @openapi
+ * /api/auth/verify-pin:
+ *   post:
+ *     summary: Verifica el PIN del usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               employeeId:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: PIN verificado correctamente
+ *       401:
+ *         description: PIN incorrecto
+ *       404:
+ *         description: Usuario no encontrado o inactivo
+ */
 async function verifyPin(req, res, next) {
     try {
         const { employeeId, password } = req.body;
@@ -176,6 +273,22 @@ async function verifyPin(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/auth/check-role/{employeeId}:
+ *   get:
+ *     summary: Comprueba el rol de un usuario
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: employeeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Rol del usuario obtenido
+ */
 async function checkRole(req, res, next) {
     try {
         const { employeeId } = req.params;

@@ -4,8 +4,17 @@ import { SessionProvider, useSession } from './SessionContext';
 import { getUserProfile } from '../services/userService';
 import { login, verifyEmployeePin } from '../services/auth';
 import { fetchTurnoTotals, createCashSession, closeCashSession, getActiveSession } from '../services/cashSessionService';
+import storageService from '../services/storageService';
 
-// Mock all services
+jest.mock('../services/storageService', () => ({
+  get: jest.fn(),
+  set: jest.fn(),
+  remove: jest.fn(),
+  clear: jest.fn(),
+  migrate: jest.fn(),
+  clearSessionCache: jest.fn(),
+}));
+
 jest.mock('../services/userService', () => ({
   getUserProfile: jest.fn()
 }));
@@ -21,7 +30,6 @@ jest.mock('../services/cashSessionService', () => ({
   closeCashSession: jest.fn(),
   getActiveSession: jest.fn()
 }));
-
 function SessionContextProbe() {
   const {
     currentUser,
@@ -61,12 +69,15 @@ function SessionContextProbe() {
 
 describe('SessionContext', () => {
   beforeEach(() => {
-    localStorage.clear();
+    storageService.clear();
     jest.clearAllMocks();
   });
 
   it('hydrates user session on mount when seller has an active session', async () => {
-    localStorage.setItem('authToken', 'test-token');
+    storageService.get.mockImplementation((key) => {
+      if (key === 'authToken') return 'test-token';
+      return null;
+    });
     getUserProfile.mockResolvedValueOnce({
       _id: 'user-1',
       displayName: 'Vendedor Test',
@@ -97,7 +108,10 @@ describe('SessionContext', () => {
   });
 
   it('forces session open modal if seller has no active session on mount', async () => {
-    localStorage.setItem('authToken', 'test-token');
+    storageService.get.mockImplementation((key) => {
+      if (key === 'authToken') return 'test-token';
+      return null;
+    });
     getUserProfile.mockResolvedValueOnce({
       _id: 'user-1',
       displayName: 'Vendedor Test',
@@ -119,7 +133,7 @@ describe('SessionContext', () => {
   });
 
   it('allows opening session via login', async () => {
-    getUserProfile.mockResolvedValueOnce(null); // No token initially
+    storageService.get.mockReturnValue(null); // No token initially
     
     login.mockResolvedValueOnce({
       data: {
@@ -153,7 +167,7 @@ describe('SessionContext', () => {
       password: '1234'
     });
     expect(createCashSession).toHaveBeenCalledWith(100, '2026-06-22T10:00:00.000Z');
-    expect(localStorage.getItem('authToken')).toBe('new-token');
+    expect(storageService.set).toHaveBeenCalledWith('authToken', 'new-token');
     expect(screen.getByTestId('user-name')).toHaveTextContent('Vendedor Test');
   });
 });

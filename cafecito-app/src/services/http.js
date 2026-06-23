@@ -1,4 +1,5 @@
 import axios from 'axios';
+import storageService from './storageService';
 
 const APP_BASE_URL = process.env.REACT_APP_API_URL;
 
@@ -18,7 +19,7 @@ export const http = axios.create({
 
 http.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('authToken');
+        const token = storageService.get('authToken');
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

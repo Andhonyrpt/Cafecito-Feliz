@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { getUserProfile } from "../services/userService";
 import { login, verifyEmployeePin } from "../services/auth";
 import Loading from '../components/atoms/Loading/Loading';
+import storageService from "../services/storageService";
 import { fetchTurnoTotals, createCashSession, closeCashSession, getActiveSession } from "../services/cashSessionService";
 
 const SessionContext = createContext();
@@ -13,10 +14,16 @@ export function SessionProvider({ children }) {
     const [expectedCash, setExpectedCash] = useState(0);
     const [loading, setLoading] = useState(true);
 
-
     useEffect(() => {
+        // Ejecutar migración única de claves al iniciar la app
+        storageService.migrate('authToken', 'authToken');
+        storageService.migrate('refreshToken', 'refreshToken');
+        storageService.migrate('userData', 'userData');
+        storageService.migrate('openedAt', 'openedAt');
+        storageService.migrate('initialCash', 'initialCash');
+
         const checkActiveSession = async () => {
-            const token = localStorage.getItem('authToken');
+            const token = storageService.get('authToken');
 
             if (token) {
                 try {
@@ -33,8 +40,8 @@ export function SessionProvider({ children }) {
                             }
                         } catch (err) {
                             console.error("Error fetching active vendor session from backend, falling back to localStorage", err);
-                            openedAt = localStorage.getItem('openedAt') || null;
-                            initialCash = Number(localStorage.getItem('initialCash')) || 0;
+                            openedAt = storageService.get('openedAt') || null;
+                            initialCash = Number(storageService.get('initialCash')) || 0;
                         }
                     } else if (user.role === 'barista') {
                         try {
@@ -44,7 +51,7 @@ export function SessionProvider({ children }) {
                             }
                         } catch (err) {
                             console.error("Error fetching active barista session from backend, falling back to localStorage", err);
-                            openedAt = localStorage.getItem('openedAt') || null;
+                            openedAt = storageService.get('openedAt') || null;
                         }
                     }
 
@@ -61,7 +68,7 @@ export function SessionProvider({ children }) {
                         setIsModalOpen(true);
                     }
                 } catch (error) {
-                    localStorage.removeItem('authToken');
+                    storageService.remove('authToken');
                     setIsModalOpen(true);
                 }
             } else {
@@ -103,9 +110,9 @@ export function SessionProvider({ children }) {
 
                 const nowIsoString = new Date(data.timestamp).toISOString();
 
-                localStorage.setItem('authToken', token);
-                localStorage.setItem('openedAt', nowIsoString);
-                localStorage.setItem('initialCash', data.amount);
+                storageService.set('authToken', token);
+                storageService.set('openedAt', nowIsoString);
+                storageService.set('initialCash', data.amount);
 
                 await createCashSession(Number(data.amount), nowIsoString);
 
@@ -120,7 +127,7 @@ export function SessionProvider({ children }) {
 
             } catch (error) {
                 console.error('Error en login:', error);
-                localStorage.removeItem('authToken');
+                storageService.remove('authToken');
                 return error.response?.data?.message;
             }
 
@@ -135,9 +142,11 @@ export function SessionProvider({ children }) {
                     timestamp: data.timestamp
                 });
 
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('openedAt');
-                localStorage.removeItem('initialCash');
+                storageService.remove('authToken');
+                storageService.remove('openedAt');
+                storageService.remove('initialCash');
+
+                storageService.clearSessionCache();
 
                 setCurrentUser(null);
                 setSessionMode('open');

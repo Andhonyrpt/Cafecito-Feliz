@@ -34,6 +34,16 @@ async function findAvailableBaristaForOrder() {
     return workload[0].barista;
 }
 
+/**
+ * @openapi
+ * /api/orders:
+ *   get:
+ *     summary: Obtiene las órdenes pendientes
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Lista de órdenes pendientes
+ */
 async function getOrders(req, res, next) {
     try {
 
@@ -59,6 +69,24 @@ async function getOrders(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/orders/{orderId}:
+ *   get:
+ *     summary: Obtiene una orden por su ID
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Orden obtenida
+ *       404:
+ *         description: Orden no encontrada
+ */
 async function getOrderById(req, res, next) {
     try {
         const { orderId } = req.params;
@@ -78,6 +106,22 @@ async function getOrderById(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/orders/client/{clientId}:
+ *   get:
+ *     summary: Obtiene órdenes de un cliente
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: clientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de órdenes del cliente
+ */
 async function getOrdersByClient(req, res, next) {
     try {
         const clientId = req.params.clientId;
@@ -111,6 +155,16 @@ async function getOrdersByClient(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/orders/my-shift:
+ *   get:
+ *     summary: Obtiene órdenes del turno actual
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Resumen de ventas y órdenes del turno
+ */
 async function getMyShiftOrders(req, res, next) {
     try {
         const { userId, role } = req.user;
@@ -213,6 +267,16 @@ function getSalesSeriesLabel(date, range) {
     return new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short' }).format(date);
 }
 
+/**
+ * @openapi
+ * /api/orders/admin/sales-summary:
+ *   get:
+ *     summary: Obtiene resumen de ventas para admin
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Resumen de ventas
+ */
 async function getAdminSalesSummary(req, res, next) {
     try {
         const range = req.query.range || 'day';
@@ -290,6 +354,16 @@ async function getAdminSalesSummary(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/orders/admin/list:
+ *   get:
+ *     summary: Obtiene lista de órdenes para admin
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Lista de órdenes
+ */
 async function getAdminOrders(req, res, next) {
     try {
         const {
@@ -362,6 +436,16 @@ async function getAdminOrders(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/orders:
+ *   post:
+ *     summary: Crea una nueva orden
+ *     tags: [Orders]
+ *     responses:
+ *       201:
+ *         description: Orden creada exitosamente
+ */
 async function createOrder(req, res, next) {
     try {
         const {
@@ -519,6 +603,22 @@ async function createOrder(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/orders/{orderId}/status:
+ *   patch:
+ *     summary: Actualiza el estado de una orden
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Orden actualizada exitosamente
+ */
 async function updateOrderStatus(req, res, next) {
     try {
         const { orderId } = req.params;
@@ -561,6 +661,16 @@ async function updateOrderStatus(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/orders/preview:
+ *   post:
+ *     summary: Previsualiza el total de una orden
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Resumen financiero de la previsualización
+ */
 async function previewOrder(req, res, next) {
     try {
         const { products, client } = req.body;

@@ -1,5 +1,15 @@
 import Product from "../models/product.js";
 
+/**
+ * @openapi
+ * /api/products:
+ *   get:
+ *     summary: Obtiene todos los productos
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Lista de productos
+ */
 async function getProducts(req, res, next) {
     try {
         const { page, limit, category } = req.query;
@@ -58,6 +68,24 @@ async function getProducts(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/products/{productId}:
+ *   get:
+ *     summary: Obtiene un producto por su ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Producto obtenido
+ *       404:
+ *         description: Producto no encontrado
+ */
 async function getProductById(req, res, next) {
     try {
         const { productId } = req.params;
@@ -75,6 +103,22 @@ async function getProductById(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/products/category/{categoryId}:
+ *   get:
+ *     summary: Obtiene productos por categoría
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de productos
+ */
 async function getProductByCategory(req, res, next) {
     try {
         const { categoryId } = req.params;
@@ -90,6 +134,16 @@ async function getProductByCategory(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/products:
+ *   post:
+ *     summary: Crea un nuevo producto
+ *     tags: [Products]
+ *     responses:
+ *       201:
+ *         description: Producto creado exitosamente
+ */
 async function createProduct(req, res, next) {
     try {
         const { name, price, stock, imageUrl, parentCategory } = req.body;
@@ -113,6 +167,24 @@ async function createProduct(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/products/{productId}:
+ *   put:
+ *     summary: Actualiza un producto
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Producto actualizado exitosamente
+ *       404:
+ *         description: Producto no encontrado
+ */
 async function updateProduct(req, res, next) {
     try {
         const { productId } = req.params;
@@ -150,6 +222,24 @@ async function updateProduct(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/products/{productId}:
+ *   delete:
+ *     summary: Elimina un producto
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Producto eliminado exitosamente
+ *       404:
+ *         description: Producto no encontrado
+ */
 async function deleteProduct(req, res, next) {
     try {
         const { productId } = req.params;
