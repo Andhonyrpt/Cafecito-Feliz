@@ -4,7 +4,7 @@ import OrderPanel from './OrderPanel';
 import { useOrder } from '../../../context/OrderContext';
 import { useSession } from '../../../context/SessionContext.jsx';
 import { clearProductsCache } from '../../../services/productService.js';
-import { createOrder, previewOrder } from '../../../services/orderSevice.js';
+import { createOrder, previewOrder } from '../../../services/orderService.js';
 import { getUserProfile } from '../../../services/userService.js';
 
 jest.mock('../../../context/OrderContext', () => ({
@@ -19,7 +19,7 @@ jest.mock('../../../services/productService.js', () => ({
   clearProductsCache: jest.fn()
 }));
 
-jest.mock('../../../services/orderSevice.js', () => ({
+jest.mock('../../../services/orderService.js', () => ({
   createOrder: jest.fn(),
   previewOrder: jest.fn()
 }));

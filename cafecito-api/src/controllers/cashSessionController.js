@@ -17,6 +17,16 @@ async function assignUnassignedPendingOrdersToBarista(baristaId) {
     );
 }
 
+/**
+ * @openapi
+ * /api/total-cash/orders:
+ *   get:
+ *     summary: Obtiene el total del turno
+ *     tags: [CashSession]
+ *     responses:
+ *       200:
+ *         description: Total del turno obtenido
+ */
 async function getTurnoTotal(req, res, next) {
     try {
         const { userId } = req.user;
@@ -50,6 +60,16 @@ async function getTurnoTotal(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/total-cash/open:
+ *   post:
+ *     summary: Abre una sesión de caja
+ *     tags: [CashSession]
+ *     responses:
+ *       201:
+ *         description: Sesión de caja abierta exitosamente
+ */
 async function openCashSession(req, res, next) {
     try {
 
@@ -120,6 +140,16 @@ async function openCashSession(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/total-cash/close:
+ *   post:
+ *     summary: Cierra una sesión de caja
+ *     tags: [CashSession]
+ *     responses:
+ *       200:
+ *         description: Sesión de caja cerrada exitosamente
+ */
 async function closeCashSession(req, res, next) {
     try {
         const { userId, role } = req.user;
@@ -203,6 +233,16 @@ async function closeCashSession(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/total-cash/admin/sessions:
+ *   get:
+ *     summary: Obtiene sesiones de caja para admin
+ *     tags: [CashSession]
+ *     responses:
+ *       200:
+ *         description: Lista de sesiones de caja
+ */
 async function getAdminCashSessions(req, res, next) {
     try {
         const { status, role, employeeId, from, to, page = 1, limit = 10 } = req.query;
@@ -330,6 +370,16 @@ async function getAdminCashSessions(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/total-cash/active:
+ *   get:
+ *     summary: Obtiene la sesión de caja activa
+ *     tags: [CashSession]
+ *     responses:
+ *       200:
+ *         description: Sesión de caja activa obtenida
+ */
 async function getActiveSession(req, res, next) {
     try {
         const { userId, role } = req.user;

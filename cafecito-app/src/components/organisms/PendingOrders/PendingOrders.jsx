@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "../../atoms/Button/Button";
 import Icon from "../../atoms/Icon";
-import { getPendingOrders, updateOrderStatus } from "../../../services/orderSevice";
+import { getPendingOrders, updateOrderStatus } from "../../../services/orderService";
 import "./PendingOrders.css";
 
 export default function PendingOrders() {

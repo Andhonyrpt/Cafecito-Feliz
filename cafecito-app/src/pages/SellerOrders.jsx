@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../components/atoms/Button/Button';
 import Icon from '../components/atoms/Icon';
 import Receipt from '../components/organisms/Receipt/Receipt';
-import { getMyShiftOrders } from '../services/orderSevice';
+import { getMyShiftOrders } from '../services/orderService';
 import './SellerOrders.css';
 
 const formatCurrency = (value = 0) => {

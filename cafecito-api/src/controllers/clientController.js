@@ -1,5 +1,15 @@
 import Client from "../models/client.js";
 
+/**
+ * @openapi
+ * /api/clients:
+ *   get:
+ *     summary: Obtiene todos los clientes
+ *     tags: [Clients]
+ *     responses:
+ *       200:
+ *         description: Lista de clientes
+ */
 async function getClients(req, res, next) {
     try {
         const { page, limit } = req.query;
@@ -41,6 +51,16 @@ async function getClients(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/clients:
+ *   post:
+ *     summary: Crea un nuevo cliente
+ *     tags: [Clients]
+ *     responses:
+ *       201:
+ *         description: Cliente creado exitosamente
+ */
 async function createClient(req, res, next) {
     try {
         const { displayName, email } = req.body;
@@ -65,6 +85,24 @@ async function createClient(req, res, next) {
     }
 }
 
+/**
+ * @openapi
+ * /api/clients/{clientId}:
+ *   put:
+ *     summary: Actualiza un cliente
+ *     tags: [Clients]
+ *     parameters:
+ *       - in: path
+ *         name: clientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cliente actualizado exitosamente
+ *       404:
+ *         description: Cliente no encontrado
+ */
 async function updateClient(req, res, next) {
     try {
         const { clientId } = req.params;
@@ -99,6 +137,16 @@ async function updateClient(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/clients/check-email:
+ *   get:
+ *     summary: Comprueba si un email está en uso
+ *     tags: [Clients]
+ *     responses:
+ *       200:
+ *         description: Resultado de la comprobación
+ */
 async function checkEmail(req, res, next) {
     try {
         const email = String(req.query.email || "")
@@ -112,6 +160,16 @@ async function checkEmail(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/clients/search:
+ *   get:
+ *     summary: Busca un cliente
+ *     tags: [Clients]
+ *     responses:
+ *       200:
+ *         description: Lista de clientes encontrados
+ */
 async function searchClient(req, res, next) {
     try {
         const { search } = req.query;

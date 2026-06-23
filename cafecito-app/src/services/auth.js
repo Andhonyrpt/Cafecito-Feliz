@@ -1,7 +1,7 @@
 import { http } from "./http";
+import storageService from "./storageService";
 
 export const register = async (userData) => {
-
     try {
         const response = await http.post("/auth/register", userData);
         const { user } = response.data;
@@ -24,8 +24,8 @@ export const login = async (credentials) => {
         const { token, refreshToken } = response.data;
 
         if (token) {
-            localStorage.setItem("authToken", token);
-            localStorage.setItem("refreshToken", refreshToken);
+            storageService.set("authToken", token);
+            storageService.set("refreshToken", refreshToken);
 
             return response;
         } else {
@@ -34,13 +34,13 @@ export const login = async (credentials) => {
 
     } catch (error) {
         console.error("Error al iniciar sesión del usuario", error.message);
-        throw error; //  Vital para que el modal pinte "PIN incorrecto"
+        throw error;
     }
 };
 
 export const refresh = async () => {
     try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = storageService.get('refreshToken');
 
         if (!refreshToken) return null;
 
@@ -49,8 +49,8 @@ export const refresh = async () => {
         const { token, refreshToken: newRefreshToken } = response.data;
 
         if (token) {
-            localStorage.setItem("authToken", token);
-            localStorage.setItem("refreshToken", newRefreshToken);
+            storageService.set("authToken", token);
+            storageService.set("refreshToken", newRefreshToken);
             return token;
         }
 
@@ -65,9 +65,9 @@ export const refresh = async () => {
 export const logout = async () => {
     try {
         await http.post("/auth/logout");
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("userData");
+        storageService.remove("authToken");
+        storageService.remove("refreshToken");
+        storageService.remove("userData");
         return true;
     } catch (error) {
         console.error("Error al cerrar sesión", error);
@@ -88,7 +88,7 @@ export const verifyEmployeePin = async (employeeId, pin) => {
     }
 };
 
-export const checkEmployeeRole = async (employeeId, token = localStorage.getItem('authToken')) => {
+export const checkEmployeeRole = async (employeeId, token = storageService.get('authToken')) => {
     try {
         const response = await http.get(`/auth/check-role/${employeeId}`, token ? {
             headers: { Authorization: `Bearer ${token}` }

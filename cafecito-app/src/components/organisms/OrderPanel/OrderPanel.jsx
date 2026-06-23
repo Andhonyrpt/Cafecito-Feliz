@@ -2,7 +2,7 @@ import { lazy, Suspense, useState, useEffect, useRef } from "react";
 import { useOrder } from "../../../context/OrderContext";
 import { useSession } from "../../../context/SessionContext.jsx";
 import { clearProductsCache } from "../../../services/productService.js";
-import { createOrder, previewOrder } from "../../../services/orderSevice.js";
+import { createOrder, previewOrder } from "../../../services/orderService.js";
 import { getUserProfile } from "../../../services/userService.js";
 import Button from "../../atoms/Button/Button.jsx";
 import Icon from "../../atoms/Icon";

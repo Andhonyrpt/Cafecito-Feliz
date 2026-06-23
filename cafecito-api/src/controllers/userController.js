@@ -1,7 +1,16 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 
-// Obtener perfil del usuario autenticado
+/**
+ * @openapi
+ * /api/users/profile:
+ *   get:
+ *     summary: Obtiene el perfil del usuario autenticado
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Perfil de usuario obtenido
+ */
 const getUserProfile = async (req, res, next) => {
     try {
         const userId = req.user.userId // Middleware de autenticación
@@ -22,7 +31,16 @@ const getUserProfile = async (req, res, next) => {
     }
 };
 
-// Obtener todos los usuarios (solo admin)
+/**
+ * @openapi
+ * /api/users:
+ *   get:
+ *     summary: Obtiene todos los usuarios
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Lista de usuarios
+ */
 async function getUsers(req, res, next) {
     try {
         const { page = 1, limit = 10, employeeId, role, isActive } = req.query;
@@ -59,7 +77,24 @@ async function getUsers(req, res, next) {
     }
 }
 
-// Obtener usuario por ID (solo admin)
+/**
+ * @openapi
+ * /api/users/{userId}:
+ *   get:
+ *     summary: Obtiene un usuario por su ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Usuario obtenido
+ *       404:
+ *         description: Usuario no encontrado
+ */
 async function getUserById(req, res, next) {
     try {
         const { userId } = req.params;
@@ -79,7 +114,24 @@ async function getUserById(req, res, next) {
     }
 };
 
-// Actualizar usuario (solo admin)
+/**
+ * @openapi
+ * /api/users/{userId}:
+ *   put:
+ *     summary: Actualiza un usuario
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Usuario actualizado exitosamente
+ *       404:
+ *         description: Usuario no encontrado
+ */
 async function updateUser(req, res, next) {
     try {
         const { userId } = req.params;
@@ -124,7 +176,24 @@ async function updateUser(req, res, next) {
     }
 };
 
-// Activar/Desactivar usuario (solo admin)
+/**
+ * @openapi
+ * /api/users/toggle-status/{userId}:
+ *   patch:
+ *     summary: Activa/Desactiva un usuario
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Estado del usuario actualizado
+ *       404:
+ *         description: Usuario no encontrado
+ */
 async function toggleUserStatus(req, res, next) {
     try {
         const { userId } = req.params;
@@ -149,7 +218,16 @@ async function toggleUserStatus(req, res, next) {
     }
 };
 
-// Crear usuario (solo admin)
+/**
+ * @openapi
+ * /api/users:
+ *   post:
+ *     summary: Crea un nuevo usuario
+ *     tags: [Users]
+ *     responses:
+ *       201:
+ *         description: Usuario creado exitosamente
+ */
 async function createUser(req, res, next) {
     try {
         const { displayName, employeeId, password, role, avatar, isActive } = req.body;

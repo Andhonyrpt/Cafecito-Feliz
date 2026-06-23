@@ -1,6 +1,16 @@
 import Category from "../models/category.js";
 import Product from "../models/product.js";
 
+/**
+ * @openapi
+ * /api/categories:
+ *   get:
+ *     summary: Obtiene todas las categorías
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Lista de categorías
+ */
 async function getCategories(req, res, next) {
     try {
         const { page, limit } = req.query;
@@ -42,6 +52,24 @@ async function getCategories(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/categories/{categoryId}:
+ *   get:
+ *     summary: Obtiene una categoría por su ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Categoría obtenida
+ *       404:
+ *         description: Categoría no encontrada
+ */
 async function getCategoryById(req, res, next) {
     try {
         const category = await Category.findById(req.params.categoryId).populate('parentCategory');
@@ -57,6 +85,16 @@ async function getCategoryById(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/categories:
+ *   post:
+ *     summary: Crea una nueva categoría
+ *     tags: [Categories]
+ *     responses:
+ *       201:
+ *         description: Categoría creada exitosamente
+ */
 async function createCategory(req, res, next) {
     try {
         const { name, imageUrl, parentCategory } = req.body;
@@ -75,6 +113,24 @@ async function createCategory(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/categories/{categoryId}:
+ *   put:
+ *     summary: Actualiza una categoría
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Categoría actualizada exitosamente
+ *       404:
+ *         description: Categoría no encontrada
+ */
 async function updateCategory(req, res, next) {
     try {
         const { name, imageUrl, parentCategory } = req.body;
@@ -112,6 +168,26 @@ async function updateCategory(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/categories/{categoryId}:
+ *   delete:
+ *     summary: Elimina una categoría
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Categoría eliminada exitosamente
+ *       400:
+ *         description: La categoría tiene productos asociados
+ *       404:
+ *         description: Categoría no encontrada
+ */
 async function deleteCategory(req, res, next) {
     try {
         const { categoryId } = req.params;
@@ -137,6 +213,16 @@ async function deleteCategory(req, res, next) {
     }
 };
 
+/**
+ * @openapi
+ * /api/categories/search:
+ *   get:
+ *     summary: Busca categorías
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Lista de categorías encontradas
+ */
 async function searchCategories(req, res, next) {
     try {
         const {

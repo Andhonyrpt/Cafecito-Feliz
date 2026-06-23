@@ -4,6 +4,8 @@ import dbConnection from './src/config/database.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './src/config/swagger.js';
 import errorHandler from './src/middlewares/errorHandler.js';
 import setupGlobalErrorHandlers from "./src/middlewares/globalerrorHandler.js";
 import routes from './src/routes/index.js';
@@ -52,6 +54,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', routes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use((req, res) => {
     res.status(404).json({
