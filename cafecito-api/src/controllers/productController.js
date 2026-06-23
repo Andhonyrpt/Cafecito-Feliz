@@ -9,6 +9,17 @@ import Product from "../models/product.js";
  *     responses:
  *       200:
  *         description: Lista de productos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 pagination:
+ *                   type: object
  */
 async function getProducts(req, res, next) {
     try {

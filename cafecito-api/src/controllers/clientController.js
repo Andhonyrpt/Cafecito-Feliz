@@ -9,6 +9,15 @@ import Client from "../models/client.js";
  *     responses:
  *       200:
  *         description: Lista de clientes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 clients:
+ *                   type: array
+ *                   items:
+ *                     type: object
  */
 async function getClients(req, res, next) {
     try {

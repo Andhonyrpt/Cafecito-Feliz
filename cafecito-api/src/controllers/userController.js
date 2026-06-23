@@ -40,6 +40,19 @@ const getUserProfile = async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Lista de usuarios
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 pagination:
+ *                   type: object
  */
 async function getUsers(req, res, next) {
     try {

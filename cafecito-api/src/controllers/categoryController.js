@@ -10,6 +10,15 @@ import Product from "../models/product.js";
  *     responses:
  *       200:
  *         description: Lista de categorías
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 categories:
+ *                   type: array
+ *                   items:
+ *                     type: object
  */
 async function getCategories(req, res, next) {
     try {

@@ -43,6 +43,15 @@ async function findAvailableBaristaForOrder() {
  *     responses:
  *       200:
  *         description: Lista de órdenes pendientes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 orders:
+ *                   type: array
+ *                   items:
+ *                     type: object
  */
 async function getOrders(req, res, next) {
     try {
@@ -442,9 +451,46 @@ async function getAdminOrders(req, res, next) {
  *   post:
  *     summary: Crea una nueva orden
  *     tags: [Orders]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               client:
+ *                 type: string
+ *               products:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     productId:
+ *                       type: string
+ *                     quantity:
+ *                       type: number
+ *                     notes:
+ *                       type: string
+ *               paymentMethod:
+ *                 type: string
+ *                 enum: [efectivo, tarjeta]
+ *               orderType:
+ *                 type: string
+ *                 enum: [local, llevar]
  *     responses:
  *       201:
  *         description: Orden creada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 orderNumber:
+ *                   type: number
+ *                 totalPrice:
+ *                   type: number
  */
 async function createOrder(req, res, next) {
     try {

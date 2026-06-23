@@ -26,6 +26,18 @@ async function assignUnassignedPendingOrdersToBarista(baristaId) {
  *     responses:
  *       200:
  *         description: Total del turno obtenido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 openedAt:
+ *                   type: string
+ *                   format: date-time
+ *                 cashSales:
+ *                   type: number
  */
 async function getTurnoTotal(req, res, next) {
     try {
@@ -66,9 +78,30 @@ async function getTurnoTotal(req, res, next) {
  *   post:
  *     summary: Abre una sesión de caja
  *     tags: [CashSession]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               initialCash:
+ *                 type: number
+ *               timestamp:
+ *                 type: string
+ *                 format: date-time
  *     responses:
  *       201:
  *         description: Sesión de caja abierta exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 session:
+ *                   type: object
  */
 async function openCashSession(req, res, next) {
     try {
@@ -146,9 +179,34 @@ async function openCashSession(req, res, next) {
  *   post:
  *     summary: Cierra una sesión de caja
  *     tags: [CashSession]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pin:
+ *                 type: string
+ *               isCashCorrect:
+ *                 type: boolean
+ *               discrepancyReason:
+ *                 type: string
+ *               timestamp:
+ *                 type: string
+ *                 format: date-time
  *     responses:
  *       200:
  *         description: Sesión de caja cerrada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 session:
+ *                   type: object
  */
 async function closeCashSession(req, res, next) {
     try {
@@ -242,6 +300,19 @@ async function closeCashSession(req, res, next) {
  *     responses:
  *       200:
  *         description: Lista de sesiones de caja
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 summary:
+ *                   type: object
+ *                 pagination:
+ *                   type: object
  */
 async function getAdminCashSessions(req, res, next) {
     try {
@@ -379,6 +450,15 @@ async function getAdminCashSessions(req, res, next) {
  *     responses:
  *       200:
  *         description: Sesión de caja activa obtenida
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 session:
+ *                   type: object
+ *                 baristaSession:
+ *                   type: object
  */
 async function getActiveSession(req, res, next) {
     try {
